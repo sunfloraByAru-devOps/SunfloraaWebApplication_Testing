@@ -1,0 +1,37 @@
+---
+import '../pages/index.css';
+
+import "../styles/global.css";
+const {
+  title = "My Website",
+  description = "My awesome website",
+} = Astro.props;
+---
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400;1,700&display=swap');
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Basic SEO -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+
+    <!-- Title -->
+    <title>{title}</title>
+
+    <!-- Open Graph (for social sharing) -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+  </head>
+
+  <body class="paper-grain min-h-screen relative">
+    <slot />
+  </body>
+</html>

@@ -1,0 +1,900 @@
+---
+// index.astro — Sunflora Landing Page
+// All sections inline, no JSX component imports, no framer-motion dependency.
+// Animations handled via CSS + Intersection Observer. Accordion via <details>.
+const LOGO = "/logo.JPG";
+
+import HERO from "../assets/sun_on_desk.png";
+import SUN_CLOSEUP from "../assets/sun_on_desk_closeup.png";
+import STARS from "../assets/stars.png";
+import FOUNDER from "../assets/ldki.jpg";
+import DINO from "../assets/green-dino.jpg";
+import SUNMOON from "../assets/sun_and_moon.jpg";
+import SPIDEY from "../assets/spiderman.jpg";
+const navLinks = [
+  { label: "Shop",    href: "#featured" },
+  { label: "Story",   href: "#story"    },
+  { label: "Customs", href: "#custom"   },
+  { label: "Journal", href: "#gallery"  },
+  { label: "FAQ",     href: "#faq"      },
+];
+
+const products = [
+  { id: 1, name: "Sunshine Amigurumi", price: "₹ 649", tag: "Best seller", img: SUN_CLOSEUP },
+  { id: 2, name: "Lil' Dino Keychain", price: "₹ 249", tag: "New",         img: DINO        },
+  { id: 3, name: "Sun & Moon Pair",    price: "₹ 449", tag: "Set of 2",    img: SUNMOON     },
+  { id: 4, name: "Spidey Hanging",     price: "₹ 549", tag: "Limited",     img: SPIDEY      },
+];
+
+const categories = [
+  { name: "Amigurumi",     count: "24 pieces"  },
+  { name: "Keychains",     count: "18 pieces"  },
+  { name: "Flower stems",  count: "12 pieces"  },
+  { name: "Wall hangings", count: "9 pieces"   },
+  { name: "Customs",       count: "By request" },
+];
+
+const customSteps = [
+  { num: "01", title: "Dream",   text: "Send us a photo, a memory, a moodboard — even a doodle. We'll listen." },
+  { num: "02", title: "Craft",   text: "We sketch, choose yarns together, and hook your piece over 5–14 days." },
+  { num: "03", title: "Deliver", text: "Wrapped in kraft paper, twine, and a handwritten note — straight to your door." },
+];
+
+const testimonials = [
+  { q: "It arrived like a letter from someone who knew me.",         who: "— Sneha, Mumbai"    },
+  { q: "My daughter named hers Buttercup. We bought three more.",   who: "— Rhea, Bengaluru"  },
+  { q: "It outlived the trend it replaced. That's the point.",      who: "— Aarav, Delhi"     },
+  { q: "Wrapped, written, witnessed. A whole little world.",        who: "— Meera, Pune"      },
+];
+
+const galleryTiles = [
+  { src: HERO,      span: "col-span-2 row-span-2", alt: "Crochet sun on pegboard"  },
+  { src: STARS,     span: "",                       alt: "Crochet stars"            },
+  { src: DINO,      span: "",                       alt: "Dino keychain"            },
+  { src: SUNMOON,   span: "col-span-2",             alt: "Sun and moon set"         },
+  { src: SUN_CLOSEUP, span: "",                     alt: "Sun close-up"             },
+  { src: SPIDEY,    span: "",                       alt: "Spidey hanging"           },
+];
+
+const faqItems = [
+  { q: "How long does an order take?",          a: "Most ready-made pieces ship within 3–5 days. Custom orders take 5–14 days depending on complexity — we'll always share a timeline before we start." },
+  { q: "Do you ship internationally?",          a: "Yes — we ship worldwide. International orders are sent via tracked mail and usually arrive within 7–14 working days." },
+  { q: "Can I order a piece in custom colours?", a: "Absolutely. Send us a reference, and we'll match colours from our cotton library. You'll get a swatch photo for approval before we begin." },
+  { q: "How do I care for my crochet piece?",   a: "Gently spot clean with mild soap and cold water. Air dry flat, away from direct sun. Each package comes with a care card." },
+  { q: "Are returns possible?",                 a: "Because each piece is handmade, we don't accept returns — but if something is genuinely wrong, write to us and we'll make it right." },
+];
+
+const marqueeWords = ["Amigurumi","Keychains","Flower stems","Wall hangings","Bouquets","Custom orders","Gift sets"];
+const marqueeItems = [...marqueeWords, ...marqueeWords, ...marqueeWords];
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sunflora — Handmade Crochet Studio</title>
+  <meta name="description" content="Sunflora is a small crochet studio crafting heirloom-feel keepsakes — sun-bright amigurumi, blooming flowers, and tiny companions." />
+
+  <!-- Tailwind CDN (swap for your project's Tailwind setup) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── Base ── */
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      font-family: 'Jost', sans-serif;
+      background-color: #EFE8DA;
+      color: #1A1815;
+      overflow-x: hidden;
+    }
+
+    .font-serif-display { font-family: 'Cormorant Garamond', serif; }
+
+    /* ── Grain overlay ── */
+    .paper-grain::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.35;
+    }
+
+    /* ── Hover underline ── */
+    .hover-underline {
+      position: relative;
+      text-decoration: none;
+    }
+    .hover-underline::after {
+      content: '';
+      position: absolute;
+      bottom: -2px; left: 0;
+      width: 0; height: 1px;
+      background: currentColor;
+      transition: width 0.4s ease;
+    }
+    .hover-underline:hover::after { width: 100%; }
+
+    /* ── Squiggle underline ── */
+    .squiggle {
+      text-decoration: underline wavy #C8862C;
+      text-underline-offset: 6px;
+    }
+
+    /* ── Marquee ── */
+    @keyframes marquee {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-33.333%); }
+    }
+    .marquee-track {
+      animation: marquee 28s linear infinite;
+      will-change: transform;
+    }
+
+    /* ── Scroll-reveal animations ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1),
+                  transform 0.9s cubic-bezier(0.16,1,0.3,1);
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* stagger delays */
+    .reveal-d1 { transition-delay: 0.12s; }
+    .reveal-d2 { transition-delay: 0.24s; }
+    .reveal-d3 { transition-delay: 0.36s; }
+    .reveal-d4 { transition-delay: 0.48s; }
+
+    /* hero loads immediately */
+    .reveal-hero {
+      opacity: 0;
+      transform: translateY(28px);
+      animation: heroReveal 0.9s cubic-bezier(0.16,1,0.3,1) forwards;
+    }
+    .reveal-hero.d1 { animation-delay: 0.12s; }
+    .reveal-hero.d2 { animation-delay: 0.24s; }
+    .reveal-hero.d3 { animation-delay: 0.36s; }
+    .reveal-hero.d4 { animation-delay: 0.48s; }
+    .reveal-hero.d5 { animation-delay: 0.60s; }
+    .reveal-hero-img {
+      opacity: 0;
+      transform: translateY(40px);
+      animation: heroReveal 1.2s cubic-bezier(0.16,1,0.3,1) 0.2s forwards;
+    }
+    @keyframes heroReveal {
+      to { opacity: 1; transform: none; }
+    }
+
+    /* scroll indicator pulse */
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    .animate-pulse { animation: pulse 2s ease-in-out infinite; }
+
+    /* ── FAQ / Accordion ── */
+    details summary { list-style: none; cursor: pointer; }
+    details summary::-webkit-details-marker { display: none; }
+    details[open] .faq-icon-plus  { display: none; }
+    details:not([open]) .faq-icon-minus { display: none; }
+    details[open] summary .faq-q { color: #C8862C; }
+
+    /* ── Nav scrolled state (JS toggles class) ── */
+    #site-header.scrolled {
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+      backdrop-filter: blur(12px);
+      background-color: rgba(239,232,218,0.8);
+      border-bottom: 1px solid rgba(26,24,21,0.08);
+    }
+
+    /* ── Mobile menu ── */
+    #mobile-menu {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s cubic-bezier(0.16,1,0.3,1),
+                  opacity 0.3s ease;
+      opacity: 0;
+    }
+    #mobile-menu.open {
+      max-height: 600px;
+      opacity: 1;
+    }
+
+    /* ── Product card hover ── */
+    .product-card:hover .product-overlay { opacity: 1; background-color: rgba(26,24,21,0.15); }
+    .product-card:hover .product-img { transform: scale(1.05); }
+    .product-img { transition: transform 1200ms ease-out; }
+    .product-overlay {
+      opacity: 0;
+      background-color: transparent;
+      transition: opacity 0.7s, background-color 0.7s;
+    }
+
+    /* ── Category row hover ── */
+    .cat-row:hover .cat-name { color: #C8862C; font-style: italic; }
+    .cat-row:hover .cat-arrow { transform: rotate(45deg); color: #C8862C; }
+    .cat-name  { transition: color 0.5s, font-style 0.5s; }
+    .cat-arrow { transition: transform 0.5s, color 0.5s; }
+  </style>
+</head>
+
+<body class="paper-grain min-h-screen relative">
+
+<!-- ═══════════════ NAV ═══════════════ -->
+<header
+  id="site-header"
+  data-testid="site-header"
+  class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 py-6"
+>
+  <div class="max-w-[1400px] mx-auto px-6 md:px-12 flex items-center justify-between">
+    <!-- Logo -->
+    <a href="#top" data-testid="nav-logo" class="flex items-center gap-2">
+      <span class="font-serif-display text-3xl md:text-[34px] italic font-medium tracking-tight text-[#1A1815]">
+        Sunflora
+      </span>
+      <span class="w-2.5 h-2.5 rounded-full bg-[#C8862C] -ml-1 mt-3"></span>
+    </a>
+
+    <!-- Desktop nav -->
+    <nav class="hidden md:flex items-center gap-10">
+      {navLinks.map(l => (
+        <a
+          href={l.href}
+          data-testid={`nav-link-${l.label.toLowerCase()}`}
+          class="hover-underline text-sm tracking-wide text-[#1A1815]/80 hover:text-[#1A1815]"
+        >{l.label}</a>
+      ))}
+    </nav>
+
+    <a
+      href="#cta"
+      data-testid="nav-cta-button"
+      class="hidden md:inline-flex items-center gap-2 bg-[#1A1815] text-[#EFE8DA] px-5 py-2.5 text-sm tracking-wide hover:bg-[#C8862C] transition-colors duration-500"
+    >
+      Inquire
+      <!-- ArrowUpRight -->
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+    </a>
+
+    <!-- Hamburger -->
+    <button
+      id="menu-toggle"
+      data-testid="mobile-menu-toggle"
+      class="md:hidden text-[#1A1815]"
+      aria-label="Toggle menu"
+    >
+      <!-- Menu icon (shown when closed) -->
+      <svg id="icon-menu" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      <!-- X icon (shown when open) -->
+      <svg id="icon-close" class="hidden" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+
+  <!-- Mobile drawer -->
+  <div id="mobile-menu" class="md:hidden bg-[#EFE8DA] border-t border-[rgba(26,24,21,0.08)]">
+    <div class="px-6 py-6 flex flex-col gap-5">
+      {navLinks.map(l => (
+        <a
+          href={l.href}
+          class="mobile-nav-link font-serif-display text-3xl italic text-[#1A1815]"
+        >{l.label}</a>
+      ))}
+      <a
+        href="#cta"
+        class="mobile-nav-link mt-2 inline-flex items-center gap-2 bg-[#1A1815] text-[#EFE8DA] px-5 py-3 text-sm w-fit"
+      >
+        Inquire
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+      </a>
+    </div>
+  </div>
+</header>
+
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<section id="top" data-testid="hero-section" class="relative pt-36 md:pt-44 pb-24 md:pb-32 overflow-hidden">
+  <div class="max-w-[1400px] mx-auto px-6 md:px-12 grid grid-cols-12 gap-8 items-end">
+
+    <!-- Left copy -->
+    <div class="col-span-12 lg:col-span-7">
+      <div class="reveal-hero flex items-center gap-3 mb-8">
+        <span class="w-10 h-px bg-[#C8862C]"></span>
+        <span class="uppercase tracking-[0.28em] text-xs text-[#C8862C] font-medium">
+          Est. handmade — one stitch at a time
+        </span>
+      </div>
+
+      <h1 class="reveal-hero d1 font-serif-display text-[56px] sm:text-7xl lg:text-[112px] leading-[0.95] tracking-tighter text-[#1A1815]">
+        Soft little <em class="italic font-light">things</em>
+        <br />made <span class="squiggle">slowly</span>,
+        <br />made with <span class="text-[#C8862C] italic">love</span>.
+      </h1>
+
+      <p class="reveal-hero d2 mt-10 max-w-xl text-[15px] md:text-[17px] leading-[1.7] text-[#4A453E]">
+        Sunflora is a small crochet studio crafting heirloom-feel keepsakes —
+        sun-bright amigurumi, blooming flowers, and tiny companions that travel
+        on bag straps and bedside tables. Each piece is hooked, stitched, and
+        whispered to by hand.
+      </p>
+
+      <div class="reveal-hero d3 mt-10 flex flex-wrap items-center gap-5">
+        <a
+          href="#featured"
+          data-testid="hero-explore-button"
+          class="inline-flex items-center gap-2 bg-[#1A1815] text-[#EFE8DA] px-7 py-4 text-sm tracking-wider uppercase hover:bg-[#C8862C] transition-colors duration-500"
+        >
+          Explore the collection
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+        </a>
+        <a
+          href="#story"
+          data-testid="hero-story-button"
+          class="inline-flex items-center gap-2 text-[#1A1815] text-sm tracking-wider uppercase border-b border-[#1A1815] pb-1 hover:text-[#C8862C] hover:border-[#C8862C] transition-colors"
+        >
+          Our story
+        </a>
+      </div>
+
+      <div class="reveal-hero d4 mt-16 flex items-center gap-8 text-xs uppercase tracking-[0.2em] text-[#4A453E]">
+        <div class="flex items-center gap-2">
+          <!-- Hand icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C8862C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2"/><path d="M14 10V4a2 2 0 0 0-2-2 2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg>
+          Hand-crocheted
+        </div>
+        <div class="hidden sm:flex items-center gap-2">
+          <!-- Heart icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C8862C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          Small batch
+        </div>
+        <div class="hidden md:flex items-center gap-2">
+          <!-- Sparkles icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C8862C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5z"/><path d="M19 3l.5 1.5L21 5l-1.5.5L19 7l-.5-1.5L17 5l1.5-.5z"/><path d="M5 19l.5 1.5L7 21l-1.5.5L5 23l-.5-1.5L3 21l1.5-.5z"/></svg>
+          Custom welcome
+        </div>
+      </div>
+    </div>
+
+    <!-- Right image -->
+    <div class="reveal-hero-img col-span-12 lg:col-span-5 relative">
+      <div class="absolute -inset-4 bg-[#C8862C]/15 -z-10 translate-x-6 translate-y-6"></div>
+      <img
+        src={HERO.src}
+        alt="Crochet sunshine on pegboard"
+        data-testid="hero-image"
+        class="w-full aspect-[4/5] object-cover grayscale-[0.05]"
+        loading="eager"
+      />
+      <div class="absolute -bottom-6 -left-6 bg-[#EFE8DA] border border-[rgba(26,24,21,0.12)] px-5 py-4 max-w-[220px]">
+        <p class="font-serif-display italic text-[#1A1815] text-lg leading-snug">
+          "She brings the sun indoors."
+        </p>
+        <p class="text-[10px] uppercase tracking-[0.2em] text-[#4A453E] mt-2">— Anika, returning customer</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scroll indicator -->
+  <div class="hidden md:flex absolute bottom-6 left-1/2 -translate-x-1/2 flex-col items-center gap-2 text-[10px] uppercase tracking-[0.3em] text-[#4A453E]">
+    <span>Scroll</span>
+    <span class="w-px h-12 bg-[#4A453E] animate-pulse"></span>
+  </div>
+</section>
+
+
+<!-- ═══════════════ MARQUEE ═══════════════ -->
+<div data-testid="marquee" class="border-y border-[rgba(26,24,21,0.12)] bg-[#E5DFD1] py-6 overflow-hidden">
+  <div class="marquee-track flex gap-12 whitespace-nowrap w-max">
+    {marqueeItems.map((w, i) => (
+      <span class="font-serif-display italic text-3xl md:text-4xl text-[#1A1815] flex items-center gap-12">
+        {w}
+        <span class="w-2 h-2 rounded-full bg-[#C8862C]"></span>
+      </span>
+    ))}
+  </div>
+</div>
+
+
+<!-- ═══════════════ FEATURED PRODUCTS ═══════════════ -->
+<section id="featured" data-testid="featured-products" class="py-24 md:py-32">
+  <div class="max-w-[1400px] mx-auto px-6 md:px-12">
+    <div class="flex items-end justify-between mb-16 flex-wrap gap-6">
+      <div class="reveal">
+        <p class="uppercase tracking-[0.28em] text-xs text-[#C8862C] mb-4">Featured pieces</p>
+        <h2 class="font-serif-display text-5xl md:text-6xl lg:text-7xl tracking-tighter text-[#1A1815] leading-[1.05]">
+          Tiny companions, <em>big</em> stories.
+        </h2>
+      </div>
+      <a
+        href="#cta"
+        data-testid="featured-inquire-all"
+        class="reveal reveal-d1 hover-underline text-sm uppercase tracking-[0.2em] text-[#1A1815] flex items-center gap-2"
+      >
+        Inquire about the full collection
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+      </a>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10">
+      {products.map((p, i) => (
+        <a
+          href="#cta"
+          data-testid={`product-card-${p.id}`}
+          class={`reveal product-card block ${i % 2 === 1 ? "lg:mt-16" : ""}`}
+          style={`transition-delay:${i * 0.12}s`}
+        >
+          <div class="relative overflow-hidden bg-[#E5DFD1] aspect-[4/5]">
+            <img
+              src={p.img}
+              alt={p.name}
+              class="product-img w-full h-full object-cover"
+              loading="lazy"
+            />
+            <div class="absolute top-4 left-4 bg-[#EFE8DA] px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-[#1A1815]">
+              {p.tag}
+            </div>
+            <div class="product-overlay absolute inset-0 flex items-end justify-center pb-8">
+              <span class="bg-[#EFE8DA] text-[#1A1815] px-5 py-2 text-xs uppercase tracking-[0.2em] inline-flex items-center gap-2">
+                Inquire
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+              </span>
+            </div>
+          </div>
+          <div class="mt-5 flex items-start justify-between gap-4">
+            <div>
+              <h3 class="font-serif-display text-2xl text-[#1A1815] leading-tight">{p.name}</h3>
+              <p class="text-xs uppercase tracking-[0.2em] text-[#4A453E] mt-1">Hand-finished</p>
+            </div>
+            <p class="font-serif-display text-xl text-[#C8862C]">{p.price}</p>
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════ STORY ═══════════════ -->
+<section id="story" data-testid="brand-story" class="py-24 md:py-32 bg-[#E5DFD1] border-y border-[rgba(26,24,21,0.08)]">
+  <div class="max-w-[1400px] mx-auto px-6 md:px-12 grid grid-cols-12 gap-10 lg:gap-20 items-center">
+    <!-- Founder image -->
+    <div class="reveal col-span-12 lg:col-span-5">
+      <div class="relative">
+        <div class="absolute -inset-4 border border-[#C8862C] -z-10 translate-x-5 translate-y-5"></div>
+        <img
+          src={FOUNDER.src}
+          alt="Sunflora founder"
+          data-testid="founder-image"
+          class="w-full aspect-[4/5] object-cover"
+          loading="lazy"
+        />
+      </div>
+    </div>
+
+    <!-- Copy -->
+    <div class="col-span-12 lg:col-span-7">
+      <p class="reveal uppercase tracking-[0.28em] text-xs text-[#C8862C] mb-5">
+        The hands behind Sunflora
+      </p>
+      <h2 class="reveal reveal-d1 font-serif-display text-4xl md:text-5xl lg:text-6xl tracking-tight text-[#1A1815] leading-[1.1]">
+        A studio of <em>slow stitches</em>, sunlit afternoons, and quiet rebellion against the disposable.
+      </h2>
+      <div class="reveal reveal-d2 mt-8 space-y-5 text-[15px] md:text-[17px] leading-[1.8] text-[#4A453E] max-w-xl">
+        <p>
+          Sunflora began on a verandah, with one ball of mustard yarn and an idea that
+          warmth could be something you hold. Each piece is hooked by hand — sometimes
+          across days — never replicated by machine.
+        </p>
+        <p>
+          We are small on purpose. We choose soft cottons, we name each character, and
+          we tuck a little note inside every package. Because the things that stay with
+          you are rarely the ones made in a hurry.
+        </p>
+      </div>
+      <div class="reveal reveal-d3 mt-10 flex items-center gap-6 flex-wrap">
+        <div class="flex items-baseline gap-3">
+          <span class="font-serif-display text-5xl text-[#1A1815]">3+</span>
+          <span class="text-xs uppercase tracking-[0.2em] text-[#4A453E]">years of stitching</span>
+        </div>
+        <span class="w-px h-10 bg-[rgba(26,24,21,0.2)]"></span>
+        <div class="flex items-baseline gap-3">
+          <span class="font-serif-display text-5xl text-[#1A1815]">800+</span>
+          <span class="text-xs uppercase tracking-[0.2em] text-[#4A453E]">happy homes</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════ CATEGORIES ═══════════════ -->
+<section id="categories" data-testid="categories" class="py-24 md:py-32">
+  <div class="max-w-[1400px] mx-auto px-6 md:px-12">
+    <div class="grid grid-cols-12 gap-10 mb-14">
+      <div class="reveal col-span-12 md:col-span-5">
+        <p class="uppercase tracking-[0.28em] text-xs text-[#C8862C] mb-4">Categories</p>
+        <h2 class="font-serif-display text-5xl md:text-6xl lg:text-7xl tracking-tighter text-[#1A1815] leading-[1.05]">
+          Wander a little.
+        </h2>
+      </div>
+      <p class="reveal reveal-d1 col-span-12 md:col-span-6 md:col-start-7 text-[15px] md:text-[17px] leading-[1.7] text-[#4A453E] self-end">
+        From palm-sized companions to flowers that never wilt — every collection is
+        rooted in the same idea: slow, sun-soaked craft.
+      </p>
+    </div>
+
+    <div class="border-t border-[rgba(26,24,21,0.15)]">
+      {categories.map((c, i) => (
+        <a
+          href="#cta"
+          data-testid={`category-${c.name.toLowerCase().replace(/\s/g, "-")}`}
+          class="cat-row reveal group flex items-center justify-between py-8 md:py-10 border-b border-[rgba(26,24,21,0.15)] hover:bg-[#E5DFD1]/60 transition-colors duration-500 px-2 md:px-4"
+          style={`transition-delay:${i * 0.06}s`}
+        >
+          <div class="flex items-baseline gap-6 md:gap-10">
+            <span class="font-serif-display text-xs md:text-sm text-[#C8862C]">0{i + 1}</span>
+            <span class="cat-name font-serif-display text-4xl md:text-6xl lg:text-7xl tracking-tight text-[#1A1815]">
+              {c.name}
+            </span>
+          </div>
+          <div class="flex items-center gap-4 md:gap-8">
+            <span class="hidden md:inline text-xs uppercase tracking-[0.2em] text-[#4A453E]">{c.count}</span>
+            <svg class="cat-arrow w-5 h-5 md:w-6 md:h-6 text-[#1A1815]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════ CUSTOM ORDERS ═══════════════ -->
+<section id="custom" data-testid="custom-orders" class="py-24 md:py-32 bg-[#1A1815] text-[#EFE8DA] relative overflow-hidden">
+  <div class="max-w-[1400px] mx-auto px-6 md:px-12 grid grid-cols-12 gap-10">
+    <!-- Left -->
+    <div class="col-span-12 lg:col-span-5">
+      <p class="reveal uppercase tracking-[0.28em] text-xs text-[#C8862C] mb-5">
+        Custom orders
+      </p>
+      <h2 class="reveal reveal-d1 font-serif-display text-5xl md:text-6xl lg:text-[80px] tracking-tighter leading-[1.02]">
+        Bring us your<br />
+        <em class="text-[#C8862C]">strangest</em><br />
+        little idea.
+      </h2>
+      <p class="reveal reveal-d2 mt-8 text-[15px] md:text-[17px] leading-[1.7] text-[#EFE8DA]/70 max-w-md">
+        That cat with the crooked tail. The bouquet she didn't get to keep. The
+        character only your best friend would recognise. We make those.
+      </p>
+      <a
+        href="#cta"
+        data-testid="custom-cta-button"
+        class="reveal reveal-d3 mt-10 inline-flex items-center gap-2 bg-[#C8862C] text-[#1A1815] px-7 py-4 text-sm uppercase tracking-[0.2em] hover:bg-[#EFE8DA] transition-colors duration-500"
+      >
+        Start a custom
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+      </a>
+    </div>
+
+    <!-- Steps -->
+    <div class="col-span-12 lg:col-span-7 space-y-6">
+      {customSteps.map((s, i) => (
+        <div
+          class="reveal border-l-2 border-[#C8862C] pl-8 py-3"
+          style={`transition-delay:${i * 0.12}s`}
+        >
+          <div class="flex items-baseline gap-6 mb-2">
+            <span class="font-serif-display text-2xl text-[#C8862C]">{s.num}</span>
+            <h3 class="font-serif-display italic text-4xl md:text-5xl text-[#EFE8DA]">{s.title}</h3>
+          </div>
+          <p class="text-[15px] leading-[1.7] text-[#EFE8DA]/65 max-w-lg">{s.text}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════ PACKAGING ═══════════════ -->
+<section data-testid="packaging" class="py-24 md:py-32">
+  <div class="max-w-[1400px] mx-auto px-6 md:px-12 grid grid-cols-12 gap-10 items-center">
+    <!-- Copy -->
+    <div class="col-span-12 lg:col-span-6">
+      <p class="reveal uppercase tracking-[0.28em] text-xs text-[#C8862C] mb-5">The unboxing</p>
+      <h2 class="reveal reveal-d1 font-serif-display text-5xl md:text-6xl lg:text-7xl tracking-tighter leading-[1.05] text-[#1A1815]">
+        A small <em>ritual</em>, before it's yours.
+      </h2>
+      <ul class="reveal reveal-d2 mt-10 space-y-5 text-[15px] md:text-[17px] leading-[1.7] text-[#4A453E]">
+        <li class="flex gap-4">
+          <!-- Package icon -->
+          <svg class="w-5 h-5 text-[#C8862C] mt-1 shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+          Kraft paper folded by hand, sealed with our sun stamp.
+        </li>
+        <li class="flex gap-4">
+          <svg class="w-5 h-5 text-[#C8862C] mt-1 shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          A handwritten card with your piece's name and birthdate.
+        </li>
+        <li class="flex gap-4">
+          <svg class="w-5 h-5 text-[#C8862C] mt-1 shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5z"/><path d="M19 3l.5 1.5L21 5l-1.5.5L19 7l-.5-1.5L17 5l1.5-.5z"/><path d="M5 19l.5 1.5L7 21l-1.5.5L5 23l-.5-1.5L3 21l1.5-.5z"/></svg>
+          Dried marigold petals, twine, and a free yarn keepsake.
+        </li>
+        <li class="flex gap-4">
+          <svg class="w-5 h-5 text-[#C8862C] mt-1 shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          A care guide, so your piece ages like a love letter.
+        </li>
+      </ul>
+    </div>
+
+    <!-- Image grid -->
+    <div class="reveal col-span-12 lg:col-span-6 grid grid-cols-2 gap-4">
+      <img src={SUN_CLOSEUP} alt="Crochet sun"      class="aspect-square object-cover col-span-2" loading="lazy" />
+      <img src={STARS}       alt="Crochet stars"    class="aspect-[4/5] object-cover"             loading="lazy" />
+      <img src={SUNMOON}     alt="Sun and moon set" class="aspect-[4/5] object-cover"             loading="lazy" />
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════ TESTIMONIALS ═══════════════ -->
+<section data-testid="testimonials" class="py-24 md:py-32 bg-[#E5DFD1] border-y border-[rgba(26,24,21,0.08)]">
+  <div class="max-w-[1400px] mx-auto px-6 md:px-12">
+    <div class="mb-16">
+      <p class="reveal uppercase tracking-[0.28em] text-xs text-[#C8862C] mb-4">Whispered back to us</p>
+      <h2 class="reveal reveal-d1 font-serif-display text-5xl md:text-6xl lg:text-7xl tracking-tighter text-[#1A1815] leading-[1.05]">
+        Notes from those who kept them.
+      </h2>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+      {testimonials.map((t, i) => (
+        <figure
+          data-testid={`testimonial-${i}`}
+          class="reveal border-l-2 border-[#C8862C] pl-8 py-2"
+          style={`transition-delay:${i * 0.12}s`}
+        >
+          <blockquote class="font-serif-display text-3xl md:text-4xl italic leading-[1.25] text-[#1A1815]">
+            "{t.q}"
+          </blockquote>
+          <figcaption class="mt-5 text-xs uppercase tracking-[0.25em] text-[#4A453E]">{t.who}</figcaption>
+        </figure>
+      ))}
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════ GALLERY ═══════════════ -->
+<section id="gallery" data-testid="gallery" class="py-24 md:py-32">
+  <div class="max-w-[1400px] mx-auto px-6 md:px-12">
+    <div class="flex items-end justify-between flex-wrap gap-6 mb-14">
+      <div>
+        <p class="reveal uppercase tracking-[0.28em] text-xs text-[#C8862C] mb-4">@sunflora.craft</p>
+        <h2 class="reveal reveal-d1 font-serif-display text-5xl md:text-6xl lg:text-7xl tracking-tighter leading-[1.05] text-[#1A1815]">
+          Lived-in, loved-in.
+        </h2>
+      </div>
+      <a
+        href="#cta"
+        data-testid="gallery-follow"
+        class="reveal inline-flex items-center gap-2 text-sm uppercase tracking-[0.2em] text-[#1A1815] hover-underline"
+      >
+        <!-- Instagram icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        Follow on Instagram
+      </a>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 auto-rows-[200px] md:auto-rows-[260px]">
+      {galleryTiles.map((t, i) => (
+        <div
+          class={`reveal relative overflow-hidden ${t.span}`}
+          style={`transition-delay:${i * 0.06}s`}
+        >
+          <img
+            src={t.src}
+            alt={t.alt}
+            class="w-full h-full object-cover hover:scale-105 transition-transform duration-[1500ms] ease-out"
+            loading="lazy"
+          />
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════ FAQ ═══════════════ -->
+<section id="faq" data-testid="faq" class="py-24 md:py-32">
+  <div class="max-w-[1100px] mx-auto px-6 md:px-12">
+    <div class="text-center mb-14">
+      <p class="reveal uppercase tracking-[0.28em] text-xs text-[#C8862C] mb-4">The asked things</p>
+      <h2 class="reveal reveal-d1 font-serif-display text-5xl md:text-6xl lg:text-7xl tracking-tighter leading-[1.05] text-[#1A1815]">
+        Curious? <em>Same.</em>
+      </h2>
+    </div>
+
+    <div data-testid="faq-accordion" class="w-full">
+      {faqItems.map((item, idx) => (
+        <details
+          data-testid={`faq-item-${idx}`}
+          class="reveal border-b border-[rgba(26,24,21,0.15)] group"
+          style={`transition-delay:${idx * 0.06}s`}
+        >
+          <summary class="flex items-center justify-between py-6 cursor-pointer">
+            <span class="faq-q font-serif-display text-xl md:text-3xl text-[#1A1815] tracking-tight text-left pr-6 transition-colors duration-300 group-open:text-[#C8862C]">
+              {item.q}
+            </span>
+            <span class="shrink-0 w-7 h-7 flex items-center justify-center border border-[rgba(26,24,21,0.2)] rounded-full text-[#1A1815]">
+              <svg class="faq-icon-plus w-3 h-3" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="1" x2="6" y2="11"/><line x1="1" y1="6" x2="11" y2="6"/></svg>
+              <svg class="faq-icon-minus w-3 h-3" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><line x1="1" y1="6" x2="11" y2="6"/></svg>
+            </span>
+          </summary>
+          <p class="text-[15px] md:text-[17px] leading-[1.8] text-[#4A453E] pb-8 max-w-2xl">
+            {item.a}
+          </p>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════ FINAL CTA ═══════════════ -->
+<section id="cta" data-testid="final-cta" class="py-32 md:py-48 bg-[#E5DFD1] border-y border-[rgba(26,24,21,0.08)] relative overflow-hidden">
+  <div class="absolute -top-20 -right-20 w-[360px] h-[360px] rounded-full bg-[#C8862C]/20 blur-3xl pointer-events-none"></div>
+  <div class="max-w-[1100px] mx-auto px-6 md:px-12 text-center relative">
+    <p class="reveal uppercase tracking-[0.32em] text-xs text-[#C8862C] mb-6">One last thing</p>
+    <h2 class="reveal reveal-d1 font-serif-display text-[56px] sm:text-7xl lg:text-[120px] tracking-tighter leading-[0.95] text-[#1A1815]">
+      Let's craft<br />
+      <em class="text-[#C8862C]">your</em> story.
+    </h2>
+    <p class="reveal reveal-d2 mt-10 max-w-xl mx-auto text-[15px] md:text-[17px] leading-[1.7] text-[#4A453E]">
+      Whether it's a gift, a heirloom, or simply something to keep on your desk — we'd
+      love to make it for you. Slide into our DMs or send us a hello.
+    </p>
+    <div class="reveal reveal-d3 mt-12 flex flex-wrap items-center justify-center gap-5">
+      <a
+        href="https://wa.me/910000000000"
+        target="_blank"
+        rel="noreferrer"
+        data-testid="cta-whatsapp"
+        class="inline-flex items-center gap-3 bg-[#1A1815] text-[#EFE8DA] px-8 py-4 text-sm uppercase tracking-[0.2em] hover:bg-[#C8862C] transition-colors duration-500"
+      >
+        <!-- MessageCircle icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        WhatsApp us
+      </a>
+      <a
+        href="https://instagram.com"
+        target="_blank"
+        rel="noreferrer"
+        data-testid="cta-instagram"
+        class="inline-flex items-center gap-3 border border-[#1A1815] text-[#1A1815] px-8 py-4 text-sm uppercase tracking-[0.2em] hover:bg-[#1A1815] hover:text-[#EFE8DA] transition-colors duration-500"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        @sunflora.craft
+      </a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer data-testid="site-footer" class="bg-[#1A1815] text-[#EFE8DA] py-16">
+  <div class="max-w-[1400px] mx-auto px-6 md:px-12">
+    <div class="grid grid-cols-12 gap-10 mb-12">
+      <div class="col-span-12 md:col-span-5">
+        <span class="font-serif-display text-5xl italic">
+          Sunflora<span class="text-[#C8862C]">.</span>
+        </span>
+        <p class="mt-5 text-sm leading-[1.7] text-[#EFE8DA]/60 max-w-sm">
+          A tiny crochet studio. Made slowly, sent with love, signed by hand.
+        </p>
+      </div>
+      <div class="col-span-6 md:col-span-3">
+        <p class="text-xs uppercase tracking-[0.25em] text-[#C8862C] mb-5">Wander</p>
+        <ul class="space-y-3 text-sm text-[#EFE8DA]/80">
+          <li><a href="#featured" class="hover-underline">Featured</a></li>
+          <li><a href="#story"    class="hover-underline">Story</a></li>
+          <li><a href="#custom"   class="hover-underline">Customs</a></li>
+          <li><a href="#gallery"  class="hover-underline">Gallery</a></li>
+        </ul>
+      </div>
+      <div class="col-span-6 md:col-span-4">
+        <p class="text-xs uppercase tracking-[0.25em] text-[#C8862C] mb-5">Stay in touch</p>
+        <ul class="space-y-3 text-sm text-[#EFE8DA]/80">
+          <li>
+            <a href="https://instagram.com" target="_blank" rel="noreferrer" class="hover-underline inline-flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+              @sunflora.craft
+            </a>
+          </li>
+          <li>
+            <a href="https://wa.me/910000000000" target="_blank" rel="noreferrer" class="hover-underline inline-flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              WhatsApp
+            </a>
+          </li>
+          <li>
+            <a href="mailto:hello@sunflora.studio" class="hover-underline">hello@sunflora.studio</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="border-t border-[#EFE8DA]/15 pt-6 flex flex-wrap items-center justify-between gap-4 text-xs text-[#EFE8DA]/50 uppercase tracking-[0.2em]">
+      <p>© {new Date().getFullYear()} Sunflora Studio — Handmade with care.</p>
+      <p>Hooked in India · shipped worldwide</p>
+    </div>
+  </div>
+</footer>
+
+
+<!-- ═══════════════ SCRIPTS ═══════════════ -->
+<script>
+  // ── Nav: scroll state ──
+  const header = document.getElementById('site-header');
+  window.addEventListener('scroll', () => {
+    header?.classList.toggle('scrolled', window.scrollY > 30);
+  }, { passive: true });
+
+  // ── Nav: mobile menu toggle ──
+  const toggle   = document.getElementById('menu-toggle');
+  const menu     = document.getElementById('mobile-menu');
+  const iconMenu = document.getElementById('icon-menu');
+  const iconClose = document.getElementById('icon-close');
+  const mobileLinks = document.querySelectorAll('.mobile-nav-link');
+
+  function closeMenu() {
+    menu?.classList.remove('open');
+    iconMenu?.classList.remove('hidden');
+    iconClose?.classList.add('hidden');
+  }
+
+  toggle?.addEventListener('click', () => {
+    const isOpen = menu?.classList.toggle('open');
+    iconMenu?.classList.toggle('hidden', !!isOpen);
+    iconClose?.classList.toggle('hidden', !isOpen);
+  });
+
+  mobileLinks.forEach(l => l.addEventListener('click', closeMenu));
+
+  // ── Scroll-reveal via Intersection Observer ──
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.12, rootMargin: '0px 0px -60px 0px' }
+  );
+  reveals.forEach(el => observer.observe(el));
+
+  // ── Lenis smooth scroll ──
+  (async () => {
+    try {
+      // @ts-ignore — lenis loaded at runtime
+      const { default: Lenis } = await import('https://cdn.jsdelivr.net/npm/lenis@1.1.9/+esm');
+      const lenis = new Lenis({
+        duration: 1.2,
+        easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      });
+      const raf = (time: number) => { lenis.raf(time); requestAnimationFrame(raf); };
+      requestAnimationFrame(raf);
+    } catch (e) {
+      // Lenis optional — page works fine without it
+    }
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,45 @@
+---
+const steps = [
+  { num: "01", title: "Dream",   text: "Send us a photo, a memory, a moodboard — even a doodle. We'll listen." },
+  { num: "02", title: "Craft",   text: "We sketch, choose yarns together, and hook your piece over 5–14 days." },
+  { num: "03", title: "Deliver", text: "Wrapped in kraft paper, twine, and a handwritten note — straight to your door." },
+];
+---
+
+<section id="custom" data-testid="custom-orders" class="py-24 md:py-32 bg-[#1A1815] text-[#EFE8DA] relative overflow-hidden">
+  <div class="max-w-[1400px] mx-auto px-6 md:px-12 grid grid-cols-12 gap-10">
+
+    <div class="col-span-12 lg:col-span-5">
+      <p class="fade-up uppercase tracking-[0.28em] text-xs text-[#C8862C] mb-5">Custom orders</p>
+      <h2 class="fade-up font-serif-display text-5xl md:text-6xl lg:text-[80px] tracking-tighter leading-[1.02]">
+        Bring us your<br />
+        <em class="text-[#C8862C]">strangest</em><br />
+        little idea.
+      </h2>
+      <p class="fade-up mt-8 text-[15px] md:text-[17px] leading-[1.7] text-[#EFE8DA]/70 max-w-md">
+        That cat with the crooked tail. The bouquet she didn't get to keep. The
+        character only your best friend would recognise. We make those.
+      </p>
+      
+        href="#cta"
+        data-testid="custom-cta-button"
+        class="fade-up mt-10 inline-flex items-center gap-2 bg-[#C8862C] text-[#1A1815] px-7 py-4 text-sm uppercase tracking-[0.2em] hover:bg-[#EFE8DA] transition-colors duration-500"
+      >
+        Start a custom
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg>
+      </a>
+    </div>
+
+    <div class="col-span-12 lg:col-span-7 space-y-6">
+      {steps.map(s => (
+        <div class="fade-up border-l-2 border-[#C8862C] pl-8 py-3">
+          <div class="flex items-baseline gap-6 mb-2">
+            <span class="font-serif-display text-2xl text-[#C8862C]">{s.num}</span>
+            <h3 class="font-serif-display italic text-4xl md:text-5xl text-[#EFE8DA]">{s.title}</h3>
+          </div>
+          <p class="text-[15px] leading-[1.7] text-[#EFE8DA]/65 max-w-lg">{s.text}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
