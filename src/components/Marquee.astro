@@ -1,0 +1,45 @@
+---
+const words = [
+  "Amigurumi",
+  "Keychains",
+  "Flower stems",
+  "Wall hangings",
+  "Bouquets",
+  "Custom orders",
+  "Gift sets"
+];
+
+const items = [...words, ...words, ...words];
+---
+
+<div
+  data-testid="marquee"
+  class="border-y border-[rgba(26,24,21,0.12)] bg-[#E5DFD1] py-6 overflow-hidden"
+>
+  <div class="marquee-track flex gap-12 whitespace-nowrap w-max">
+
+    {items.map((w) => (
+      <span class="font-serif-display italic text-3xl md:text-4xl text-[#1A1815] flex items-center gap-12">
+        {w}
+        <span class="w-2 h-2 rounded-full bg-[#C8862C]"></span>
+      </span>
+    ))}
+
+  </div>
+</div>
+
+<style>
+  .marquee-track {
+    animation: marquee 28s linear infinite;
+  }
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+
+    to {
+      transform: translateX(-33.333%);
+    }
+  }
+</style>

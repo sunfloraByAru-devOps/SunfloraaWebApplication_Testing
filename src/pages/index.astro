@@ -1,0 +1,62 @@
+---
+import Nav from '../components/Nav.astro';
+import Hero from '../components/Hero.astro';
+import Marquee from '../components/Marquee.astro';
+import Featured from '../components/Featured.astro';
+import Story from '../components/Story.astro';
+import Categories from '../components/Categories.astro';
+import Custom from '../components/Custom.astro';
+import Packaging from '../components/Packaging.astro';
+import Testimonials from '../components/Testimonials.astro';
+import Gallery from '../components/Gallery.astro';
+import Faq from '../components/Faq.astro';
+import FinalCTA from '../components/FinalCTA.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sunflora — Handmade Crochet Studio</title>
+  <link rel="stylesheet" href="/src/styles/global.css" />
+</head>
+<body class="paper-grain min-h-screen relative">
+  <Nav />
+  <Hero />
+  <Marquee />
+  <Featured />
+  <Story />
+  <Categories />
+  <Custom />
+  <Packaging />
+  <Testimonials />
+  <Gallery />
+  <Faq />
+  <FinalCTA />
+  <Footer />
+
+  <script>
+    // Lenis smooth scroll
+    (async () => {
+      const Lenis = (await import('lenis')).default;
+      const lenis = new Lenis({ duration: 1.2, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+      const loop = (time: number) => { lenis.raf(time); requestAnimationFrame(loop); };
+      requestAnimationFrame(loop);
+    })();
+
+    // Intersection Observer for fade-up animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(el => {
+        if (el.isIntersecting) {
+          el.target.classList.add('in-view');
+          observer.unobserve(el.target);
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '-60px 0px' });
+
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>

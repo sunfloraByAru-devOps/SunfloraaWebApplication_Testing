@@ -1,0 +1,48 @@
+---
+const categories = [
+  { name: "Amigurumi",     count: "24 pieces"  },
+  { name: "Keychains",     count: "18 pieces"  },
+  { name: "Flower stems",  count: "12 pieces"  },
+  { name: "Wall hangings", count: "9 pieces"   },
+  { name: "Customs",       count: "By request" },
+];
+---
+
+<section id="categories" data-testid="categories" class="py-24 md:py-32">
+  <div class="max-w-[1400px] mx-auto px-6 md:px-12">
+
+    <div class="grid grid-cols-12 gap-10 mb-14">
+      <div class="col-span-12 md:col-span-5 fade-up">
+        <p class="uppercase tracking-[0.28em] text-xs text-[#C8862C] mb-4">Categories</p>
+        <h2 class="font-serif-display text-5xl md:text-6xl lg:text-7xl tracking-tighter text-[#1A1815] leading-[1.05]">
+          Wander a little.
+        </h2>
+      </div>
+      <p class="fade-up col-span-12 md:col-span-6 md:col-start-7 text-[15px] md:text-[17px] leading-[1.7] text-[#4A453E] self-end">
+        From palm-sized companions to flowers that never wilt — every collection is
+        rooted in the same idea: slow, sun-soaked craft.
+      </p>
+    </div>
+
+    <div class="border-t border-[rgba(26,24,21,0.15)]">
+      {categories.map((c, i) => (
+        <a
+          href="#cta"
+          data-testid={`category-${c.name.toLowerCase().replace(/\s/g, '-')}`}
+          class="fade-up group flex items-center justify-between py-8 md:py-10 border-b border-[rgba(26,24,21,0.15)] hover:bg-[#E5DFD1]/60 transition-colors duration-500 px-2 md:px-4"
+        >
+          <div class="flex items-baseline gap-6 md:gap-10">
+            <span class="font-serif-display text-xs md:text-sm text-[#C8862C]">0{i + 1}</span>
+            <span class="font-serif-display text-4xl md:text-6xl lg:text-7xl tracking-tight text-[#1A1815] group-hover:text-[#C8862C] group-hover:italic transition-all duration-500">
+              {c.name}
+            </span>
+          </div>
+          <div class="flex items-center gap-4 md:gap-8">
+            <span class="hidden md:inline text-xs uppercase tracking-[0.2em] text-[#4A453E]">{c.count}</span>
+            <svg class="w-5 h-5 md:w-6 md:h-6 text-[#1A1815] group-hover:rotate-45 group-hover:text-[#C8862C] transition-all duration-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg>
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>

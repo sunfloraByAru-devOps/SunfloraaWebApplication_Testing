@@ -1,0 +1,43 @@
+---
+const items = [
+  { q: "How long does an order take?",           a: "Most ready-made pieces ship within 3–5 days. Custom orders take 5–14 days depending on complexity — we'll always share a timeline before we start." },
+  { q: "Do you ship internationally?",           a: "Yes — we ship worldwide. International orders are sent via tracked mail and usually arrive within 7–14 working days." },
+  { q: "Can I order a piece in custom colours?", a: "Absolutely. Send us a reference, and we'll match colours from our cotton library. You'll get a swatch photo for approval before we begin." },
+  { q: "How do I care for my crochet piece?",    a: "Gently spot clean with mild soap and cold water. Air dry flat, away from direct sun. Each package comes with a care card." },
+  { q: "Are returns possible?",                  a: "Because each piece is handmade, we don't accept returns — but if something is genuinely wrong, write to us and we'll make it right." },
+];
+---
+
+<section id="faq" data-testid="faq" class="py-24 md:py-32">
+  <div class="max-w-[1100px] mx-auto px-6 md:px-12">
+    <div class="text-center mb-14">
+      <p class="fade-up uppercase tracking-[0.28em] text-xs text-[#C8862C] mb-4">The asked things</p>
+      <h2 class="fade-up font-serif-display text-5xl md:text-6xl lg:text-7xl tracking-tighter leading-[1.05] text-[#1A1815]">
+        Curious? <em>Same.</em>
+      </h2>
+    </div>
+
+    <div data-testid="faq-accordion">
+      {items.map((item, idx) => (
+        <details
+          data-testid={`faq-item-${idx}`}
+          class="fade-up group border-b border-[rgba(26,24,21,0.15)]"
+        >
+          <summary class="flex items-center justify-between py-6 cursor-pointer list-none font-serif-display text-xl md:text-3xl text-[#1A1815] tracking-tight hover:text-[#C8862C] transition-colors">
+            {item.q}
+            <svg
+              class="w-5 h-5 shrink-0 text-[#4A453E] transition-transform duration-300 group-open:rotate-180"
+              xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            >
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </summary>
+          <p class="pb-8 text-[15px] md:text-[17px] leading-[1.8] text-[#4A453E] max-w-2xl">
+            {item.a}
+          </p>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>

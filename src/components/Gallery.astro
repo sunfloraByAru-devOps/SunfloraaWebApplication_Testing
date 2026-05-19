@@ -1,0 +1,63 @@
+---
+import HERO from '../assets/sun_on_desk.png';
+import STARS from '../assets/stars.png';
+import DINO from '../assets/green-dino.jpg';
+import SUNMOON from '../assets/sun_and_moon.jpg';
+import SUN_CLOSEUP from '../assets/sun_on_desk_closeup.png';
+import SPIDEY from '../assets/spiderman.jpg';
+
+const tiles = [
+  { src: HERO,        span: "md:col-span-2 md:row-span-2", alt: "Crochet sun on pegboard" },
+  { src: STARS,       span: "", alt: "Crochet stars" },
+  { src: DINO,        span: "", alt: "Dino keychain" },
+  { src: SUNMOON,     span: "md:col-span-2", alt: "Sun and moon set" },
+  { src: SUN_CLOSEUP, span: "", alt: "Sun close-up" },
+  { src: SPIDEY,      span: "", alt: "Spidey hanging" },
+];
+---
+
+<section id="gallery" data-testid="gallery" class="py-24 md:py-32">
+  <div class="max-w-[1400px] mx-auto px-6 md:px-12">
+
+    <div class="flex items-end justify-between flex-wrap gap-6 mb-14">
+      <div>
+        <p class="fade-up uppercase tracking-[0.28em] text-xs text-[#C8862C] mb-4">
+          @sunflora.craft
+        </p>
+
+        <h2 class="fade-up font-serif-display text-5xl md:text-6xl lg:text-7xl tracking-tighter leading-[1.05] text-[#1A1815]">
+          Lived-in, loved-in.
+        </h2>
+      </div>
+
+      <a
+        href="#cta"
+        data-testid="gallery-follow"
+        class="fade-up inline-flex items-center gap-2 text-sm uppercase tracking-[0.2em] text-[#1A1815] hover-underline"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+          viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+        </svg>
+
+        Follow on Instagram
+      </a>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 auto-rows-[200px] md:auto-rows-[260px]">
+      {tiles.map((t) => (
+        <div class={`fade-up relative overflow-hidden ${t.span}`}>
+          <img
+            src={t.src.src}
+            alt={t.alt}
+            class="w-full h-full object-cover hover:scale-105 transition-transform duration-[1500ms] ease-out"
+          />
+        </div>
+      ))}
+    </div>
+
+  </div>
+</section>
