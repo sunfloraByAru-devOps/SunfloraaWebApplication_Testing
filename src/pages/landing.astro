@@ -1,17 +1,23 @@
 ---
-// Sunflora Client Landing Page — MasterClass-inspired conversion page
-// Drop this into src/pages/landing.astro (or replace index.astro)
-// Uses Sunflora's existing global.css + Tailwind setup
+import Layout from '../layouts/Layout.astro';
+import HERO from '../assets/sun_on_desk.png';
+import STARS from '../assets/stars.png';
+import DINO from '../assets/green-dino.jpg';
+import SUNMOON from '../assets/sun_and_moon.jpg';
+import SUN_CLOSEUP from '../assets/sun_on_desk_closeup.png';
+import SPIDEY from '../assets/spiderman.jpg';
+
+const offerings = [
+  { num: "01", name: "Sunshine Amigurumi", sub: "Best seller · 24 pieces", price: "from ₹ 649", tag: "Best seller", img: SUN_CLOSEUP.src, href: "#cta" },
+  { num: "02", name: "Lil' Dino Keychain", sub: "New arrival · 18 pieces", price: "from ₹ 249", tag: "New", img: DINO.src, href: "#cta" },
+  { num: "03", name: "Sun & Moon Pair", sub: "Set of 2 · 12 pieces", price: "from ₹ 449", tag: "Set of 2", img: SUNMOON.src, href: "#cta" },
+  { num: "04", name: "Spidey Hanging", sub: "Limited run · 9 pieces", price: "from ₹ 549", tag: "Limited", img: SPIDEY.src, href: "#cta" },
+  { num: "05", name: "Crochet Stars", sub: "Wall hangings · new", price: "from ₹ 399", tag: "New", img: STARS.src, href: "#cta" },
+  { num: "06", name: "Custom Orders", sub: "By request · any idea", price: "Quote on inquiry", tag: "Custom", img: HERO.src, href: "#cta" },
+];
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sunflora — Handmade Crochet, Made to Last</title>
-  <meta name="description" content="One-of-a-kind crochet pieces made slowly, sent with love. Amigurumi, keychains, florals & custom orders — straight from our hands to yours." />
-  <link rel="stylesheet" href="/src/styles/global.css" />
+<Layout title="Sunflora — Handmade Crochet, Made to Last" description="One-of-a-kind crochet pieces made slowly, sent with love. Amigurumi, keychains, florals & custom orders — straight from our hands to yours.">
   <style>
     /* ── Fonts already loaded by global.css ── */
 
@@ -452,8 +458,6 @@
     .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1); }
     .reveal.visible { opacity: 1; transform: none; }
   </style>
-</head>
-<body>
 
   <!-- ── NAV ── -->
   <nav id="nav">
@@ -515,8 +519,7 @@
     </div>
 
     <div class="hero-right">
-      <!-- Replace src with your actual image path -->
-      <img src="/src/assets/sun_on_desk.png" alt="Crochet sunshine on pegboard" />
+      <img src={HERO.src} alt="Crochet sunshine on pegboard" />
       <div class="hero-badge">
         <p>"She brings the sun indoors."</p>
         <small>— Anika, returning customer</small>
@@ -561,7 +564,7 @@
   <section class="proof-section">
     <div class="proof-grid">
         <div class="proof-visual">
-          <img src="/src/assets/sun_on_desk_closeup.png" alt="Close-up of crochet sunshine" />
+          <img src={SUN_CLOSEUP.src} alt="Close-up of crochet sunshine" />
           <div class="proof-play">
             <div class="play-btn" aria-label="Watch our story">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg>
@@ -622,32 +625,32 @@
           {
             num: "01", name: "Sunshine Amigurumi", sub: "Best seller · 24 pieces",
             price: "from ₹ 649", tag: "Best seller",
-            img: "/src/assets/sun_on_desk_closeup.png", href: "#cta"
+            img: SUN_CLOSEUP.src, href: "#cta"
           },
           {
             num: "02", name: "Lil' Dino Keychain", sub: "New arrival · 18 pieces",
             price: "from ₹ 249", tag: "New",
-            img: "/src/assets/green-dino.jpg", href: "#cta"
+            img: DINO.src, href: "#cta"
           },
           {
             num: "03", name: "Sun & Moon Pair", sub: "Set of 2 · 12 pieces",
             price: "from ₹ 449", tag: "Set of 2",
-            img: "/src/assets/sun_and_moon.jpg", href: "#cta"
+            img: SUNMOON.src, href: "#cta"
           },
           {
             num: "04", name: "Spidey Hanging", sub: "Limited run · 9 pieces",
             price: "from ₹ 549", tag: "Limited",
-            img: "/src/assets/spiderman.jpg", href: "#cta"
+            img: SPIDEY.src, href: "#cta"
           },
           {
             num: "05", name: "Crochet Stars", sub: "Wall hangings · new",
             price: "from ₹ 399", tag: "New",
-            img: "/src/assets/stars.png", href: "#cta"
+            img: STARS.src, href: "#cta"
           },
           {
             num: "06", name: "Custom Orders", sub: "By request · any idea",
             price: "Quote on inquiry", tag: "Custom",
-            img: "/src/assets/sun_on_desk.png", href: "#cta"
+            img: HERO.src, href: "#cta"
           },
         ].map(o => (
           <a href={o.href} class="offering-card reveal">
@@ -832,6 +835,4 @@
     }, { threshold: 0.08, rootMargin: '-40px 0px' });
     reveals.forEach(el => observer.observe(el));
   </script>
-
-</body>
-</html>
+</Layout>
