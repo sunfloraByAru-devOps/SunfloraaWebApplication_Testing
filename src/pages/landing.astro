@@ -807,9 +807,11 @@
   <script>
     // Nav scroll shrink
     const nav = document.getElementById('nav');
-    window.addEventListener('scroll', () => {
-      nav.classList.toggle('scrolled', window.scrollY > 40);
-    });
+    if (nav) {
+      window.addEventListener('scroll', () => {
+        nav.classList.toggle('scrolled', window.scrollY > 40);
+      });
+    }
 
     // Scroll reveal
     const reveals = document.querySelectorAll('.reveal');
@@ -817,11 +819,14 @@
       entries.forEach((e, i) => {
         if (e.isIntersecting) {
           // stagger siblings
-          const siblings = Array.from(e.target.parentElement.querySelectorAll('.reveal'));
+          const siblings = e.target.parentElement
+            ? Array.from(e.target.parentElement.querySelectorAll('.reveal'))
+            : [e.target];
           const idx = siblings.indexOf(e.target);
-          e.target.style.transitionDelay = `${idx * 0.07}s`;
-          e.target.classList.add('visible');
-          observer.unobserve(e.target);
+          const target = e.target as HTMLElement;
+          target.style.transitionDelay = `${idx * 0.07}s`;
+          target.classList.add('visible');
+          observer.unobserve(target);
         }
       });
     }, { threshold: 0.08, rootMargin: '-40px 0px' });
