@@ -64,7 +64,7 @@ const features = [
 >
   <div class="bg-texture" aria-hidden="true"></div>
 
-  <div class="max-w-[1400px] mx-auto px-6 md:px-12 grid grid-cols-12 gap-10 items-start relative z-10">
+  <div class="max-w-[1400px] mx-auto px-6 md:px-12 grid grid-cols-12 gap-10 items-end relative z-10">
 
     <!-- LEFT COLUMN -->
     <div class="col-span-12 lg:col-span-5 pt-4 left-col">
@@ -269,7 +269,7 @@ const features = [
                   id="email"
                   type="email"
                   name="email"
-                  placeholder="hello@sunflora.studio"
+                  placeholder="We will notify you"
                   class="text-input"
                   autocomplete="email"
                 />
@@ -428,9 +428,15 @@ const features = [
   .bg-texture {
     position: absolute;
     inset: 0;
+    background-color: #F3EEE6;
     background-image:
       radial-gradient(ellipse at 20% 10%, rgba(200,134,44,0.07) 0%, transparent 60%),
-      radial-gradient(ellipse at 80% 90%, rgba(200,134,44,0.05) 0%, transparent 50%);
+      radial-gradient(ellipse at 80% 90%, rgba(200,134,44,0.05) 0%, transparent 50%),
+      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300"><defs><filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="4" seed="2"/><feColorMatrix type="saturate" values="0"/></filter></defs><rect width="300" height="300" fill="white" filter="url(%23grain)" opacity="0.3"/></svg>');
+    background-repeat: repeat;
+    background-size: auto, auto, 300px;
+    background-blend-mode: multiply;
+    background-position: center;
     pointer-events: none;
   }
 
@@ -514,7 +520,7 @@ const features = [
 
   /* ── Hero cat ── */
   .cat-hero-wrap {
-    margin-top: -100px;
+    margin-top: auto;
     display: block;
     margin-left: -16px;
   }
