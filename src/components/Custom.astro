@@ -1,45 +1,886 @@
 ---
-const steps = [
-  { num: "01", title: "Dream",   text: "Send us a photo, a memory, a moodboard — even a doodle. We'll listen." },
-  { num: "02", title: "Craft",   text: "We sketch, choose yarns together, and hook your piece over 5–14 days." },
-  { num: "03", title: "Deliver", text: "Wrapped in kraft paper, twine, and a handwritten note — straight to your door." },
+// ⚠️  Use the GEMINI image (transparent-bg cat on wooden table) as crochet-cat-hero.png
+// NOT the dark-background ChatGPT photo — the transparent bg blends into the beige section
+import CrochetCatHero from '../assets/crochet-cat-hero.png';
+import Cat1 from '../assets/cat-1.png';
+
+const sizes = [
+  {
+    label: "3 INCH",
+    sub: "(7–8 CM)",
+    note: "Perfect for desks, shelves and little corners of joy.",
+    selected: true,
+    imageAlt: "3 inch crochet cat",
+    imgSize: 70,
+  },
+  {
+    label: "5 INCH",
+    sub: "(12–13 CM)",
+    selected: false,
+    imageAlt: "5 inch crochet cat",
+    imgSize: 95,
+  },
+  {
+    label: "12 INCH",
+    sub: "(30–32 CM)",
+    selected: false,
+    imageAlt: "12 inch crochet cat",
+    imgSize: 120,
+  },
+ 
+  {
+    label: "BIGGER",
+    sub: "(CUSTOM)",
+    selected: false,
+    imageAlt: "Custom size",
+    isCustom: true,
+    imgSize: 0,
+  },
+];
+
+const features = [
+  {
+    icon: "heart",
+    title: "Made slowly, just for you",
+    text: "Every stitch is intentional.",
+  },
+  {
+    icon: "chat",
+    title: "We listen to every detail",
+    text: "Share your idea, we'll guide the rest.",
+  },
+  {
+    icon: "gift",
+    title: "Wrapped with love",
+    text: "Because the little things matter most.",
+  },
 ];
 ---
 
-<section id="custom" data-testid="custom-orders" class="py-24 md:py-32 bg-[#1A1815] text-[#EFE8DA] relative overflow-hidden">
-  <div class="max-w-[1400px] mx-auto px-6 md:px-12 grid grid-cols-12 gap-10">
+<section
+  id="custom"
+  data-testid="custom-orders"
+  class="custom-section py-20 md:py-28 relative overflow-hidden"
+>
+  <div class="bg-texture" aria-hidden="true"></div>
 
-    <div class="col-span-12 lg:col-span-5">
-      <p class="fade-up uppercase tracking-[0.28em] text-xs text-[#C8862C] mb-5">Custom orders</p>
-      <h2 class="fade-up font-serif-display text-5xl md:text-6xl lg:text-[80px] tracking-tighter leading-[1.02]">
+  <div class="max-w-[1400px] mx-auto px-6 md:px-12 grid grid-cols-12 gap-10 items-start relative z-10">
+
+    <!-- LEFT COLUMN -->
+    <div class="col-span-12 lg:col-span-5 pt-4 left-col">
+      <p class="fade-up label-tag mb-4">Custom Orders</p>
+
+      <h2 class="fade-up heading-display">
         Bring us your<br />
-        <em class="text-[#C8862C]">strangest</em><br />
+        <em class="heading-em">strangest</em><br />
         little idea.
       </h2>
-      <p class="fade-up mt-8 text-[15px] md:text-[17px] leading-[1.7] text-[#EFE8DA]/70 max-w-md">
+
+      <div class="fade-up divider-ornament mt-6 mb-7" aria-hidden="true">
+        <span class="line"></span>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M8 0L9.18 6.17L15 5L10.24 8.76L13 14.27L8 11L3 14.27L5.76 8.76L1 5L6.82 6.17L8 0Z" fill="#C8862C"/>
+        </svg>
+        <span class="line"></span>
+      </div>
+
+      <p class="fade-up body-text mb-10 hidden md:block">
         That cat with the crooked tail. The bouquet she didn't get to keep. The
-        character only your best friend would recognise. We make those.
+        character only your best friend would recognise.<br />We make those.
       </p>
-      
-        href="#cta"
-        data-testid="custom-cta-button"
-        class="fade-up mt-10 inline-flex items-center gap-2 bg-[#C8862C] text-[#1A1815] px-7 py-4 text-sm uppercase tracking-[0.2em] hover:bg-[#EFE8DA] transition-colors duration-500"
-      >
-        Start a custom
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg>
-      </a>
+
+      <ul class="fade-up features-list space-y-6 hidden md:block">
+        {features.map(f => (
+          <li class="feature-item">
+            <span class="feature-icon" aria-hidden="true">
+              {f.icon === "heart" && (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
+              )}
+              {f.icon === "chat" && (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+              )}
+              {f.icon === "gift" && (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 12 20 22 4 22 4 12"/>
+                  <rect x="2" y="7" width="20" height="5"/>
+                  <line x1="12" y1="22" x2="12" y2="7"/>
+                  <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/>
+                  <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+                </svg>
+              )}
+            </span>
+            <div>
+              <p class="feature-title">{f.title}</p>
+              <p class="feature-sub">{f.text}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+
+      <!-- Hero cat — desktop only -->
+      <div class="cat-hero-wrap fade-up">
+        <img
+          src={CrochetCatHero.src}
+          alt="Crochet cat amigurumi with made for you tag"
+          loading="lazy"
+          class="cat-hero-img"
+        />
+      </div>
     </div>
 
-    <div class="col-span-12 lg:col-span-7 space-y-6">
-      {steps.map(s => (
-        <div class="fade-up border-l-2 border-[#C8862C] pl-8 py-3">
-          <div class="flex items-baseline gap-6 mb-2">
-            <span class="font-serif-display text-2xl text-[#C8862C]">{s.num}</span>
-            <h3 class="font-serif-display italic text-4xl md:text-5xl text-[#EFE8DA]">{s.title}</h3>
+    <!-- RIGHT COLUMN — FORM CARD -->
+    <div class="col-span-12 lg:col-span-7">
+      <div class="form-card fade-up">
+
+        <!-- Torn paper header overlapping the card -->
+        <div class="relative w-max mx-auto -mt-6 mb-8 z-20 flex justify-center" style="filter: drop-shadow(0 2px 6px rgba(0,0,0,0.06));">
+          <!-- tape left -->
+          <div class="absolute -top-3 -left-4 w-12 h-5 bg-[#EFE8DA] opacity-90 rotate-[-12deg] shadow-[0_1px_2px_rgba(0,0,0,0.1)] z-30"></div>
+          
+          <!-- flower left -->
+          <div class="absolute -top-12 -left-8 z-10 rotate-[-25deg] pointer-events-none">
+            <svg width="48" height="64" viewBox="0 0 48 64" fill="none">
+              <line x1="24" y1="64" x2="24" y2="20" stroke="#C8A87A" stroke-width="1.2"/>
+              <circle cx="24" cy="18" r="2.5" fill="#C8A87A" opacity="0.7"/>
+              <circle cx="18" cy="12" r="2" fill="#C8A87A" opacity="0.6"/>
+              <circle cx="30" cy="10" r="2" fill="#C8A87A" opacity="0.6"/>
+              <circle cx="14" cy="18" r="1.5" fill="#C8A87A" opacity="0.5"/>
+              <circle cx="34" cy="16" r="1.5" fill="#C8A87A" opacity="0.5"/>
+              <circle cx="22" cy="6" r="1.5" fill="#C8A87A" opacity="0.4"/>
+              <circle cx="28" cy="4" r="1.5" fill="#C8A87A" opacity="0.4"/>
+            </svg>
           </div>
-          <p class="text-[15px] leading-[1.7] text-[#EFE8DA]/65 max-w-lg">{s.text}</p>
+
+          <!-- tape right -->
+          <div class="absolute top-1 -right-4 w-10 h-4 bg-[#EFE8DA] opacity-90 rotate-[15deg] shadow-[0_1px_2px_rgba(0,0,0,0.1)] z-30"></div>
+          
+          <div class="bg-[#F5F0E6] px-10 py-3 relative z-20 torn-edges">
+            <p class="font-serif italic text-xl text-[#2C2410] m-0 flex items-center gap-2">
+              You dream it, we'll crochet it.
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C8862C" stroke-width="1.5">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+              </svg>
+            </p>
+          </div>
         </div>
-      ))}
+
+        <div class="card-body">
+
+          <!-- Row 1: Name + Size -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
+            <div class="field-group">
+              <label class="field-label" for="creation-name">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 0L9.18 6.17L15 5L10.24 8.76L13 14.27L8 11L3 14.27L5.76 8.76L1 5L6.82 6.17L8 0Z" fill="#C8862C"/></svg>
+                Name your creation
+              </label>
+              <div class="input-wrap">
+                <input
+                  id="creation-name"
+                  type="text"
+                  name="creation-name"
+                  placeholder="Crooked Tail Cat"
+                  class="text-input"
+                  autocomplete="off"
+                />
+                <span class="input-icon" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C8862C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="3"/>
+                    <circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/>
+                  </svg>
+                </span>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <p class="field-label">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 0L9.18 6.17L15 5L10.24 8.76L13 14.27L8 11L3 14.27L5.76 8.76L1 5L6.82 6.17L8 0Z" fill="#C8862C"/></svg>
+                Choose size
+                <button class="size-help" type="button" aria-label="Size guide">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                </button>
+              </p>
+              <p class="size-hint">Pick the size that feels just right.</p>
+            </div>
+          </div>
+
+          <!-- Size cards — single cat image, scaled per card -->
+          <div class="size-grid">
+            {sizes.map((s) => (
+              <label class={`size-card ${s.selected ? "size-card--active" : ""} ${s.isCustom ? "size-card--custom" : ""}`}>
+                <input type="radio" name="size" value={s.label + s.sub} checked={s.selected} class="sr-only" />
+                {s.selected && (
+                  <span class="size-check" aria-hidden="true">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  </span>
+                )}
+                <span class="size-label">{s.label}</span>
+                <span class="size-sub">{s.sub}</span>
+                {!s.isCustom ? (
+                  <div class="size-img-wrap">
+                    <img
+                      src={Cat1.src}
+                      alt={s.imageAlt}
+                      loading="lazy"
+                      class="size-img"
+                      style={`width:${s.imgSize}px; height:${s.imgSize}px;`}
+                    />
+                  </div>
+                ) : (
+                  <div class="size-custom-icon" aria-hidden="true">
+                    <svg width="42" height="42" viewBox="0 0 42 42" fill="none">
+                      <rect x="4" y="4" width="34" height="34" rx="8" fill="#E8DFD0" opacity="0.55" stroke="#D4C9B8" stroke-width="1"/>
+                      <!-- teddy silhouette -->
+                      <circle cx="21" cy="14" r="5" fill="#D4C9B8" opacity="0.7"/>
+                      <circle cx="16" cy="11" r="2.5" fill="#D4C9B8" opacity="0.6"/>
+                      <circle cx="26" cy="11" r="2.5" fill="#D4C9B8" opacity="0.6"/>
+                      <ellipse cx="21" cy="26" rx="7" ry="8" fill="#D4C9B8" opacity="0.7"/>
+                      <circle cx="14" cy="27" r="3" fill="#D4C9B8" opacity="0.5"/>
+                      <circle cx="28" cy="27" r="3" fill="#D4C9B8" opacity="0.5"/>
+                    </svg>
+                    <p class="custom-label-text">Let's bring your<br/>big ideas to life.</p>
+                  </div>
+                )}
+                {s.note && (
+                  <div class="absolute top-[100%] mt-3 left-[15%] w-[160px] text-left pointer-events-none z-10 hidden md:block">
+                     <svg class="absolute -top-8 -left-4" width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="#A99B86" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+                       <path d="M20 30 Q 5 25, 10 5" />
+                       <path d="M5 10 L 10 5 L 15 8" />
+                     </svg>
+                     <p class="font-serif italic text-[#A99B86] text-[0.85rem] leading-snug pl-6 m-0" set:html={s.note.replace('shelves', 'shelves<br/>')} />
+                  </div>
+                )}
+              </label>
+            ))}
+          </div>
+
+          <!-- Contact info row -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
+            <div class="field-group">
+              <label class="field-label" for="email">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 0L9.18 6.17L15 5L10.24 8.76L13 14.27L8 11L3 14.27L5.76 8.76L1 5L6.82 6.17L8 0Z" fill="#C8862C"/></svg>
+                Email address
+              </label>
+              <div class="input-wrap">
+                <input
+                  id="email"
+                  type="email"
+                  name="email"
+                  placeholder="hello@sunflora.studio"
+                  class="text-input"
+                  autocomplete="email"
+                />
+                <span class="input-icon" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C8862C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                  </svg>
+                </span>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label" for="phone">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 0L9.18 6.17L15 5L10.24 8.76L13 14.27L8 11L3 14.27L5.76 8.76L1 5L6.82 6.17L8 0Z" fill="#C8862C"/></svg>
+                Phone number
+              </label>
+              <div class="input-wrap">
+                <input
+                  id="phone"
+                  type="tel"
+                  name="phone"
+                  placeholder="+91 XXXXX XXXXX"
+                  class="text-input"
+                  autocomplete="tel"
+                />
+                <span class="input-icon" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C8862C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 2: Tell us + Share inspiration -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+            <div class="field-group">
+              <label class="field-label" for="tell-us">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 0L9.18 6.17L15 5L10.24 8.76L13 14.27L8 11L3 14.27L5.76 8.76L1 5L6.82 6.17L8 0Z" fill="#C8862C"/></svg>
+                Tell us everything
+              </label>
+              <div class="textarea-wrap">
+                <textarea
+                  id="tell-us"
+                  name="description"
+                  rows="5"
+                  placeholder="Describe your idea in as much detail as you can… Colors, personality, tiny quirks, expressions, accessories — we love it all."
+                  class="text-area"
+                  maxlength="1000"
+                ></textarea>
+                <span class="char-count" id="char-count">0/1000</span>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <p class="field-label">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 0L9.18 6.17L15 5L10.24 8.76L13 14.27L8 11L3 14.27L5.76 8.76L1 5L6.82 6.17L8 0Z" fill="#C8862C"/></svg>
+                Share inspiration <span class="optional-tag">(optional)</span>
+              </p>
+              <label for="inspiration-upload" class="upload-zone">
+                <input type="file" id="inspiration-upload" name="inspiration" accept=".png,.jpg,.jpeg" class="sr-only" />
+                <div class="upload-icon" aria-hidden="true">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#C8862C" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                    <polyline points="21 15 16 10 5 21"/>
+                  </svg>
+                </div>
+                <p class="upload-label">Drop your photo or upload</p>
+                <p class="upload-hint">PNG, JPG up to 10MB</p>
+              </label>
+            </div>
+          </div>
+
+          <!-- Info strip -->
+          <div class="relative w-[90%] md:w-[85%] mx-auto mt-8 mb-4 flex justify-center" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.04));">
+            <!-- Tape center -->
+            <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-14 h-5 bg-[#EFE8DA] opacity-90 rotate-[-2deg] shadow-[0_1px_2px_rgba(0,0,0,0.1)] z-30"></div>
+            <div class="bg-[#F5F0E6] px-8 py-5 w-full relative z-20 torn-edges flex flex-col md:flex-row items-center gap-6">
+              <span class="info-heart text-[#C8862C] flex-shrink-0" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
+              </span>
+              <p class="font-sans text-[0.85rem] text-[#7A6E62] leading-relaxed flex-1 m-0 text-center md:text-left">
+                Not sure yet? That's okay.<br/>
+                Rough doodles, screenshots, childhood memories — anything helps.<br/>
+                We'll take it from there.
+              </p>
+              <span class="info-leaf text-[#C8A87A] flex-shrink-0" aria-hidden="true">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">
+                  <path d="M6.69 6.69C5.63 7.75 5 9.31 5 11c0 4 3 7 7 7s7-3 7-7c0-5-4-8-8-8-1.69 0-3.25.63-4.31 1.69z"/>
+                  <line x1="12" y1="18" x2="12" y2="21"/>
+                </svg>
+              </span>
+            </div>
+          </div>
+
+          <!-- CTA -->
+          <div class="flex justify-center mt-2 mb-4">
+            <button type="button" data-testid="custom-cta-button" class="cta-btn mx-auto w-auto min-w-[320px]">
+              Start my custom order
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12h14"/><path d="M12 5l7 7-7 7"/>
+              </svg>
+            </button>
+          </div>
+
+          <p class="privacy-note">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            We'll never share your details. Ever.
+          </p>
+
+        </div>
+
+        <div class="flower-deco bottom-flower" aria-hidden="true">
+          <svg width="48" height="64" viewBox="0 0 48 64" fill="none">
+            <line x1="24" y1="0" x2="24" y2="44" stroke="#C8A87A" stroke-width="1.2"/>
+            <circle cx="24" cy="46" r="2.5" fill="#C8A87A" opacity="0.7"/>
+            <circle cx="18" cy="52" r="2" fill="#C8A87A" opacity="0.6"/>
+            <circle cx="30" cy="54" r="2" fill="#C8A87A" opacity="0.6"/>
+            <circle cx="14" cy="46" r="1.5" fill="#C8A87A" opacity="0.5"/>
+            <circle cx="34" cy="48" r="1.5" fill="#C8A87A" opacity="0.5"/>
+          </svg>
+        </div>
+
+      </div>
     </div>
+
   </div>
 </section>
+
+<style>
+  :root {
+    --col-bg:      #F0E9DC;
+    --col-card:    #FAF5EE;
+    --col-gold:    #C8862C;
+    --col-gold-lt: #C8A87A;
+    --col-ink:     #2C2410;
+    --col-muted:   #7A6E62;
+    --col-border:  #E0D5C5;
+    --col-input:   #EFE9DF;
+    --font-serif:  'Georgia', 'Times New Roman', serif;
+  }
+
+  .custom-section {
+    background-color: var(--col-bg);
+    color: var(--col-ink);
+    font-family: var(--font-serif);
+    position: relative;
+  }
+
+  .bg-texture {
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(ellipse at 20% 10%, rgba(200,134,44,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 90%, rgba(200,134,44,0.05) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  /* Left column layout: flex column so cat sits naturally below features */
+  .left-col {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .label-tag {
+    font-family: sans-serif;
+    font-size: 0.68rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--col-gold);
+    font-weight: 600;
+  }
+
+  .heading-display {
+    font-family: var(--font-serif);
+    font-size: clamp(2.8rem, 5vw, 5rem);
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+    font-weight: 400;
+    color: var(--col-ink);
+  }
+
+  .heading-em {
+    color: var(--col-gold);
+    font-style: italic;
+  }
+
+  .divider-ornament {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 120px;
+  }
+  .divider-ornament .line {
+    flex: 1;
+    height: 1px;
+    background: var(--col-gold);
+    opacity: 0.5;
+  }
+
+  .body-text {
+    font-family: sans-serif;
+    font-size: 0.97rem;
+    line-height: 1.75;
+    color: var(--col-muted);
+    max-width: 380px;
+  }
+
+  .features-list { list-style: none; padding: 0; margin: 0; }
+  .feature-item { display: flex; align-items: flex-start; gap: 16px; }
+  .feature-icon {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--col-gold);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--col-gold);
+    margin-top: 2px;
+  }
+  .feature-title {
+    font-family: sans-serif;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--col-ink);
+    margin-bottom: 2px;
+  }
+  .feature-sub {
+    font-family: sans-serif;
+    font-size: 0.82rem;
+    color: var(--col-muted);
+    line-height: 1.5;
+  }
+
+  /* ── Hero cat ── */
+  .cat-hero-wrap {
+    margin-top: -100px;
+    display: block;
+    margin-left: -16px;
+  }
+
+  /* Hide on mobile, show on lg+ */
+  @media (max-width: 1023px) {
+    .cat-hero-wrap { display: none; }
+  }
+
+  .cat-hero-img {
+    display: block;
+    width: 120%;
+    max-width: none;
+    height: auto;
+    /* No border-radius / box-shadow — transparent-bg Gemini image
+       blends straight into the beige section, matching the reference */
+    border-radius: 0;
+    box-shadow: none;
+    object-fit: contain;
+    object-position: bottom left;
+  }
+
+  /* ── Form card ── */
+  .form-card {
+    background: var(--col-card);
+    border: 1px solid var(--col-border);
+    border-radius: 18px;
+    box-shadow:
+      0 2px 0 rgba(200,134,44,0.12),
+      0 8px 40px rgba(44,36,16,0.09),
+      0 1px 0 white inset;
+    position: relative;
+    /* overflow removed to allow header paper to overlap */
+  }
+
+  .flower-deco { position: absolute; pointer-events: none; }
+  .bottom-flower { bottom: -12px; right: 40px; transform: rotate(10deg); opacity: 0.5; }
+
+  .torn-edges {
+    clip-path: polygon(
+      0.5% 2%, 10% 0%, 20% 1.5%, 30% 0.5%, 40% 2%, 50% 0%, 60% 1.5%, 70% 0%, 80% 2%, 90% 0.5%, 99.5% 2%,
+      100% 20%, 99% 40%, 100% 60%, 99% 80%, 100% 98%,
+      90% 100%, 80% 98.5%, 70% 100%, 60% 98.5%, 50% 100%, 40% 98%, 30% 100%, 20% 98.5%, 10% 100%, 0.5% 98%,
+      0% 80%, 1% 60%, 0% 40%, 1% 20%
+    );
+  }
+
+  .card-body {
+    padding: 20px 32px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .field-group { display: flex; flex-direction: column; gap: 4px; }
+
+  .field-label {
+    font-family: sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--col-ink);
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .size-hint {
+    font-family: sans-serif;
+    font-size: 0.82rem;
+    color: var(--col-muted);
+    margin: 0;
+  }
+
+  .size-help {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--col-muted);
+    display: inline-flex;
+    padding: 0;
+    margin-left: 4px;
+  }
+
+  .input-wrap { position: relative; }
+  .text-input {
+    width: 100%;
+    padding: 10px 40px 10px 14px;
+    background: var(--col-input);
+    border: 1.5px solid var(--col-border);
+    border-radius: 8px;
+    font-family: var(--font-serif);
+    font-size: 0.95rem;
+    color: var(--col-ink);
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+  }
+  .text-input::placeholder { color: var(--col-muted); font-style: italic; }
+  .text-input:focus { border-color: var(--col-gold); }
+  .input-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.55;
+  }
+
+  /* Size grid ── */
+  .size-grid {
+    display: flex;
+    gap: 8px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 50px; /* room for .size-note arrow */
+    scrollbar-width: none;
+  }
+  .size-grid::-webkit-scrollbar { display: none; }
+
+  .size-card {
+    flex: 1;
+    min-width: 100px;
+    border: 1.5px solid var(--col-border);
+    border-radius: 10px;
+    padding: 14px 8px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    background: white;
+    position: relative;
+    transition: border-color 0.2s, background 0.2s, flex 0.25s;
+    user-select: none;
+  }
+  .size-card:hover { border-color: var(--col-gold-lt); }
+  /* Selected card gets a bit more breathing room */
+  .size-card--active {
+    flex: 1.35;
+    border-color: var(--col-gold);
+    background: #FBF3E7;
+  }
+  .size-card--custom { background: #F3EDE4; }
+
+  .size-check {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    background: #C8862C;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  .size-label {
+    font-family: sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--col-ink);
+  }
+  .size-sub {
+    font-family: sans-serif;
+    font-size: 0.65rem;
+    color: var(--col-muted);
+  }
+
+  /* Fixed height container so cards align regardless of img size */
+  .size-img-wrap {
+    margin: 10px 0 4px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    height: 110px;
+  }
+
+  .size-img {
+    object-fit: contain;
+    display: block;
+    max-width: none;
+    /* width/height set inline per card */
+  }
+
+  .size-custom-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    margin: 8px 0 4px;
+    height: 90px;
+    justify-content: center;
+  }
+  .custom-label-text {
+    font-family: sans-serif;
+    font-size: 0.62rem;
+    color: var(--col-muted);
+    text-align: center;
+    line-height: 1.4;
+  }
+
+
+
+  /* Textarea */
+  .textarea-wrap { position: relative; }
+  .text-area {
+    width: 100%;
+    padding: 12px 14px;
+    background: var(--col-input);
+    border: 1.5px solid var(--col-border);
+    border-radius: 8px;
+    font-family: sans-serif;
+    font-size: 0.85rem;
+    color: var(--col-ink);
+    line-height: 1.65;
+    resize: none;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+  }
+  .text-area::placeholder { color: var(--col-muted); font-style: italic; }
+  .text-area:focus { border-color: var(--col-gold); }
+  .char-count {
+    position: absolute;
+    bottom: 10px;
+    right: 12px;
+    font-family: sans-serif;
+    font-size: 0.7rem;
+    color: var(--col-muted);
+  }
+
+  /* Upload */
+  .upload-zone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1.5px dashed var(--col-border);
+    border-radius: 8px;
+    background: var(--col-input);
+    padding: 24px 16px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    height: 100%;
+    box-sizing: border-box;
+    min-height: 140px;
+  }
+  .upload-zone:hover { border-color: var(--col-gold); background: #F5EDD9; }
+  .upload-icon { color: var(--col-gold); opacity: 0.7; }
+  .upload-label {
+    font-family: sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--col-ink);
+    margin: 0;
+  }
+  .upload-hint {
+    font-family: sans-serif;
+    font-size: 0.72rem;
+    color: var(--col-muted);
+    margin: 0;
+  }
+
+  .optional-tag {
+    font-weight: 400;
+    color: var(--col-muted);
+    text-transform: none;
+    letter-spacing: normal;
+    font-size: 0.68rem;
+    margin-left: 4px;
+  }
+
+
+
+  /* CTA */
+  .cta-btn {
+    background: var(--col-gold);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 16px 24px;
+    font-family: sans-serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: background 0.3s, transform 0.15s;
+  }
+  .cta-btn:hover { background: #A96E1E; transform: translateY(-1px); }
+  .cta-btn:active { transform: translateY(0); }
+
+  .privacy-note {
+    font-family: sans-serif;
+    font-size: 0.72rem;
+    color: var(--col-muted);
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    margin: 0;
+  }
+
+  /* Fade-up animation */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(24px);
+    animation: fadeUp 0.7s ease forwards;
+  }
+  @keyframes fadeUp { to { opacity: 1; transform: none; } }
+  .fade-up:nth-child(1)  { animation-delay: 0.05s; }
+  .fade-up:nth-child(2)  { animation-delay: 0.12s; }
+  .fade-up:nth-child(3)  { animation-delay: 0.18s; }
+  .fade-up:nth-child(4)  { animation-delay: 0.24s; }
+  .fade-up:nth-child(5)  { animation-delay: 0.30s; }
+  .fade-up:nth-child(6)  { animation-delay: 0.36s; }
+  .fade-up:nth-child(7)  { animation-delay: 0.42s; }
+
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0;
+    margin: -1px; overflow: hidden; clip: rect(0,0,0,0);
+    white-space: nowrap; border-width: 0;
+  }
+
+  @media (max-width: 767px) {
+    .card-body { padding: 20px 18px 20px; }
+    .size-grid { gap: 7px; }
+    .size-card { min-width: 72px; padding: 10px 6px 8px; }
+    .size-img-wrap { height: 80px; }
+    .size-custom-icon { height: 80px; }
+  }
+</style>
+
+<script>
+  // Char counter
+  const textarea = document.getElementById('tell-us') as HTMLTextAreaElement | null;
+  const counter  = document.getElementById('char-count');
+  if (textarea && counter) {
+    textarea.addEventListener('input', () => {
+      counter!.textContent = `${textarea.value.length}/1000`;
+    });
+  }
+
+  // Size card toggle
+  document.querySelectorAll<HTMLLabelElement>('.size-card').forEach(card => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.size-card').forEach(c => c.classList.remove('size-card--active'));
+      card.classList.add('size-card--active');
+    });
+  });
+
+  // Upload drag & drop
+  const uploadZone = document.querySelector<HTMLLabelElement>('.upload-zone');
+  if (uploadZone) {
+    uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.style.borderColor = 'var(--col-gold)'; });
+    uploadZone.addEventListener('dragleave', () => { uploadZone.style.borderColor = ''; });
+    uploadZone.addEventListener('drop', e => { e.preventDefault(); uploadZone.style.borderColor = ''; });
+  }
+</script>
