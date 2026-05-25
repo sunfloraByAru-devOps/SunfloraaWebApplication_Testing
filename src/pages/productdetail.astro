@@ -1,6 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
 
 import PRODUCT_MAIN   from '../assets/sun_on_desk.png';
 import PRODUCT_CLOSE  from '../assets/sun_on_desk_closeup.png';
@@ -10,144 +11,572 @@ import DINO           from '../assets/green-dino.jpg';
 import SUNMOON        from '../assets/sun_and_moon.jpg';
 import SPIDEY         from '../assets/spiderman.jpg';
 
-const product = {
-  num:     "01",
-  name:    "Sunshine Amigurumi",
-  brand:   "Sunflora Studio",
-  tag:     "Best Seller",
-  tagline: "The one that started it all.",
-  sku:     "SFL-SUN-001",
-  rating:  4.9,
-  reviewCount: 24,
-  price:   649,
-  mrp:     899,
-  description:
-    "Meet our most-loved piece — a warm, round sun with a gentle face and golden rays. Crocheted over 10+ hours using premium anti-pill yarn, she sits comfortably on shelves, desks, and windowsills. Each one is slightly different. Each one is made for you.",
-  sizes: [
-    { label: "Mini",   cm: "8 cm",  price: 649  },
-    { label: "Medium", cm: "12 cm", price: 899  },
-    { label: "Large",  cm: "18 cm", price: 1299 },
-  ],
-  colors: [
-    { name: "Butter Gold", hex: "#F5C842" },
-    { name: "Terracotta",  hex: "#C8633A" },
-    { name: "Sage",        hex: "#7C9E7B" },
-    { name: "Chalk White", hex: "#EFE8DA", border: true },
-    { name: "Ink",         hex: "#1A1815" },
-  ],
-  details: [
-    { label: "Material",     value: "Anti-pill acrylic yarn (Scheepjes Stonewashed or similar)" },
-    { label: "Filling",      value: "Premium polyester fibrefill" },
-    { label: "Eyes",         value: "Safety eyes — 6 mm Mini · 9 mm Medium · 12 mm Large" },
-    { label: "Weight",       value: "40–120 g depending on size" },
-    { label: "Care",         value: "Spot clean only with damp cloth and mild soap" },
-    { label: "Origin",       value: "Handmade in India" },
-  ],
-  includes: [
-    "Handcrocheted by a single pair of hands",
-    "Named & numbered — never duplicated",
-    "Wrapped in kraft paper with a sun stamp",
-    "Handwritten care card enclosed",
-    "Ships in 7–10 working days",
-  ],
-  reviews: [
-    {
-      id: 1,
-      stars: 4,
-      title: "Great design, fabric could be better",
-      date: "24 Sept 2025",
-      helpful: 8,
-      unhelpful: 2,
-      author: "Goutham Patil",
-      verified: true,
-      body: "Design & Style: The satin fabric gives it a refined, slightly glossy finish — great for semi-formal or evening wear. The button-down collar adds a relaxed touch, helping it balance between formal and casual. Regular fit tends to suit most body types without being too tight or too loose. Comfort & Feel: Satin is generally smooth and soft against the skin, though breathability might be a bit compromised in hot weather. Construction & Quality: Stitching and button strength will matter a lot here; if well made, it'll last decent wear cycles. Value & Use Case: Ideal for dinners, parties, or events where you want to look sharp but not overly formal.",
-      photos: [
-        "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=200&h=200&fit=crop",
-        "https://images.unsplash.com/photo-1591462584501-0a8d0c0a1d56?w=200&h=200&fit=crop",
-        "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=200&h=200&fit=crop",
-        "https://images.unsplash.com/photo-1612198188060-c7c2a3b66eae?w=200&h=200&fit=crop"
-      ]
-    },
-    {
-      id: 2,
-      stars: 5,
-      title: "Genuinely impressed — premium feel",
-      date: "2 Jan 2026",
-      helpful: 2,
-      unhelpful: 1,
-      author: "Moh Eajaz",
-      verified: true,
-      body: "I am genuinely impressed with this piece. The fabric feels soft, smooth, and breathable, making it extremely comfortable for long hours. It has a premium touch and is suitable for all-day use. The fit is spot-on — modern, clean, and flattering without being too tight. It gives a sharp and classy look that works equally well for everyday use and special occasions. The bright colour looks elegant and premium, and it remains fresh without fading even after multiple washes. The stitching and finishing are neat and durable, clearly reflecting good craftsmanship. Overall, a perfect balance of comfort, style, and value for money. Highly recommended!",
-      photos: []
-    },
-    {
-      id: 3,
-      stars: 5,
-      title: "Quietly upgrades your entire look",
-      date: "5 Apr 2026",
-      helpful: 2,
-      unhelpful: 1,
-      author: "Vishal Khanavkar",
-      verified: true,
-      body: "I didn't expect this to impress me this much, but it genuinely did. From the moment I had it, I could feel the difference — it's super soft yet breathable, which makes it perfect for all-day use. It sits comfortably without feeling too tight or too loose, almost like it was made just right. What I really liked is how versatile it is. I've used it casually and even dressed it up for a more formal look, and it worked perfectly both ways. Even after a few washes, the colour and shape stayed exactly the same — no fading or change in form. It's become my go-to piece, and I find myself reaching for it more often than I expected. Definitely worth it if you're looking for comfort, style, and durability all in one.",
-      photos: [
-        "https://images.unsplash.com/photo-1608501078713-8e445a709b39?w=200&h=200&fit=crop",
-        "https://images.unsplash.com/photo-1617196034183-421b4040ed20?w=200&h=200&fit=crop"
-      ]
-    },
-  ],
-  ratingBreakdown: [
-    { stars: 5, count: 118905 },
-    { stars: 4, count: 46971  },
-    { stars: 3, count: 18700  },
-    { stars: 2, count: 7246   },
-    { stars: 1, count: 15245  },
-  ],
-  totalRatings:   207100,
-  customerInsights: [
-    {
-      label: "Stitch Quality",
-      options: [
-        { text: "Excellent", pct: 78 },
-        { text: "Good", pct: 15 },
-        { text: "Average", pct: 7 }
-      ]
-    },
-    {
-      label: "Softness",
-      options: [
-        { text: "Very Soft", pct: 82 },
-        { text: "Somewhat Soft", pct: 13 },
-        { text: "Firm", pct: 5 }
-      ]
-    },
-    {
-      label: "Yarn Durability",
-      options: [
-        { text: "Holds Up Well", pct: 74 },
-        { text: "Minor Pilling", pct: 20 },
-        { text: "Pilled Quickly", pct: 6 }
-      ]
-    },
-    {
-      label: "Customer Satisfaction",
-      options: [
-        { text: "Exceeded Expectations", pct: 85 },
-        { text: "Met Expectations", pct: 12 },
-        { text: "Below Expectations", pct: 3 }
-      ]
-    },
-  ],
-  productCode: "SFL-SUN-001",
-  related: [
-    { num: "02", name: "Lil' Dino Keychain", price: 249, mrp: 349, tag: "New",      img: DINO   },
-    { num: "03", name: "Sun & Moon Pair",    price: 449, mrp: 599, tag: "Set of 2", img: SUNMOON },
-    { num: "04", name: "Spidey Hanging",     price: 549, mrp: 699, tag: "Limited",  img: SPIDEY  },
-  ],
+const productsData = {
+  1: {
+    num: "01",
+    name: "Sunshine Amigurumi",
+    brand: "Sunflora Studio",
+    tag: "Best Seller",
+    tagline: "The one that started it all.",
+    sku: "SFL-SUN-001",
+    rating: 4.9,
+    reviewCount: 24,
+    price: 649,
+    mrp: 899,
+    description: "Meet our most-loved piece — a warm, round sun with a gentle face and golden rays. Crocheted over 10+ hours using premium anti-pill yarn, she sits comfortably on shelves, desks, and windowsills. Each one is slightly different. Each one is made for you.",
+    sizes: [
+      { label: "Mini", cm: "8 cm", price: 649, mrp: 899 },
+      { label: "Medium", cm: "12 cm", price: 899, mrp: 1199 },
+      { label: "Large", cm: "18 cm", price: 1299, mrp: 1699 }
+    ],
+    colors: [
+      { name: "Butter Gold", hex: "#F5C842" },
+      { name: "Terracotta", hex: "#C8633A" },
+      { name: "Sage", hex: "#7C9E7B" },
+      { name: "Chalk White", hex: "#EFE8DA", border: true },
+      { name: "Ink", hex: "#1A1815" }
+    ],
+    details: [
+      { label: "Material", value: "Anti-pill acrylic yarn (Scheepjes Stonewashed or similar)" },
+      { label: "Filling", value: "Premium polyester fibrefill" },
+      { label: "Eyes", value: "Safety eyes — 6 mm Mini · 9 mm Medium · 12 mm Large" },
+      { label: "Weight", value: "40–120 g depending on size" },
+      { label: "Care", value: "Spot clean only with damp cloth and mild soap" },
+      { label: "Origin", value: "Handmade in India" }
+    ],
+    includes: [
+      "Handcrocheted by a single pair of hands",
+      "Named & numbered — never duplicated",
+      "Wrapped in kraft paper with a sun stamp",
+      "Handwritten care card enclosed",
+      "Ships in 7–10 working days"
+    ],
+    reviews: [
+      { id: 1, stars: 4, title: "Warm and beautifully made", date: "24 Sept 2025", helpful: 8, unhelpful: 2, author: "Goutham Patil", verified: true, body: "Absolutely wonderful. The stitching and feel of the yarn are premium. It sits nicely on my study table and spreads immense warmth.", photos: [] },
+      { id: 2, stars: 5, title: "Super soft and cute", date: "2 Jan 2026", helpful: 2, unhelpful: 1, author: "Moh Eajaz", verified: true, body: "Genuinely impressed with this piece. The details are beautiful, modern, clean and cozy. It adds the perfect touch to my room.", photos: [] }
+    ],
+    ratingBreakdown: [
+      { stars: 5, count: 18 },
+      { stars: 4, count: 4 },
+      { stars: 3, count: 1 },
+      { stars: 2, count: 1 },
+      { stars: 1, count: 0 }
+    ],
+    totalRatings: 24,
+    customerInsights: [
+      { label: "Stitch Quality", options: [{ text: "Excellent", pct: 85 }, { text: "Good", pct: 10 }, { text: "Average", pct: 5 }] },
+      { label: "Softness", options: [{ text: "Very Soft", pct: 90 }, { text: "Medium", pct: 8 }, { text: "Firm", pct: 2 }] }
+    ],
+    productCode: "SFL-SUN-001",
+    related: [
+      { num: "02", name: "Lil' Dino Keychain", price: 249, mrp: 349, tag: "New", img: DINO.src, id: 2 },
+      { num: "03", name: "Sun & Moon Stem", price: 449, mrp: 599, tag: "Set of 2", img: SUNMOON.src, id: 3 },
+      { num: "04", name: "Spidey Hanging Charm", price: 299, mrp: 399, tag: "Limited", img: SPIDEY.src, id: 4 }
+    ],
+    images: [PRODUCT_CLOSE.src, PRODUCT_MAIN.src, PRODUCT_DETAIL.src, PRODUCT_LIFE.src]
+  },
+  2: {
+    num: "02",
+    name: "Lil' Dino Keychain",
+    brand: "Sunflora Studio",
+    tag: "New",
+    tagline: "A pocket-sized dinosaur companion.",
+    sku: "SFL-DNO-002",
+    rating: 4.7,
+    reviewCount: 18,
+    price: 249,
+    mrp: 349,
+    description: "A pocket-sized green dinosaur companion to guard your keys or ride along on your backpack. Handmade with super-soft cotton yarn, featuring a sturdy silver metal keyring.",
+    sizes: [
+      { label: "Standard", cm: "5 cm", price: 249, mrp: 349 }
+    ],
+    colors: [
+      { name: "Forest Green", hex: "#4E7355" },
+      { name: "Lime Green", hex: "#A8D18C" },
+      { name: "Chalk White", hex: "#EFE8DA", border: true }
+    ],
+    details: [
+      { label: "Material", value: "100% combed cotton yarn" },
+      { label: "Filling", value: "Polyester fibrefill" },
+      { label: "Keyring", value: "Silver alloy clasp" },
+      { label: "Care", value: "Handwash in cold water" }
+    ],
+    includes: [
+      "Stitched meticulously with high-grade cotton yarn",
+      "Sturdy premium keyring attachment included",
+      "Packaged in safe kraft envelopes",
+      "Handwritten thank you note"
+    ],
+    reviews: [
+      { id: 1, stars: 5, title: "Insanely cute", date: "15 Jan 2026", helpful: 3, unhelpful: 0, author: "Aditi S.", verified: true, body: "Perfect companion for my backpack. It gets compliments everywhere I go!", photos: [] }
+    ],
+    ratingBreakdown: [
+      { stars: 5, count: 14 },
+      { stars: 4, count: 3 },
+      { stars: 3, count: 1 },
+      { stars: 2, count: 0 },
+      { stars: 1, count: 0 }
+    ],
+    totalRatings: 18,
+    customerInsights: [
+      { label: "Stitch Quality", options: [{ text: "Excellent", pct: 90 }, { text: "Good", pct: 10 }] },
+      { label: "Softness", options: [{ text: "Very Soft", pct: 95 }] }
+    ],
+    productCode: "SFL-DNO-002",
+    related: [
+      { num: "01", name: "Sunshine Amigurumi", price: 649, mrp: 899, tag: "Best Seller", img: PRODUCT_CLOSE.src, id: 1 },
+      { num: "03", name: "Sun & Moon Stem", price: 449, mrp: 599, tag: "Set of 2", img: SUNMOON.src, id: 3 },
+      { num: "04", name: "Spidey Hanging Charm", price: 299, mrp: 399, tag: "Limited", img: SPIDEY.src, id: 4 }
+    ],
+    images: [DINO.src, PRODUCT_MAIN.src, PRODUCT_DETAIL.src, PRODUCT_LIFE.src]
+  },
+  3: {
+    num: "03",
+    name: "Sun & Moon Stem",
+    brand: "Sunflora Studio",
+    tag: "Set of 2",
+    tagline: "Always together, day and night.",
+    sku: "SFL-SM-003",
+    rating: 4.8,
+    reviewCount: 15,
+    price: 449,
+    mrp: 599,
+    description: "A gorgeous set of two floral-inspired stems featuring a cheerful miniature sun and a sleepy, cozy crescent moon. Perfect for glass vases or desk organization decor.",
+    sizes: [
+      { label: "Standard Stems", cm: "15 cm", price: 449, mrp: 599 }
+    ],
+    colors: [
+      { name: "Gold & White", hex: "#EAD27B" },
+      { name: "Pastel Set", hex: "#CBE0F5" }
+    ],
+    details: [
+      { label: "Material", value: "Mercerized cotton yarn with interior wire stem" },
+      { label: "Length", value: "approx 15 cm each" },
+      { label: "Core", value: "Bendable florist wire (keep dry)" },
+      { label: "Care", value: "Dust lightly, do not submerge in water" }
+    ],
+    includes: [
+      "1x Sun Stem & 1x Moon Stem",
+      "Flexible, bendable inner wire stems",
+      "Wrapped neatly in aesthetic parchment paper",
+      "Handwritten letter"
+    ],
+    reviews: [
+      { id: 1, stars: 5, title: "Beautiful decor!", date: "10 Feb 2026", helpful: 5, author: "Rahul K.", verified: true, body: "Looks incredibly premium in a tiny glass vase on my bookshelf. Super happy with it!", photos: [] }
+    ],
+    ratingBreakdown: [
+      { stars: 5, count: 12 },
+      { stars: 4, count: 2 },
+      { stars: 3, count: 1 },
+      { stars: 2, count: 0 },
+      { stars: 1, count: 0 }
+    ],
+    totalRatings: 15,
+    customerInsights: [
+      { label: "Craftsmanship", options: [{ text: "Excellent", pct: 93 }] }
+    ],
+    productCode: "SFL-SM-003",
+    related: [
+      { num: "01", name: "Sunshine Amigurumi", price: 649, mrp: 899, tag: "Best Seller", img: PRODUCT_CLOSE.src, id: 1 },
+      { num: "02", name: "Lil' Dino Keychain", price: 249, mrp: 349, tag: "New", img: DINO.src, id: 2 },
+      { num: "04", name: "Spidey Hanging Charm", price: 299, mrp: 399, tag: "Limited", img: SPIDEY.src, id: 4 }
+    ],
+    images: [SUNMOON.src, PRODUCT_MAIN.src, PRODUCT_DETAIL.src, PRODUCT_LIFE.src]
+  },
+  4: {
+    num: "04",
+    name: "Spidey Hanging Charm",
+    brand: "Sunflora Studio",
+    tag: "Limited",
+    tagline: "Your friendly neighborhood crochet charm.",
+    sku: "SFL-SPD-004",
+    rating: 4.7,
+    reviewCount: 22,
+    price: 299,
+    mrp: 399,
+    description: "Hang this friendly little spider hero anywhere you need a small dash of courage and support. Crafted using rich scarlet and deep navy threads.",
+    sizes: [
+      { label: "Standard", cm: "6 cm", price: 299, mrp: 399 }
+    ],
+    colors: [
+      { name: "Classic Red/Blue", hex: "#D63B3B" },
+      { name: "Spider-verse Black", hex: "#2B2B2B" }
+    ],
+    details: [
+      { label: "Material", value: "Scheepjes Catona fine cotton" },
+      { label: "Loop", value: "8 cm braided hanging cord" },
+      { label: "Details", value: "Embroidered webbing details" }
+    ],
+    includes: [
+      "Crocheted spider hero hanging charm",
+      "Braided loop for easy hanging",
+      "Packed in a thematic card slot",
+      "Slowly hand-stitched"
+    ],
+    reviews: [
+      { id: 1, stars: 5, title: "A hit with my son", date: "1 Mar 2026", helpful: 4, author: "Meera R.", verified: true, body: "My son absolutely loves it. The webbing details are so finely done. Exceptional craft!", photos: [] }
+    ],
+    ratingBreakdown: [
+      { stars: 5, count: 17 },
+      { stars: 4, count: 4 },
+      { stars: 3, count: 1 },
+      { stars: 2, count: 0 },
+      { stars: 1, count: 0 }
+    ],
+    totalRatings: 22,
+    customerInsights: [
+      { label: "Stitch Precision", options: [{ text: "High", pct: 95 }] }
+    ],
+    productCode: "SFL-SPD-004",
+    related: [
+      { num: "01", name: "Sunshine Amigurumi", price: 649, mrp: 899, tag: "Best Seller", img: PRODUCT_CLOSE.src, id: 1 },
+      { num: "02", name: "Lil' Dino Keychain", price: 249, mrp: 349, tag: "New", img: DINO.src, id: 2 },
+      { num: "03", name: "Sun & Moon Stem", price: 449, mrp: 599, tag: "Set of 2", img: SUNMOON.src, id: 3 }
+    ],
+    images: [SPIDEY.src, PRODUCT_MAIN.src, PRODUCT_DETAIL.src, PRODUCT_LIFE.src]
+  },
+  5: {
+    num: "05",
+    name: "Crochet Stars Set",
+    brand: "Sunflora Studio",
+    tag: "New",
+    tagline: "Bring a piece of the night sky home.",
+    sku: "SFL-STR-005",
+    rating: 4.9,
+    reviewCount: 16,
+    price: 399,
+    mrp: 549,
+    description: "A pack of three dreamy crochet stars in sweet celestial hues. Soft to the touch and perfect for bedroom displays, garland hanging, or shelf styling.",
+    sizes: [
+      { label: "Set of 3", cm: "6 cm each", price: 399, mrp: 549 }
+    ],
+    colors: [
+      { name: "Creamy Ivory", hex: "#FFFDF2" },
+      { name: "Pastel Yellow", hex: "#FDE68A" }
+    ],
+    details: [
+      { label: "Material", value: "Soft baby-safe cotton yarn" },
+      { label: "Includes", value: "3 stars (Ivory, Yellow, and Soft Grey)" },
+      { label: "Care", value: "Gently wipe with a soft dry cloth" }
+    ],
+    includes: [
+      "Three beautiful handcrocheted stars",
+      "Stitched with love & anti-pill yarn",
+      "Aesthetic craft paper gift wrapping",
+      "Exclusive signature collectable card"
+    ],
+    reviews: [
+      { id: 1, stars: 5, title: "Super sweet!", date: "4 Apr 2026", helpful: 3, author: "Pooja V.", verified: true, body: "Perfect decoration for my nursery. They look so elegant and gentle.", photos: [] }
+    ],
+    ratingBreakdown: [
+      { stars: 5, count: 14 },
+      { stars: 4, count: 2 },
+      { stars: 3, count: 0 }
+    ],
+    totalRatings: 16,
+    customerInsights: [
+      { label: "Sweetness Factor", options: [{ text: "Extremely High", pct: 100 }] }
+    ],
+    productCode: "SFL-STR-005",
+    related: [
+      { num: "01", name: "Sunshine Amigurumi", price: 649, mrp: 899, tag: "Best Seller", img: PRODUCT_CLOSE.src, id: 1 },
+      { num: "03", name: "Sun & Moon Stem", price: 449, mrp: 599, tag: "Set of 2", img: SUNMOON.src, id: 3 },
+      { num: "02", name: "Lil' Dino Keychain", price: 249, mrp: 349, tag: "New", img: DINO.src, id: 2 }
+    ],
+    images: [PRODUCT_DETAIL.src, PRODUCT_MAIN.src, DINO.src, SUNMOON.src]
+  },
+  6: {
+    num: "06",
+    name: "Golden Sunshine Desk Piece",
+    brand: "Sunflora Studio",
+    tag: "Fan Fav",
+    tagline: "Your bright, permanent desk sunshine.",
+    sku: "SFL-GSD-006",
+    rating: 5.0,
+    reviewCount: 30,
+    price: 749,
+    mrp: 999,
+    description: "A deluxe, larger sunshine plushie designed to stand firmly on flat surfaces. Features fully stuffed 3D sunbeams and a premium polished oak display stand.",
+    sizes: [
+      { label: "Desk Size", cm: "14 cm", price: 749, mrp: 999 }
+    ],
+    colors: [
+      { name: "Golden Amber", hex: "#D97706" },
+      { name: "Butter Cream", hex: "#FEF3C7" }
+    ],
+    details: [
+      { label: "Material", value: "Double strand worsted weight cotton yarn" },
+      { label: "Stand", value: "Treated organic oak display block" },
+      { label: "Weight", value: "Approx 160g including block" }
+    ],
+    includes: [
+      "Extra large handcrocheted Sunshine Desk Piece",
+      "Polished organic oak display stand",
+      "Wrapped in dynamic tissue with wax seal",
+      "Signature number certificate of craft"
+    ],
+    reviews: [
+      { id: 1, stars: 5, title: "Outstanding desk accessory!", date: "12 Apr 2026", helpful: 9, author: "Karan J.", verified: true, body: "Stands proudly right next to my screen. The wood base makes it look extremely class and premium. Truly 5 stars!", photos: [] }
+    ],
+    ratingBreakdown: [
+      { stars: 5, count: 30 },
+      { stars: 4, count: 0 }
+    ],
+    totalRatings: 30,
+    customerInsights: [
+      { label: "Craftsmanship", options: [{ text: "Incredible", pct: 100 }] }
+    ],
+    productCode: "SFL-GSD-006",
+    related: [
+      { num: "01", name: "Sunshine Amigurumi", price: 649, mrp: 899, tag: "Best Seller", img: PRODUCT_CLOSE.src, id: 1 },
+      { num: "03", name: "Sun & Moon Stem", price: 449, mrp: 599, tag: "Set of 2", img: SUNMOON.src, id: 3 },
+      { num: "04", name: "Spidey Hanging Charm", price: 299, mrp: 399, tag: "Limited", img: SPIDEY.src, id: 4 }
+    ],
+    images: [PRODUCT_MAIN.src, PRODUCT_CLOSE.src, PRODUCT_DETAIL.src, PRODUCT_LIFE.src]
+  },
+  7: {
+    num: "07",
+    name: "Mini Dino Amigurumi",
+    brand: "Sunflora Studio",
+    tag: "",
+    tagline: "A mini plush dinosaur for desks.",
+    sku: "SFL-MDA-007",
+    rating: 4.8,
+    reviewCount: 14,
+    price: 549,
+    mrp: 699,
+    description: "Meet our mini dino companion plushie! Stuffed full of cozy fibrefill and featuring a round, cuddly body that fits perfectly in your hand.",
+    sizes: [
+      { label: "Mini Size", cm: "7 cm", price: 549, mrp: 699 }
+    ],
+    colors: [
+      { name: "Forest Green", hex: "#4E7355" }
+    ],
+    details: [
+      { label: "Material", value: "Anti-pill acrylic yarn" },
+      { label: "Filling", value: "Premium polyester fibrefill" }
+    ],
+    includes: [
+      "Handcrocheted mini dinosaur plushie",
+      "Named & numbered craft label",
+      "Kraft box packaging"
+    ],
+    reviews: [
+      { id: 1, stars: 5, title: "So cuddly!", date: "20 May 2026", author: "Sneha", verified: true, body: "Such a neat little dino. Fits on my shelf perfectly.", photos: [] }
+    ],
+    ratingBreakdown: [{ stars: 5, count: 12 }, { stars: 4, count: 2 }],
+    totalRatings: 14,
+    customerInsights: [{ label: "Softness", options: [{ text: "Very Soft", pct: 90 }] }],
+    productCode: "SFL-MDA-007",
+    related: [
+      { num: "02", name: "Lil' Dino Keychain", price: 249, mrp: 349, tag: "New", img: DINO.src, id: 2 },
+      { num: "01", name: "Sunshine Amigurumi", price: 649, mrp: 899, tag: "Best Seller", img: PRODUCT_CLOSE.src, id: 1 }
+    ],
+    images: [DINO.src, PRODUCT_MAIN.src, PRODUCT_DETAIL.src, PRODUCT_LIFE.src]
+  },
+  8: {
+    num: "08",
+    name: "Moon Stem Single",
+    brand: "Sunflora Studio",
+    tag: "",
+    tagline: "A peaceful single crescent stem.",
+    sku: "SFL-MSS-008",
+    rating: 4.6,
+    reviewCount: 9,
+    price: 299,
+    mrp: 399,
+    description: "A single, sleepy crescent moon stem perfect for elegant bedside vases. Adds a calm, starry night touch to any space.",
+    sizes: [
+      { label: "Single Stem", cm: "15 cm", price: 299, mrp: 399 }
+    ],
+    colors: [
+      { name: "Aesthetic Grey", hex: "#B8B8B8" },
+      { name: "Creamy Ivory", hex: "#FFFDF2" }
+    ],
+    details: [
+      { label: "Material", value: "Mercerized cotton yarn with wire" }
+    ],
+    includes: [
+      "1x Crescent Moon Stem",
+      "Care card"
+    ],
+    reviews: [
+      { id: 1, stars: 5, title: "Super elegant", date: "22 May 2026", author: "Maya", verified: true, body: "Simple and gorgeous.", photos: [] }
+    ],
+    ratingBreakdown: [{ stars: 5, count: 7 }, { stars: 4, count: 2 }],
+    totalRatings: 9,
+    customerInsights: [{ label: "Craftsmanship", options: [{ text: "High", pct: 90 }] }],
+    productCode: "SFL-MSS-008",
+    related: [
+      { num: "03", name: "Sun & Moon Stem", price: 449, mrp: 599, tag: "Set of 2", img: SUNMOON.src, id: 3 },
+      { num: "01", name: "Sunshine Amigurumi", price: 649, mrp: 899, tag: "Best Seller", img: PRODUCT_CLOSE.src, id: 1 }
+    ],
+    images: [SUNMOON.src, PRODUCT_MAIN.src, PRODUCT_DETAIL.src, PRODUCT_LIFE.src]
+  },
+  9: {
+    num: "09",
+    name: "Sunshine Bouquet",
+    brand: "Sunflora Studio",
+    tag: "Top Rated",
+    tagline: "Flowers that stay vibrant forever.",
+    sku: "SFL-SB-009",
+    rating: 4.9,
+    reviewCount: 32,
+    price: 1299,
+    mrp: 1699,
+    description: "A spectacular permanent bouquet containing one Sunshine stem, two Daisy stems, and matching green sprigs. Lovingly arranged and wrapped in dual-tone textured brown kraft sheets.",
+    sizes: [
+      { label: "Full Bouquet", cm: "28 cm", price: 1299, mrp: 1699 }
+    ],
+    colors: [
+      { name: "Sun Yellow / Sage", hex: "#FEF08A" }
+    ],
+    details: [
+      { label: "Stems included", value: "1x Sunshine, 2x Daisy, 2x Eucalyptus sprigs" },
+      { label: "Wrapping", value: "Dual-tone craft sheets with satin ribbon" }
+    ],
+    includes: [
+      "Spectacular handmade bouquet array",
+      "Deluxe gift packaging box",
+      "Sunflora care handbook"
+    ],
+    reviews: [
+      { id: 1, stars: 5, title: "Simply breathtaking", date: "24 May 2026", author: "Nisha P.", verified: true, body: "Gifted this to my sister and she cried. It's so gorgeous and never dies!", photos: [] }
+    ],
+    ratingBreakdown: [{ stars: 5, count: 29 }, { stars: 4, count: 3 }],
+    totalRatings: 32,
+    customerInsights: [{ label: "Detailing", options: [{ text: "Outstanding", pct: 98 }] }],
+    productCode: "SFL-SB-009",
+    related: [
+      { num: "01", name: "Sunshine Amigurumi", price: 649, mrp: 899, tag: "Best Seller", img: PRODUCT_CLOSE.src, id: 1 },
+      { num: "03", name: "Sun & Moon Stem", price: 449, mrp: 599, tag: "Set of 2", img: SUNMOON.src, id: 3 }
+    ],
+    images: [PRODUCT_CLOSE.src, PRODUCT_MAIN.src, PRODUCT_DETAIL.src, PRODUCT_LIFE.src]
+  },
+  10: {
+    num: "10",
+    name: "Galaxy Star Mobile",
+    brand: "Sunflora Studio",
+    tag: "New",
+    tagline: "Dreamy stars for baby nurseries.",
+    sku: "SFL-GSM-010",
+    rating: 4.7,
+    reviewCount: 11,
+    price: 599,
+    mrp: 799,
+    description: "A gorgeous hanging crib mobile carrying five sweet crochet stars in pastels. Suspended safely on a natural bamboo hoop.",
+    sizes: [
+      { label: "Standard Hoop", cm: "40 cm drop", price: 599, mrp: 799 }
+    ],
+    colors: [
+      { name: "Celestial Pastel", hex: "#EBE6FE" }
+    ],
+    details: [
+      { label: "Hoop Material", value: "100% natural organic bamboo" }
+    ],
+    includes: [
+      "Natural bamboo mobile frame",
+      "5x Crochet stars with cotton drop threads"
+    ],
+    reviews: [
+      { id: 1, stars: 5, title: "A beautiful addition", date: "25 May 2026", author: "Harshini", verified: true, body: "Looks incredibly cute above the crib.", photos: [] }
+    ],
+    ratingBreakdown: [{ stars: 5, count: 9 }, { stars: 4, count: 2 }],
+    totalRatings: 11,
+    customerInsights: [{ label: "Quality", options: [{ text: "Very good", pct: 92 }] }],
+    productCode: "SFL-GSM-010",
+    related: [
+      { num: "05", name: "Crochet Stars Set", price: 399, mrp: 549, tag: "New", img: PRODUCT_DETAIL.src, id: 5 },
+      { num: "01", name: "Sunshine Amigurumi", price: 649, mrp: 899, tag: "Best Seller", img: PRODUCT_CLOSE.src, id: 1 }
+    ],
+    images: [PRODUCT_DETAIL.src, PRODUCT_MAIN.src, DINO.src, SUNMOON.src]
+  },
+  11: {
+    num: "11",
+    name: "Spidey + Dino Duo",
+    brand: "Sunflora Studio",
+    tag: "Bundle",
+    tagline: "Double the friendship and support.",
+    sku: "SFL-SDD-011",
+    rating: 4.8,
+    reviewCount: 19,
+    price: 499,
+    mrp: 649,
+    description: "Get our two most famous keychain/charm buddies as a bundle! Contains one friendly spider hero and one cute green dino keychain.",
+    sizes: [
+      { label: "Duo Set", cm: "Keychains", price: 499, mrp: 649 }
+    ],
+    colors: [
+      { name: "Classic Combo", hex: "#D63B3B" }
+    ],
+    details: [
+      { label: "Bundle contents", value: "1x Lil' Dino Keychain, 1x Spidey Hanging Charm" }
+    ],
+    includes: [
+      "1x Lil' Dino Keychain",
+      "1x Spidey Hanging Charm",
+      "Dual keychain craft gift packaging"
+    ],
+    reviews: [
+      { id: 1, stars: 5, title: "Best keychains ever", date: "26 May 2026", author: "Ganesh", verified: true, body: "Love both of them! Excellent value bundle.", photos: [] }
+    ],
+    ratingBreakdown: [{ stars: 5, count: 16 }, { stars: 4, count: 3 }],
+    totalRatings: 19,
+    customerInsights: [{ label: "Softness", options: [{ text: "Very soft", pct: 95 }] }],
+    productCode: "SFL-SDD-011",
+    related: [
+      { num: "02", name: "Lil' Dino Keychain", price: 249, mrp: 349, tag: "New", img: DINO.src, id: 2 },
+      { num: "04", name: "Spidey Hanging Charm", price: 299, mrp: 399, tag: "Limited", img: SPIDEY.src, id: 4 }
+    ],
+    images: [SPIDEY.src, DINO.src, PRODUCT_MAIN.src, PRODUCT_DETAIL.src]
+  },
+  12: {
+    num: "12",
+    name: "Sunrise Amigurumi",
+    brand: "Sunflora Studio",
+    tag: "Fan Fav",
+    tagline: "Bring the morning glow inside.",
+    sku: "SFL-SRA-012",
+    rating: 5.0,
+    reviewCount: 15,
+    price: 699,
+    mrp: 899,
+    description: "A beautiful variation of our sunshine plushie featuring pastel morning glow sunrise hues (soft pinks, butter creams and corals). Perfect for soft aesthetics.",
+    sizes: [
+      { label: "Standard", cm: "12 cm", price: 699, mrp: 899 }
+    ],
+    colors: [
+      { name: "Morning Glow Pink", hex: "#FCA5A5" },
+      { name: "Sunrise Orange", hex: "#FDBA74" }
+    ],
+    details: [
+      { label: "Material", value: "Anti-pill acrylic yarn" }
+    ],
+    includes: [
+      "Handcrocheted Sunrise Amigurumi Piece",
+      "Numbered certificate of craft label"
+    ],
+    reviews: [
+      { id: 1, stars: 5, title: "Pure pastel magic!", date: "26 May 2026", author: "Kriti", verified: true, body: "The colors are absolutely beautiful.", photos: [] }
+    ],
+    ratingBreakdown: [{ stars: 5, count: 15 }],
+    totalRatings: 15,
+    customerInsights: [{ label: "Color Aesthetics", options: [{ text: "Perfect", pct: 100 }] }],
+    productCode: "SFL-SRA-012",
+    related: [
+      { num: "01", name: "Sunshine Amigurumi", price: 649, mrp: 899, tag: "Best Seller", img: PRODUCT_CLOSE.src, id: 1 },
+      { num: "03", name: "Sun & Moon Stem", price: 449, mrp: 599, tag: "Set of 2", img: SUNMOON.src, id: 3 }
+    ],
+    images: [PRODUCT_MAIN.src, PRODUCT_CLOSE.src, PRODUCT_DETAIL.src, PRODUCT_LIFE.src]
+  }
 };
 
-const images = [PRODUCT_MAIN.src, PRODUCT_CLOSE.src, PRODUCT_DETAIL.src, PRODUCT_LIFE.src];
+const initialProductId = 1;
+const product = productsData[initialProductId];
+const images = product.images;
 const discount = Math.round((1 - product.price / product.mrp) * 100);
+
+const productsJson = JSON.stringify(productsData);
 ---
 <Layout title={`${product.name} — ${product.brand}`} description={product.description}>
 
@@ -177,36 +606,7 @@ const discount = Math.round((1 - product.price / product.mrp) * 100);
     -webkit-font-smoothing: antialiased;
   }
 
-  /* ── NAV ── */
-  nav {
-    position: sticky; top: 0; z-index: 200;
-    background: var(--dark);
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0 clamp(1rem, 3vw, 3rem);
-    height: 56px;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-  }
-  .nav-logo {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.5rem; font-style: italic;
-    color: #fff; text-decoration: none; letter-spacing: 0.02em;
-  }
-  .nav-logo span { color: var(--amber); }
-  .nav-links { display: flex; gap: 2rem; list-style: none; }
-  .nav-links a {
-    font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase;
-    color: rgba(255,255,255,0.6); text-decoration: none; transition: color 0.2s;
-  }
-  .nav-links a:hover { color: #fff; }
-  .nav-actions { display: flex; align-items: center; gap: 1rem; }
-  .nav-icon-btn {
-    background: none; border: none; cursor: pointer;
-    color: rgba(255,255,255,0.7); display: flex; align-items: center;
-    gap: 0.35rem; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase;
-    transition: color 0.2s; text-decoration: none;
-  }
-  .nav-icon-btn:hover { color: #fff; }
-  @media (max-width: 768px) { .nav-links { display: none; } }
+
 
   /* ── BREADCRUMB ── */
   .breadcrumb {
@@ -932,21 +1332,6 @@ const discount = Math.round((1 - product.price / product.mrp) * 100);
   .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
 </style>
 
-<!-- NAV -->
-<nav>
-  <a href="/" class="nav-logo">Sunflora<span>.</span></a>
-  <ul class="nav-links">
-    <li><a href="/#offerings">Collections</a></li>
-    <li><a href="/#how">Process</a></li>
-    <li><a href="/#testimonials">Love notes</a></li>
-  </ul>
-  <div class="nav-actions">
-    <a href="https://wa.me/910000000000" class="nav-icon-btn" target="_blank" rel="noreferrer">
-      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      Order
-    </a>
-  </div>
-</nav>
 
 <!-- BREADCRUMB -->
 <div class="breadcrumb">
@@ -981,7 +1366,7 @@ const discount = Math.round((1 - product.price / product.mrp) * 100);
     <div style="position: relative;">
       <div class="main-image-wrap" id="main-image-wrap">
         <img src={images[0]} alt={product.name} id="main-img" />
-        {product.tag && <span class="img-tag">{product.tag}</span>}
+        <span class="img-tag" id="img-tag" style={product.tag ? "" : "display: none;"}>{product.tag}</span>
         <button class="main-img-nav main-img-nav--prev" id="img-prev" aria-label="Previous image">
           <svg width="8" height="14" viewBox="0 0 8 14" fill="none"><path d="M7 1L1 7L7 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
@@ -999,7 +1384,7 @@ const discount = Math.round((1 - product.price / product.mrp) * 100);
 
       <div class="rating-bar">
         <span class="rating-pill">
-          {product.rating}
+          <span id="rating-val">{product.rating}</span>
           <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         </span>
         <span class="rating-count">{product.reviewCount} Ratings</span>
@@ -1019,7 +1404,7 @@ const discount = Math.round((1 - product.price / product.mrp) * 100);
         <div class="section-label">
           Colour <span id="color-label">— {product.colors[0].name}</span>
         </div>
-        <div class="color-row">
+        <div class="color-row" id="color-container">
           {product.colors.map((c, i) => (
             <button
               class={`color-swatch${i === 0 ? ' active' : ''}${c.border ? ' border-swatch' : ''}`}
@@ -1041,7 +1426,7 @@ const discount = Math.round((1 - product.price / product.mrp) * 100);
             Size Chart
           </a>
         </div>
-        <div class="size-grid">
+        <div class="size-grid" id="sizes-container">
           {product.sizes.map((s, i) => (
             <button
               class={`size-btn${i === 0 ? ' active' : ''}`}
@@ -1116,7 +1501,7 @@ const discount = Math.round((1 - product.price / product.mrp) * 100);
         </button>
         <div class="accordion-body open" id="acc-desc">
           <div class="accordion-inner">
-            <p style="font-size:0.82rem;line-height:1.75;color:var(--muted);padding:0.5rem 0 1rem;">{product.description}</p>
+            <p id="product-description" style="font-size:0.82rem;line-height:1.75;color:var(--muted);padding:0.5rem 0 1rem;">{product.description}</p>
           </div>
         </div>
 
@@ -1127,12 +1512,14 @@ const discount = Math.round((1 - product.price / product.mrp) * 100);
         <div class="accordion-body" id="acc-details">
           <div class="accordion-inner">
             <table class="details-table">
-              {product.details.map(d => (
-                <tr>
-                  <td>{d.label}</td>
-                  <td>{d.value}</td>
-                </tr>
-              ))}
+              <tbody id="details-table-body">
+                {product.details.map(d => (
+                  <tr>
+                    <td>{d.label}</td>
+                    <td>{d.value}</td>
+                  </tr>
+                ))}
+              </tbody>
             </table>
           </div>
         </div>
@@ -1143,7 +1530,7 @@ const discount = Math.round((1 - product.price / product.mrp) * 100);
         </button>
         <div class="accordion-body" id="acc-includes">
           <div class="accordion-inner">
-            <div class="includes-list">
+            <div class="includes-list" id="includes-container">
               {product.includes.map(item => (
                 <div class="includes-item">
                   <svg class="includes-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -1214,9 +1601,9 @@ const discount = Math.round((1 - product.price / product.mrp) * 100);
       <div class="rating-score-block">
         <span class="rating-score-num">{product.rating}</span>
         <div class="rating-score-stars">★★★★★</div>
-        <div class="rating-score-total">{(product.totalRatings / 1000).toFixed(1)}k<br/>Verified Buyers</div>
+        <div class="rating-score-total" id="rating-score-total">{(product.totalRatings / 1000).toFixed(1)}k<br/>Verified Buyers</div>
       </div>
-      <div class="rating-bars">
+      <div class="rating-bars" id="rating-bars-container">
         {product.ratingBreakdown.map(row => {
           const pct = Math.round((row.count / product.totalRatings) * 100);
           const isLow = row.stars >= 2;
@@ -1237,7 +1624,7 @@ const discount = Math.round((1 - product.price / product.mrp) * 100);
     <!-- Customer Insights — crochet-specific -->
     <div class="insights-block">
       <div class="insights-title">What Customers Said</div>
-      <div class="insights-rows">
+      <div class="insights-rows" id="insights-container">
         {product.customerInsights.map(ins => (
           <div class="insight-row">
             <div class="insight-row-label">{ins.label}</div>
@@ -1277,7 +1664,7 @@ const discount = Math.round((1 - product.price / product.mrp) * 100);
       <span class="reviews-list-count">({product.reviews.length * 11357} reviews)</span>
     </div>
 
-    <div class="reviews-list">
+    <div class="reviews-list" id="reviews-list-container">
       {product.reviews.map(r => {
         const starColor = r.stars >= 4 ? '' : r.stars === 3 ? ' mid' : ' low';
         const words = r.body.split(' ');
@@ -1340,7 +1727,7 @@ const discount = Math.round((1 - product.price / product.mrp) * 100);
     </a>
 
     <div class="product-code-row">
-      <span>Product Code: <span>{product.productCode}</span></span>
+      <span>Product Code: <span id="product-code-val">{product.productCode}</span></span>
       <span>Seller: <a href="#" style="color:var(--amber);text-decoration:none;">View Supplier Information</a></span>
     </div>
   </section>
@@ -1353,19 +1740,21 @@ const discount = Math.round((1 - product.price / product.mrp) * 100);
       <span class="insights-dialog-title">What customers say about this product</span>
       <button class="insights-dialog-close" id="insights-close" aria-label="Close">×</button>
     </div>
-    {product.customerInsights.map(ins => (
-      <div class="dialog-insight-group">
-        <div class="dialog-insight-label">{ins.label}</div>
-        {ins.options.map((opt, oi) => (
-          <div class="dialog-bar-row">
-            <span class={`dialog-bar-name${oi === 0 ? ' bold' : ''}`}>{opt.text} ({opt.pct}%)</span>
-            <div class="dialog-bar-track">
-              <div class={`dialog-bar-fill${oi === 0 ? ' primary' : ''}`} style={`width:${opt.pct}%`}></div>
+    <div class="insights-dialog-body" id="dialog-insights-container" style="padding: 1rem 1.5rem 1.5rem; display: flex; flex-direction: column; gap: 1.5rem;">
+      {product.customerInsights.map(ins => (
+        <div class="dialog-insight-group">
+          <div class="dialog-insight-label">{ins.label}</div>
+          {ins.options.map((opt, oi) => (
+            <div class="dialog-bar-row">
+              <span class={`dialog-bar-name${oi === 0 ? ' bold' : ''}`}>{opt.text} ({opt.pct}%)</span>
+              <div class="dialog-bar-track">
+                <div class={`dialog-bar-fill${oi === 0 ? ' primary' : ''}`} style={`width:${opt.pct}%`}></div>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
-    ))}
+          ))}
+        </div>
+      ))}
+    </div>
   </div>
 </div>
 
@@ -1375,13 +1764,13 @@ const discount = Math.round((1 - product.price / product.mrp) * 100);
     <h2>You might also love</h2>
     <a href="/#offerings" class="see-all">See all →</a>
   </div>
-  <div class="related-grid">
+  <div class="related-grid" id="related-grid-container">
     {product.related.map(o => {
       const relDisc = Math.round((1 - o.price / o.mrp) * 100);
       return (
-        <a href="#" class="related-card">
+        <a href={`/productdetail?id=${o.id}`} class="related-card">
           <div class="related-img-wrap">
-            <Image src={o.img} alt={o.name} />
+            <img src={o.img} alt={o.name} />
             <span class="related-badge">{o.tag}</span>
           </div>
           <div class="related-body">
@@ -1390,7 +1779,7 @@ const discount = Math.round((1 - product.price / product.mrp) * 100);
             <div class="related-price-row">
               <span class="related-price">₹ {o.price}</span>
               <span class="related-mrp">₹ {o.mrp}</span>
-              <span class="related-disc">{relDisc}% off</span>
+              <span class="related-disc">({relDisc}% OFF)</span>
             </div>
           </div>
         </a>
@@ -1415,7 +1804,7 @@ const discount = Math.round((1 - product.price / product.mrp) * 100);
 <!-- MOBILE STICKY BAR -->
 <div class="mobile-sticky" id="mobile-sticky">
   <div class="mobile-sticky-price">
-    <div class="ms-name">{product.name}</div>
+    <div class="ms-name" id="sticky-name">{product.name}</div>
     <div class="ms-price" id="sticky-price">₹ {product.price}</div>
   </div>
   <a href="https://wa.me/910000000000" class="mobile-sticky-btn" target="_blank" rel="noreferrer">
@@ -1423,66 +1812,401 @@ const discount = Math.round((1 - product.price / product.mrp) * 100);
   </a>
 </div>
 
-<script is:inline>
-  // ── Gallery ──
-  const mainImg  = document.getElementById('main-img');
-  const thumbs   = Array.from(document.querySelectorAll('.thumb-btn'));
-  let current    = 0;
+<script is:inline define:vars={{ productsJson }}>
+  const products = JSON.parse(productsJson);
 
-  function setImage(index) {
-    if (index === current) return;
-    mainImg.classList.add('fading');
-    setTimeout(() => {
-      mainImg.src = thumbs[index].dataset.src;
-      mainImg.classList.remove('fading');
-    }, 200);
-    thumbs[current].classList.remove('active');
-    thumbs[index].classList.add('active');
-    current = index;
+  // 1. Get Product from URL Params
+  const urlParams = new URLSearchParams(window.location.search);
+  const productId = parseInt(urlParams.get('id')) || 1;
+  const product = products[productId] || products[1];
+
+  // 2. Hydration Function
+  function hydratePDP(product) {
+    // Page metadata & titles
+    document.title = `${product.name} — ${product.brand}`;
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) metaDesc.setAttribute('content', product.description);
+
+    const breadcrumbCurrent = document.querySelector('.breadcrumb-current');
+    if (breadcrumbCurrent) breadcrumbCurrent.textContent = product.name;
+
+    const breadcrumbParent = document.querySelector('.breadcrumb a:nth-of-type(2)');
+    if (breadcrumbParent) {
+      const cat = product.category || (product.num === "01" || product.num === "06" || product.num === "07" || product.num === "12" ? "Amigurumi" : product.num === "02" || product.num === "04" || product.num === "11" ? "Keychains" : product.num === "03" || product.num === "08" ? "Flower Stems" : product.num === "09" ? "Bouquets" : "Wall Hangings");
+      breadcrumbParent.textContent = cat;
+      breadcrumbParent.href = "/productlist?category=" + encodeURIComponent(cat);
+    }
+
+    const prodBrand = document.querySelector('.prod-brand');
+    if (prodBrand) prodBrand.textContent = product.brand;
+    const prodTitle = document.querySelector('.prod-title');
+    if (prodTitle) prodTitle.textContent = product.name;
+
+    const imgTag = document.getElementById('img-tag');
+    if (imgTag) {
+      if (product.tag) {
+        imgTag.textContent = product.tag;
+        imgTag.style.display = '';
+      } else {
+        imgTag.style.display = 'none';
+      }
+    }
+
+    // Ratings bar
+    const ratingVal = document.getElementById('rating-val');
+    if (ratingVal) ratingVal.textContent = product.rating;
+    const ratingCount = document.querySelector('.rating-count');
+    if (ratingCount) ratingCount.textContent = product.reviewCount + " Ratings";
+    const ratingSku = document.querySelector('.rating-sku');
+    if (ratingSku) ratingSku.textContent = "SKU: " + product.sku;
+
+    // Price block
+    const activePrice = document.getElementById('active-price');
+    const activeMrp = document.getElementById('active-mrp');
+    const activeDisc = document.getElementById('active-disc');
+    const stickyPrice = document.getElementById('sticky-price');
+    const stickyName = document.getElementById('sticky-name');
+
+    const discount = Math.round((1 - product.price / product.mrp) * 100);
+    if (activePrice) activePrice.textContent = '₹ ' + product.price;
+    if (activeMrp) activeMrp.textContent = 'MRP ₹ ' + product.mrp;
+    if (activeDisc) activeDisc.textContent = '(' + discount + '% OFF)';
+    if (stickyPrice) stickyPrice.textContent = '₹ ' + product.price;
+    if (stickyName) stickyName.textContent = product.name;
+
+    // 3. Color swatches setup
+    const colorLabel = document.getElementById('color-label');
+    if (colorLabel) colorLabel.textContent = '— ' + product.colors[0].name;
+
+    const colorContainer = document.getElementById('color-container');
+    if (colorContainer) {
+      colorContainer.innerHTML = product.colors.map((c, i) => `
+        <button
+          class="color-swatch${i === 0 ? ' active' : ''}${c.border ? ' border-swatch' : ''}"
+          style="background:${c.hex};"
+          data-name="${c.name}"
+          aria-label="${c.name}"
+          title="${c.name}"
+        ></button>
+      `).join('');
+
+      const swatches = colorContainer.querySelectorAll('.color-swatch');
+      swatches.forEach(swatch => {
+        swatch.addEventListener('click', () => {
+          swatches.forEach(s => s.classList.remove('active'));
+          swatch.classList.add('active');
+          if (colorLabel) colorLabel.textContent = '— ' + swatch.dataset.name;
+        });
+      });
+    }
+
+    // 4. Size grid setup
+    const sizesContainer = document.getElementById('sizes-container');
+    if (sizesContainer) {
+      sizesContainer.innerHTML = product.sizes.map((s, i) => `
+        <button
+          class="size-btn${i === 0 ? ' active' : ''}"
+          data-price="${s.price}"
+          data-mrp="${s.mrp || (product.mrp + (i * 200))}"
+          aria-pressed="${i === 0 ? "true" : "false"}"
+        >
+          <span class="sz-label">${s.label}</span>
+          <span class="sz-cm">${s.cm}</span>
+          <span class="sz-price">₹ ${s.price}</span>
+        </button>
+      `).join('');
+
+      const sizeBtns = sizesContainer.querySelectorAll('.size-btn');
+      sizeBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          sizeBtns.forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed','false'); });
+          btn.classList.add('active');
+          btn.setAttribute('aria-pressed','true');
+          const p = parseInt(btn.dataset.price);
+          const mrp = parseInt(btn.dataset.mrp);
+          const disc = Math.round((1 - p/mrp)*100);
+          if (activePrice) activePrice.textContent = '₹ ' + p;
+          if (activeMrp) activeMrp.textContent = 'MRP ₹ ' + mrp;
+          if (activeDisc) activeDisc.textContent = '(' + disc + '% OFF)';
+          if (stickyPrice) stickyPrice.textContent = '₹ ' + p;
+        });
+      });
+    }
+
+    // 5. Accordion Description & details table
+    const prodDescPara = document.getElementById('product-description');
+    if (prodDescPara) prodDescPara.textContent = product.description;
+
+    const detailsTableBody = document.getElementById('details-table-body');
+    if (detailsTableBody) {
+      detailsTableBody.innerHTML = product.details.map(d => `
+        <tr>
+          <td>${d.label}</td>
+          <td>${d.value}</td>
+        </tr>
+      `).join('');
+    }
+
+    const includesContainer = document.getElementById('includes-container');
+    if (includesContainer) {
+      includesContainer.innerHTML = product.includes.map(item => `
+        <div class="includes-item">
+          <svg class="includes-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          ${item}
+        </div>
+      `).join('');
+    }
+
+    // 6. Reviews & ratings hydration
+    const ratingScoreNum = document.querySelector('.rating-score-num');
+    if (ratingScoreNum) ratingScoreNum.textContent = product.rating;
+
+    const ratingScoreTotal = document.getElementById('rating-score-total');
+    if (ratingScoreTotal) {
+      ratingScoreTotal.innerHTML = `${(product.totalRatings / 1000).toFixed(1)}k<br/>Verified Buyers`;
+    }
+
+    const ratingBarsContainer = document.getElementById('rating-bars-container');
+    if (ratingBarsContainer) {
+      ratingBarsContainer.innerHTML = product.ratingBreakdown.map(row => {
+        const pct = Math.round((row.count / product.totalRatings) * 100);
+        const isLow = row.stars >= 2;
+        return `
+          <div class="rating-bar-row">
+            <span class="rating-bar-label">${row.stars}</span>
+            <span class="rating-bar-star">★</span>
+            <div class="rating-bar-track">
+              <div class="rating-bar-fill${isLow ? ' low' : ''}" style="width:${pct}%"></div>
+            </div>
+            <span class="rating-bar-count">${row.count.toLocaleString('en-IN')}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    const insightsContainer = document.getElementById('insights-container');
+    if (insightsContainer) {
+      insightsContainer.innerHTML = product.customerInsights.map(ins => `
+        <div class="insight-row">
+          <div class="insight-row-label">${ins.label}</div>
+          <div class="insight-bar-wrap">
+            <div class="insight-bar-track">
+              <div class="insight-bar-fill" style="width:${ins.options[0].pct}%"></div>
+            </div>
+            <span class="insight-bar-label">${ins.options[0].text} (${ins.options[0].pct}%)</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    const dialogInsightsContainer = document.getElementById('dialog-insights-container');
+    if (dialogInsightsContainer) {
+      dialogInsightsContainer.innerHTML = product.customerInsights.map(ins => `
+        <div class="dialog-insight-group">
+          <div class="dialog-insight-label">${ins.label}</div>
+          ${ins.options.map((opt, oi) => `
+            <div class="dialog-bar-row">
+              <span class="dialog-bar-name${oi === 0 ? ' bold' : ''}">${opt.text} (${opt.pct}%)</span>
+              <div class="dialog-bar-track">
+                <div class="dialog-bar-fill${oi === 0 ? ' primary' : ''}" style="width:${opt.pct}%"></div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `).join('');
+    }
+
+    const reviewsListCount = document.querySelector('.reviews-list-count');
+    if (reviewsListCount) {
+      reviewsListCount.textContent = `(${product.reviews.length * 11357} reviews)`;
+    }
+
+    const reviewsListContainer = document.getElementById('reviews-list-container');
+    if (reviewsListContainer) {
+      reviewsListContainer.innerHTML = product.reviews.map(r => {
+        const starColor = r.stars >= 4 ? '' : r.stars === 3 ? ' mid' : ' low';
+        const words = r.body.split(' ');
+        const preview = words.slice(0, 22).join(' ');
+        const overflow = words.slice(22).join(' ');
+        
+        let bodyHtml = `<span class="review-body-text">${preview}</span>`;
+        if (words.length > 22) {
+          bodyHtml += `
+            <span class="review-body-overflow hidden" id="overflow-${r.id}"> ${overflow}</span>
+            <button class="review-read-more" data-id="${r.id}" id="rm-${r.id}">... Read more</button>
+          `;
+        }
+
+        return `
+          <div class="review-card">
+            <div class="review-top">
+              <span class="review-stars-pill${starColor}">
+                ${r.stars} ★
+              </span>
+              <span class="review-title">${r.title}</span>
+            </div>
+
+            <div class="review-body-wrap">
+              ${bodyHtml}
+            </div>
+
+            ${r.photos && r.photos.length > 0 ? `
+              <div class="review-photos">
+                ${r.photos.map((photo, pi) => `
+                  <div class="review-photo">
+                    <img src="${photo}" alt="Review photo ${pi + 1}" loading="lazy" />
+                  </div>
+                `).join('')}
+              </div>
+            ` : ''}
+
+            <div class="review-meta">
+              <span class="review-author">${r.author}</span>
+              ${r.verified ? `
+                <span class="review-verified">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  Verified Buyer
+                </span>
+              ` : ''}
+              <span class="review-date">${r.date}</span>
+            </div>
+            <div class="review-helpful">
+              Was this review helpful?
+              <button class="helpful-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+                Yes (${r.helpful})
+              </button>
+              <button class="helpful-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/><path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>
+                No (${r.unhelpful || 0})
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Helpful buttons handlers
+      reviewsListContainer.querySelectorAll('.helpful-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          btn.style.borderColor = 'var(--dark)';
+          btn.style.color = 'var(--dark)';
+        });
+      });
+
+      // Read more handlers
+      reviewsListContainer.querySelectorAll('.review-read-more').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.dataset.id;
+          const overflow = document.getElementById('overflow-' + id);
+          if (overflow) {
+            const isHidden = overflow.classList.contains('hidden');
+            if (isHidden) {
+              overflow.classList.remove('hidden');
+              btn.textContent = ' Read less';
+            } else {
+              overflow.classList.add('hidden');
+              btn.textContent = '... Read more';
+            }
+          }
+        });
+      });
+    }
+
+    const viewAllReviews = document.querySelector('.view-all-reviews');
+    if (viewAllReviews) {
+      viewAllReviews.textContent = `View all ${product.reviews.length * 11357} reviews`;
+    }
+
+    const productCodeVal = document.getElementById('product-code-val');
+    if (productCodeVal) productCodeVal.textContent = product.productCode;
+
+    // 7. Related grid cards
+    const relatedGridContainer = document.getElementById('related-grid-container');
+    if (relatedGridContainer) {
+      relatedGridContainer.innerHTML = product.related.map(o => {
+        const relDisc = Math.round((1 - o.price / o.mrp) * 100);
+        return `
+          <a href="/productdetail?id=${o.id}" class="related-card">
+            <div class="related-img-wrap">
+              <img src="${o.img}" alt="${o.name}" />
+              ${o.tag ? `<span class="related-badge">${o.tag}</span>` : ''}
+            </div>
+            <div class="related-body">
+              <span class="related-brand">Sunflora Studio</span>
+              <span class="related-name">${o.name}</span>
+              <div class="related-price-row">
+                <span class="related-price">₹ ${o.price}</span>
+                <span class="related-mrp">₹ ${o.mrp}</span>
+                <span class="related-disc">(${relDisc}% OFF)</span>
+              </div>
+            </div>
+          </a>
+        `;
+      }).join('') + `
+        <a href="/#offerings" class="related-card" style="align-items:center;justify-content:center;min-height:200px;border-style:dashed;background:transparent;color:var(--muted);">
+          <div style="text-align:center;padding:1.5rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <p style="margin-top:0.5rem;font-size:0.75rem;letter-spacing:0.08em;text-transform:uppercase;">View All</p>
+          </div>
+        </a>
+      `;
+    }
+
+    // 8. Gallery and thumb strip hydration
+    const mainImg = document.getElementById('main-img');
+    const thumbStrip = document.getElementById('thumb-strip');
+    if (thumbStrip && mainImg) {
+      mainImg.src = product.images[0];
+      mainImg.alt = product.name;
+
+      thumbStrip.innerHTML = product.images.map((src, i) => `
+        <button
+          class="thumb-btn${i === 0 ? ' active' : ''}"
+          data-index="${i}"
+          data-src="${src}"
+          aria-label="View image ${i + 1}"
+        >
+          <img src="${src}" alt="" loading="lazy" />
+        </button>
+      `).join('');
+
+      let current = 0;
+      const thumbs = Array.from(thumbStrip.querySelectorAll('.thumb-btn'));
+
+      function setImage(index) {
+        if (index === current) return;
+        mainImg.classList.add('fading');
+        setTimeout(() => {
+          mainImg.src = thumbs[index].dataset.src;
+          mainImg.classList.remove('fading');
+        }, 200);
+        thumbs[current].classList.remove('active');
+        thumbs[index].classList.add('active');
+        current = index;
+      }
+
+      thumbs.forEach((btn, i) => btn.addEventListener('click', () => setImage(i)));
+
+      const prevBtn = document.getElementById('img-prev');
+      const nextBtn = document.getElementById('img-next');
+
+      if (prevBtn) {
+        const newPrev = prevBtn.cloneNode(true);
+        prevBtn.parentNode.replaceChild(newPrev, prevBtn);
+        newPrev.addEventListener('click', () => setImage((current - 1 + thumbs.length) % thumbs.length));
+      }
+      if (nextBtn) {
+        const newNext = nextBtn.cloneNode(true);
+        nextBtn.parentNode.replaceChild(newNext, nextBtn);
+        newNext.addEventListener('click', () => setImage((current + 1) % thumbs.length));
+      }
+    }
   }
 
-  thumbs.forEach((btn, i) => btn.addEventListener('click', () => setImage(i)));
-  document.getElementById('img-prev').addEventListener('click', () =>
-    setImage((current - 1 + thumbs.length) % thumbs.length)
-  );
-  document.getElementById('img-next').addEventListener('click', () =>
-    setImage((current + 1) % thumbs.length)
-  );
+  // Hydrate UI with URL parameter product or default to Product 1
+  hydratePDP(product);
 
-  // ── Size selector ──
-  const sizeBtns    = document.querySelectorAll('.size-btn');
-  const activePrice = document.getElementById('active-price');
-  const activeMrp   = document.getElementById('active-mrp');
-  const activeDisc  = document.getElementById('active-disc');
-  const stickyPrice = document.getElementById('sticky-price');
-
-  sizeBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      sizeBtns.forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed','false'); });
-      btn.classList.add('active');
-      btn.setAttribute('aria-pressed','true');
-      const p   = parseInt(btn.dataset.price);
-      const mrp = parseInt(btn.dataset.mrp);
-      const disc = Math.round((1 - p/mrp)*100);
-      if (activePrice) activePrice.textContent = '₹ ' + p;
-      if (activeMrp)   activeMrp.textContent   = 'MRP ₹ ' + mrp;
-      if (activeDisc)  activeDisc.textContent   = '(' + disc + '% OFF)';
-      if (stickyPrice) stickyPrice.textContent  = '₹ ' + p;
-    });
-  });
-
-  // ── Colour picker ──
-  const swatches   = document.querySelectorAll('.color-swatch');
-  const colorLabel = document.getElementById('color-label');
-  swatches.forEach(swatch => {
-    swatch.addEventListener('click', () => {
-      swatches.forEach(s => s.classList.remove('active'));
-      swatch.classList.add('active');
-      if (colorLabel) colorLabel.textContent = '— ' + swatch.dataset.name;
-    });
-  });
-
-  // ── Accordion ──
+  // 9. Standard Accordion logic (independent of specific product layout rebuild)
   const triggers = document.querySelectorAll('.accordion-trigger');
   triggers.forEach(trigger => {
     trigger.addEventListener('click', () => {
@@ -1500,83 +2224,65 @@ const discount = Math.round((1 - product.price / product.mrp) * 100);
     });
   });
 
-  // ── Pincode check ──
+  // 10. Pincode check
   const pincodeInput = document.getElementById('pincode-input');
   const pincodeBtn   = document.getElementById('pincode-btn');
   const deliveryNote = document.getElementById('delivery-note');
-  pincodeBtn.addEventListener('click', () => {
-    const val = pincodeInput.value.trim();
-    if (val.length === 6 && /^\d+$/.test(val)) {
-      deliveryNote.style.display = 'flex';
-    }
-  });
-  pincodeInput.addEventListener('keydown', e => {
-    if (e.key === 'Enter') pincodeBtn.click();
-  });
-
-  // ── Wishlist toggle ──
-  const wishlistBtn = document.getElementById('wishlist-btn');
-  let wishlisted = false;
-  wishlistBtn.addEventListener('click', () => {
-    wishlisted = !wishlisted;
-    wishlistBtn.style.color      = wishlisted ? 'var(--red)' : '';
-    wishlistBtn.style.background = wishlisted ? '#fff0ef'    : '';
-    wishlistBtn.style.borderColor= wishlisted ? 'var(--red)' : '';
-    const icon = wishlistBtn.querySelector('svg');
-    if (icon) icon.setAttribute('fill', wishlisted ? 'currentColor' : 'none');
-  });
-
-  // ── Review "Read more" — inline toggle (22 words) ──
-  document.querySelectorAll('.review-read-more').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const id       = btn.dataset.id;
-      const overflow = document.getElementById('overflow-' + id);
-      const isHidden = overflow.classList.contains('hidden');
-      if (isHidden) {
-        overflow.classList.remove('hidden');
-        btn.textContent = ' Read less';
-      } else {
-        overflow.classList.add('hidden');
-        btn.textContent = '... Read more';
+  if (pincodeBtn && pincodeInput) {
+    pincodeBtn.addEventListener('click', () => {
+      const val = pincodeInput.value.trim();
+      if (val.length === 6 && /^\d+$/.test(val)) {
+        deliveryNote.style.display = 'flex';
       }
     });
-  });
-
-  // ── Helpful button toggle ──
-  document.querySelectorAll('.helpful-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      btn.style.borderColor = 'var(--dark)';
-      btn.style.color       = 'var(--dark)';
+    pincodeInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') pincodeBtn.click();
     });
-  });
+  }
 
-  // ── Insights Dialog ──
+  // 11. Wishlist toggle
+  const wishlistBtn = document.getElementById('wishlist-btn');
+  if (wishlistBtn) {
+    let wishlisted = false;
+    wishlistBtn.addEventListener('click', () => {
+      wishlisted = !wishlisted;
+      wishlistBtn.style.color      = wishlisted ? 'var(--red)' : '';
+      wishlistBtn.style.background = wishlisted ? '#fff0ef'    : '';
+      wishlistBtn.style.borderColor= wishlisted ? 'var(--red)' : '';
+      const icon = wishlistBtn.querySelector('svg');
+      if (icon) icon.setAttribute('fill', wishlisted ? 'currentColor' : 'none');
+    });
+  }
+
+  // 12. Insights Dialog
   const overlay      = document.getElementById('insights-overlay');
   const viewDetailsBtn = document.getElementById('view-details-btn');
   const closeBtn     = document.getElementById('insights-close');
 
-  viewDetailsBtn.addEventListener('click', () => {
-    overlay.classList.add('open');
-    document.body.style.overflow = 'hidden';
-  });
-  closeBtn.addEventListener('click', () => {
-    overlay.classList.remove('open');
-    document.body.style.overflow = '';
-  });
-  overlay.addEventListener('click', (e) => {
-    if (e.target === overlay) {
+  if (viewDetailsBtn && overlay && closeBtn) {
+    viewDetailsBtn.addEventListener('click', () => {
+      overlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    });
+    closeBtn.addEventListener('click', () => {
       overlay.classList.remove('open');
       document.body.style.overflow = '';
-    }
-  });
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && overlay.classList.contains('open')) {
-      overlay.classList.remove('open');
-      document.body.style.overflow = '';
-    }
-  });
+    });
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        overlay.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && overlay.classList.contains('open')) {
+        overlay.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+    });
+  }
 
-  // ── Mobile sticky: show when panel scrolls out ──
+  // 13. Mobile sticky: show when panel scrolls out
   const mobileSticky = document.getElementById('mobile-sticky');
   const productPanel = document.querySelector('.product-panel');
   if (mobileSticky && productPanel) {
@@ -1585,8 +2291,10 @@ const discount = Math.round((1 - product.price / product.mrp) * 100);
     }, { threshold: 0 });
     obs.observe(productPanel);
   }
-  if (mobileSticky) mobileSticky.style.transform = 'translateY(100%)';
-  if (mobileSticky) mobileSticky.style.transition = 'transform 0.3s';
+  if (mobileSticky) {
+    mobileSticky.style.transform = 'translateY(100%)';
+    mobileSticky.style.transition = 'transform 0.3s';
+  }
 </script>
 
 </Layout>

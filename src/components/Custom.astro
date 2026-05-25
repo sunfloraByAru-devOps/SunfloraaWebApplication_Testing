@@ -212,11 +212,9 @@ const features = [
             {sizes.map((s) => (
               <label class={`size-card ${s.selected ? "size-card--active" : ""} ${s.isCustom ? "size-card--custom" : ""}`}>
                 <input type="radio" name="size" value={s.label + s.sub} checked={s.selected} class="sr-only" />
-                {s.selected && (
-                  <span class="size-check" aria-hidden="true">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                  </span>
-                )}
+                <span class="size-check" aria-hidden="true">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
                 <span class="size-label">{s.label}</span>
                 <span class="size-sub">{s.sub}</span>
                 {!s.isCustom ? (
@@ -636,6 +634,8 @@ const features = [
     gap: 8px;
     flex-wrap: nowrap;
     overflow-x: auto;
+    padding-top: 12px;
+    margin-top: -12px;
     padding-bottom: 50px; /* room for .size-note arrow */
     scrollbar-width: none;
   }
@@ -678,6 +678,13 @@ const features = [
     align-items: center;
     justify-content: center;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    opacity: 0;
+    transform: scale(0.8);
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  .size-card--active .size-check {
+    opacity: 1;
+    transform: scale(1);
   }
 
   .size-label {

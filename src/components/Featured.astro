@@ -48,6 +48,15 @@ const categories = [
     product: null,
   },
 ];
+
+const categoryMap = {
+  "bouquet": "Bouquets",
+  "single-flower": "Flower Stems",
+  "plushie": "Amigurumi",
+  "amigurumi": "Amigurumi",
+  "keychain-bagcharm": "Keychains",
+  "hanging-charms": "Wall Hangings",
+};
 ---
 
 <section id="categories" data-testid="categories" class="py-24 md:py-32">
@@ -73,7 +82,7 @@ const categories = [
 
           <!-- Clickable image layer → goes to category -->
           <a
-            href={`#${c.slug}`}
+            href={`/productlist?category=${encodeURIComponent(categoryMap[c.slug] || 'All')}`}
             data-testid={`category-link-${c.slug}`}
             aria-label={`Browse ${c.name} collection`}
             class="absolute inset-0 z-0"
@@ -103,7 +112,7 @@ const categories = [
           <div class="absolute top-0 left-0 right-0 flex items-start justify-between p-3.5 md:p-4 z-20">
             <!-- Big category label -->
             <a
-              href={`#${c.slug}`}
+              href={`/productlist?category=${encodeURIComponent(categoryMap[c.slug] || 'All')}`}
               data-testid={`category-label-${c.slug}`}
               class="font-serif-display text-xl md:text-2xl lg:text-3xl text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)] leading-tight hover:opacity-80 transition-opacity duration-300"
             >
@@ -129,7 +138,7 @@ const categories = [
 
               <!-- Buy this button -->
               <a
-                href="#cta"
+                href={`/productdetail?id=${c.product.id}`}
                 data-testid={`product-buy-${c.product.id}`}
                 aria-label={`Buy ${c.product.name}`}
                 class="bg-[#1A1815] hover:bg-[#C8862C] text-white text-[10px] md:text-xs uppercase tracking-[0.15em] px-4 py-2.5 rounded-full flex items-center gap-2 transition-colors duration-300 shadow-sm font-medium"
@@ -148,7 +157,7 @@ const categories = [
           {!c.product && (
             <div class="absolute bottom-0 left-0 right-0 flex items-center justify-between p-3.5 md:p-4 z-20">
               <a
-                href={`#${c.slug}`}
+                href={`/productlist?category=${encodeURIComponent(categoryMap[c.slug] || 'All')}`}
                 class="bg-white/90 backdrop-blur-sm text-[#1A1815] text-[10px] uppercase tracking-[0.15em] px-4 py-2.5 rounded-full hover:bg-white transition-colors duration-300 shadow-sm font-medium"
               >
                 Notify me
@@ -163,7 +172,7 @@ const categories = [
     <!-- Footer link -->
     <div class="mt-12 text-center fade-up">
       <a
-        href="#cta"
+        href="/productlist"
         data-testid="browse-all"
         class="hover-underline text-sm uppercase tracking-[0.2em] text-[#1A1815] inline-flex items-center gap-2"
       >

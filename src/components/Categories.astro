@@ -27,7 +27,11 @@ const categories = [
     <div class="border-t border-[rgba(26,24,21,0.15)]">
       {categories.map((c, i) => (
         <a
-          href="#cta"
+          href={`/productlist?category=${encodeURIComponent(
+            c.name === 'Flower stems' ? 'Flower Stems' : 
+            c.name === 'Wall hangings' ? 'Wall Hangings' : 
+            c.name
+          )}`}
           data-testid={`category-${c.name.toLowerCase().replace(/\s/g, '-')}`}
           class="fade-up group flex items-center justify-between py-8 md:py-10 border-b border-[rgba(26,24,21,0.15)] hover:bg-[#E5DFD1]/60 transition-colors duration-500 px-2 md:px-4"
         >

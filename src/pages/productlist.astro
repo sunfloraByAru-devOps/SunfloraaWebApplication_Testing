@@ -1,0 +1,1402 @@
+---
+import { Image } from "astro:assets";
+import Layout from "../layouts/Layout.astro";
+import Nav from "../components/Nav.astro";
+import SUN_CLOSEUP from "../assets/sun_on_desk_closeup.png";
+import DINO from "../assets/green-dino.jpg";
+import SUNMOON from "../assets/sun_and_moon.jpg";
+import SPIDEY from "../assets/spiderman.jpg";
+import STARS from "../assets/stars.png";
+import HERO from "../assets/sun_on_desk.png";
+
+// ── All products ──────────────────────────────────────────
+const allProducts = [
+    {
+        id: 1,
+        name: "Sunshine Amigurumi",
+        category: "Amigurumi",
+        price: 649,
+        mrp: 899,
+        rating: 4.9,
+        reviews: 24,
+        tag: "Best Seller",
+        img: SUN_CLOSEUP,
+        isNew: false,
+        inStock: true,
+    },
+    {
+        id: 2,
+        name: "Lil' Dino Keychain",
+        category: "Keychains",
+        price: 249,
+        mrp: 349,
+        rating: 4.7,
+        reviews: 18,
+        tag: "New",
+        img: DINO,
+        isNew: true,
+        inStock: true,
+    },
+    {
+        id: 3,
+        name: "Sun & Moon Stem",
+        category: "Flower Stems",
+        price: 449,
+        mrp: 599,
+        rating: 4.8,
+        reviews: 12,
+        tag: "Set of 2",
+        img: SUNMOON,
+        isNew: false,
+        inStock: true,
+    },
+    {
+        id: 4,
+        name: "Spidey Hanging Charm",
+        category: "Keychains",
+        price: 299,
+        mrp: 399,
+        rating: 4.7,
+        reviews: 9,
+        tag: "Limited",
+        img: SPIDEY,
+        isNew: false,
+        inStock: true,
+    },
+    {
+        id: 5,
+        name: "Crochet Stars Set",
+        category: "Wall Hangings",
+        price: 399,
+        mrp: 549,
+        rating: 4.9,
+        reviews: 15,
+        tag: "New",
+        img: STARS,
+        isNew: true,
+        inStock: true,
+    },
+    {
+        id: 6,
+        name: "Golden Sunshine Desk Piece",
+        category: "Amigurumi",
+        price: 749,
+        mrp: 999,
+        rating: 5.0,
+        reviews: 31,
+        tag: "Fan Fav",
+        img: HERO,
+        isNew: false,
+        inStock: true,
+    },
+    {
+        id: 7,
+        name: "Mini Dino Amigurumi",
+        category: "Amigurumi",
+        price: 549,
+        mrp: 699,
+        rating: 4.8,
+        reviews: 8,
+        tag: null,
+        img: DINO,
+        isNew: false,
+        inStock: false,
+    },
+    {
+        id: 8,
+        name: "Moon Stem Single",
+        category: "Flower Stems",
+        price: 299,
+        mrp: 399,
+        rating: 4.6,
+        reviews: 7,
+        tag: null,
+        img: SUNMOON,
+        isNew: false,
+        inStock: true,
+    },
+];
+
+// ── Recommendation products (shown after 8 main products) ──
+const recommendations = [
+    {
+        id: 9,
+        name: "Sunshine Bouquet",
+        category: "Bouquets",
+        price: 1299,
+        mrp: 1699,
+        rating: 4.9,
+        reviews: 22,
+        tag: "Top Rated",
+        img: SUN_CLOSEUP,
+    },
+    {
+        id: 10,
+        name: "Galaxy Star Mobile",
+        category: "Wall Hangings",
+        price: 599,
+        mrp: 799,
+        rating: 4.7,
+        reviews: 14,
+        tag: "New",
+        img: STARS,
+    },
+    {
+        id: 11,
+        name: "Spidey + Dino Duo",
+        category: "Keychains",
+        price: 499,
+        mrp: 649,
+        rating: 4.8,
+        reviews: 19,
+        tag: "Bundle",
+        img: SPIDEY,
+    },
+    {
+        id: 12,
+        name: "Sunrise Amigurumi",
+        category: "Amigurumi",
+        price: 699,
+        mrp: 899,
+        rating: 5.0,
+        reviews: 11,
+        tag: "Fan Fav",
+        img: HERO,
+    },
+];
+
+const categories = [
+    "All",
+    "Amigurumi",
+    "Keychains",
+    "Flower Stems",
+    "Wall Hangings",
+    "Bouquets",
+    "Customs",
+];
+---
+
+<Layout
+    title="Shop — Sunflora Handmade Crochet"
+    description="Browse our full collection of handmade crochet pieces — amigurumi, keychains, florals and custom orders."
+>
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap");
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --cream: #efe8da;
+            --cream-lt: #f7f3ec;
+            --cream-dk: #e5dfd1;
+            --ink: #1a1815;
+            --ink-lt: #4a453e;
+            --gold: #c8862c;
+            --gold-lt: #d4a054;
+            --border: rgba(26, 24, 21, 0.12);
+            --card-bg: #fdfaf6;
+            --green: #4a7c59;
+            --red: #b5452a;
+            --radius: 12px;
+        }
+
+        body {
+            background: var(--cream-lt);
+            color: var(--ink);
+            font-family: "Jost", sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── SHOP HEADER ── */
+        .shop-header {
+            background: var(--ink);
+            padding: 5rem clamp(1.25rem, 5vw, 5rem) 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .shop-header::before {
+            content: "";
+            position: absolute;
+            top: -60px;
+            right: -60px;
+            width: 320px;
+            height: 320px;
+            border-radius: 50%;
+            background: radial-gradient(
+                circle,
+                rgba(200, 134, 44, 0.22) 0%,
+                transparent 70%
+            );
+            pointer-events: none;
+        }
+        .shop-header::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(
+                to right,
+                transparent,
+                rgba(200, 134, 44, 0.4),
+                transparent
+            );
+        }
+
+        .shop-header-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 2rem;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
+        }
+
+        .shop-eyebrow {
+            font-size: 0.65rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        .shop-eyebrow::before {
+            content: "";
+            display: block;
+            width: 28px;
+            height: 1px;
+            background: var(--gold);
+        }
+
+        .shop-title {
+            font-family: "Cormorant Garamond", serif;
+            font-size: clamp(2.8rem, 7vw, 6rem);
+            font-weight: 400;
+            line-height: 0.95;
+            letter-spacing: -0.02em;
+            color: var(--cream);
+        }
+        .shop-title em {
+            color: var(--gold);
+            font-style: italic;
+        }
+
+        .shop-meta {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            color: rgba(239, 232, 218, 0.5);
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            align-self: flex-end;
+            padding-bottom: 0.5rem;
+        }
+        .shop-meta span {
+            color: rgba(239, 232, 218, 0.8);
+        }
+
+        /* ── STICKY CATEGORY BAR ── */
+        .category-bar-wrap {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: var(--ink);
+            border-bottom: 1px solid rgba(239, 232, 218, 0.08);
+            backdrop-filter: blur(12px);
+        }
+
+        .category-bar {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 clamp(1.25rem, 5vw, 5rem);
+            display: flex;
+            align-items: center;
+            gap: 0;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+        .category-bar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .cat-btn {
+            flex-shrink: 0;
+            padding: 1.1rem 1.4rem;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            font-family: "Jost", sans-serif;
+            font-size: 0.72rem;
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: rgba(239, 232, 218, 0.5);
+            cursor: pointer;
+            transition: color 0.25s, border-color 0.25s;
+            white-space: nowrap;
+        }
+        .cat-btn:hover {
+            color: rgba(239, 232, 218, 0.85);
+        }
+        .cat-btn.active {
+            color: var(--gold);
+            border-bottom-color: var(--gold);
+        }
+
+        /* ── FILTER + SORT ROW ── */
+        .controls-row {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem clamp(1.25rem, 5vw, 5rem);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .results-label {
+            font-size: 0.78rem;
+            color: var(--ink-lt);
+            letter-spacing: 0.04em;
+        }
+        .results-label strong {
+            color: var(--ink);
+            font-weight: 600;
+        }
+
+        .sort-wrap {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .sort-label {
+            font-size: 0.7rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--ink-lt);
+        }
+        .sort-select {
+            appearance: none;
+            background: var(--card-bg);
+            border: 1.5px solid var(--border);
+            border-radius: 6px;
+            padding: 0.5rem 2rem 0.5rem 0.9rem;
+            font-family: "Jost", sans-serif;
+            font-size: 0.78rem;
+            color: var(--ink);
+            cursor: pointer;
+            outline: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%234A453E' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            transition: border-color 0.2s;
+        }
+        .sort-select:focus {
+            border-color: var(--gold);
+        }
+
+        /* ── PRODUCT GRID ── */
+        .products-section {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 clamp(1.25rem, 5vw, 5rem) 4rem;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.25rem;
+        }
+        @media (max-width: 1100px) {
+            .product-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        @media (max-width: 740px) {
+            .product-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+            }
+        }
+        @media (max-width: 420px) {
+            .product-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.6rem;
+            }
+        }
+
+        /* ── PRODUCT CARD ── */
+        .prod-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            text-decoration: none;
+            color: inherit;
+            transition: box-shadow 0.35s, transform 0.35s;
+            position: relative;
+        }
+        .prod-card:hover {
+            box-shadow: 0 12px 40px rgba(26, 24, 21, 0.1);
+            transform: translateY(-3px);
+        }
+        .prod-card:hover .card-img {
+            transform: scale(1.06);
+        }
+        .prod-card:hover .card-cta {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Out of stock */
+        .prod-card.out-of-stock {
+            opacity: 0.7;
+        }
+        .prod-card.out-of-stock .card-img {
+            filter: grayscale(0.4);
+        }
+
+        .card-img-wrap {
+            aspect-ratio: 3/4;
+            overflow: hidden;
+            background: var(--cream-dk);
+            position: relative;
+        }
+        .card-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .card-tag {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: var(--ink);
+            color: var(--cream);
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 3px 8px;
+            border-radius: 3px;
+            z-index: 2;
+        }
+        .card-tag.tag-new {
+            background: var(--green);
+        }
+        .card-tag.tag-sale {
+            background: var(--red);
+        }
+        .card-tag.tag-gold {
+            background: var(--gold);
+            color: var(--ink);
+        }
+
+        .card-wishlist {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.88);
+            border: 1px solid rgba(26, 24, 21, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--ink-lt);
+            transition: background 0.2s, color 0.2s, transform 0.2s;
+            z-index: 2;
+            flex-shrink: 0;
+        }
+        .card-wishlist:hover {
+            background: #fff;
+            color: var(--red);
+            transform: scale(1.1);
+        }
+        .card-wishlist.active {
+            color: var(--red);
+            background: #fff0ef;
+        }
+
+        .out-of-stock-badge {
+            position: absolute;
+            inset: 0;
+            background: rgba(239, 232, 218, 0.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3;
+        }
+        .out-of-stock-badge span {
+            background: var(--ink);
+            color: var(--cream);
+            font-size: 0.68rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            padding: 6px 14px;
+            border-radius: 3px;
+        }
+
+        .card-cta {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--ink);
+            color: var(--cream);
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            padding: 0.7rem 1rem;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: opacity 0.3s, transform 0.3s;
+            z-index: 4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        @media (hover: none) {
+            .card-cta {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-body {
+            padding: 0.9rem 0.85rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            flex: 1;
+        }
+
+        .card-cat {
+            font-size: 0.62rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        .card-name {
+            font-family: "Cormorant Garamond", serif;
+            font-size: 1.15rem;
+            font-weight: 500;
+            line-height: 1.2;
+            letter-spacing: -0.01em;
+            color: var(--ink);
+            margin-top: 1px;
+        }
+
+        .card-rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 4px;
+        }
+        .card-stars {
+            color: var(--gold);
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+        }
+        .card-rating-num {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--ink);
+        }
+        .card-rating-count {
+            font-size: 0.68rem;
+            color: var(--ink-lt);
+        }
+
+        .card-price-row {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            margin-top: 6px;
+        }
+        .card-price {
+            font-family: "Jost", sans-serif;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--ink);
+        }
+        .card-mrp {
+            font-size: 0.78rem;
+            color: var(--ink-lt);
+            text-decoration: line-through;
+        }
+        .card-disc {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--green);
+            margin-left: auto;
+        }
+
+        /* ── DIVIDER — "Our Recommendations" ── */
+        .reco-divider {
+            max-width: 1400px;
+            margin: 2rem auto 0;
+            padding: 0 clamp(1.25rem, 5vw, 5rem);
+        }
+        .reco-divider-inner {
+            border-top: 1px solid var(--border);
+            padding-top: 3rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .reco-eyebrow {
+            font-size: 0.65rem;
+            letter-spacing: 0.28em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 0.5rem;
+        }
+        .reco-title {
+            font-family: "Cormorant Garamond", serif;
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            font-weight: 400;
+            letter-spacing: -0.02em;
+            line-height: 1.05;
+            color: var(--ink);
+        }
+        .reco-title em {
+            font-style: italic;
+            color: var(--gold);
+        }
+
+        .reco-arrow-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.72rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--ink);
+            text-decoration: none;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 2px;
+            transition: color 0.2s, border-color 0.2s;
+            white-space: nowrap;
+            align-self: flex-end;
+        }
+        .reco-arrow-link:hover {
+            color: var(--gold);
+            border-color: var(--gold);
+        }
+
+        /* Reco horizontal scroll on mobile, 4-grid on desktop */
+        .reco-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.25rem;
+        }
+        @media (max-width: 1100px) {
+            .reco-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 640px) {
+            .reco-grid {
+                display: flex;
+                overflow-x: auto;
+                scrollbar-width: none;
+                gap: 0.75rem;
+                padding-bottom: 0.5rem;
+            }
+            .reco-grid::-webkit-scrollbar {
+                display: none;
+            }
+            .reco-grid .prod-card {
+                flex: 0 0 72vw;
+                max-width: 300px;
+            }
+        }
+
+        /* ── LOAD MORE ── */
+        .load-more-wrap {
+            max-width: 1400px;
+            margin: 2.5rem auto 4rem;
+            padding: 0 clamp(1.25rem, 5vw, 5rem);
+            display: flex;
+            justify-content: center;
+        }
+        .load-more-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: none;
+            border: 1.5px solid var(--ink);
+            color: var(--ink);
+            padding: 0.85rem 2.5rem;
+            font-family: "Jost", sans-serif;
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: background 0.3s, color 0.3s;
+        }
+        .load-more-btn:hover {
+            background: var(--ink);
+            color: var(--cream);
+        }
+
+        /* ── EMPTY STATE ── */
+        .empty-state {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 6rem 2rem;
+            text-align: center;
+            gap: 1rem;
+        }
+        .empty-state.show {
+            display: flex;
+        }
+        .empty-state svg {
+            color: var(--gold);
+            opacity: 0.4;
+        }
+        .empty-state p {
+            font-family: "Cormorant Garamond", serif;
+            font-size: 1.5rem;
+            font-style: italic;
+            color: var(--ink-lt);
+        }
+
+        /* ── CARD ENTER ANIMATION ── */
+        .prod-card {
+            opacity: 0;
+            animation: cardIn 0.5s ease forwards;
+        }
+        @keyframes cardIn {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .prod-card:nth-child(1) {
+            animation-delay: 0.04s;
+        }
+        .prod-card:nth-child(2) {
+            animation-delay: 0.08s;
+        }
+        .prod-card:nth-child(3) {
+            animation-delay: 0.12s;
+        }
+        .prod-card:nth-child(4) {
+            animation-delay: 0.16s;
+        }
+        .prod-card:nth-child(5) {
+            animation-delay: 0.2s;
+        }
+        .prod-card:nth-child(6) {
+            animation-delay: 0.24s;
+        }
+        .prod-card:nth-child(7) {
+            animation-delay: 0.28s;
+        }
+        .prod-card:nth-child(8) {
+            animation-delay: 0.32s;
+        }
+
+        /* ── RECO SECTION ── */
+        .reco-section {
+            background: var(--cream-dk);
+            margin-top: 3rem;
+            padding-bottom: 5rem;
+        }
+
+        /* ── MOBILE: wider padding ── */
+        @media (max-width: 640px) {
+            .products-section {
+                padding: 0 0.75rem 3rem;
+            }
+            .controls-row {
+                padding: 1rem 0.75rem;
+            }
+            .shop-header {
+                padding: 4.5rem 1.25rem 2.5rem;
+            }
+            .reco-divider {
+                padding: 0 0.75rem;
+            }
+            .load-more-wrap {
+                padding: 0 0.75rem;
+            }
+            .reco-divider-inner {
+                padding-top: 2rem;
+            }
+        }
+
+        /* ── FOOTER STRIP ── */
+        .shop-footer-strip {
+            background: var(--ink);
+            color: rgba(239, 232, 218, 0.5);
+            padding: 1.5rem clamp(1.25rem, 5vw, 5rem);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            font-size: 0.7rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+        .shop-footer-strip a {
+            color: inherit;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .shop-footer-strip a:hover {
+            color: var(--gold);
+        }
+    </style>
+
+    <!-- ── NAV (reuse project Nav component) ── -->
+    <Nav />
+
+    <!-- ── SHOP HEADER ── -->
+    <div class="shop-header">
+        <div class="shop-header-inner">
+            <div>
+                <div class="shop-eyebrow">Give All You Need</div>
+                <h1 class="shop-title">
+                    Everything<br />we <em>make.</em>
+                </h1>
+            </div>
+            <div class="shop-meta">
+                <span>{allProducts.length}</span> pieces available
+            </div>
+        </div>
+    </div>
+
+    <!-- ── STICKY CATEGORY BAR ── -->
+    <div class="category-bar-wrap">
+        <div
+            class="category-bar"
+            id="category-bar"
+            role="tablist"
+            aria-label="Product categories"
+        >
+            {
+                categories.map((cat, i) => (
+                    <button
+                        class={`cat-btn${i === 0 ? " active" : ""}`}
+                        data-cat={cat}
+                        role="tab"
+                        aria-selected={i === 0 ? "true" : "false"}
+                    >
+                        {cat}
+                    </button>
+                ))
+            }
+        </div>
+    </div>
+
+    <!-- ── CONTROLS ROW ── -->
+    <div class="controls-row">
+        <p class="results-label">
+            Showing <strong id="result-count">{allProducts.length}</strong> pieces
+        </p>
+        <div class="sort-wrap">
+            <span class="sort-label">Sort</span>
+            <select
+                class="sort-select"
+                id="sort-select"
+                aria-label="Sort products"
+            >
+                <option value="default">Featured</option>
+                <option value="price-asc">Price: Low → High</option>
+                <option value="price-desc">Price: High → Low</option>
+                <option value="rating">Top Rated</option>
+                <option value="new">Newest First</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- ── PRODUCT GRID ── -->
+    <section class="products-section" aria-label="Products">
+        <div class="product-grid" id="product-grid">
+            {
+                allProducts.map((p) => {
+                    const disc = Math.round((1 - p.price / p.mrp) * 100);
+                    const tagClass =
+                        p.tag === "New"
+                            ? "tag-new"
+                            : p.tag === "Fan Fav" || p.tag === "Top Rated"
+                            ? "tag-gold"
+                            : "";
+                    return (
+                        <a
+                            href={`/productdetail?id=${p.id}`}
+                            class={`prod-card${
+                                !p.inStock ? " out-of-stock" : ""
+                            }`}
+                            data-category={p.category}
+                            data-price={p.price}
+                            data-rating={p.rating}
+                            data-new={p.isNew ? "1" : "0"}
+                            aria-label={`${p.name} — ₹${p.price}`}
+                        >
+                            <div class="card-img-wrap">
+                                <Image
+                                    src={p.img}
+                                    alt={p.name}
+                                    class="card-img"
+                                    loading="lazy"
+                                />
+                                {p.tag && (
+                                    <span class={`card-tag ${tagClass}`}>
+                                        {p.tag}
+                                    </span>
+                                )}
+                                {!p.inStock && (
+                                    <div class="out-of-stock-badge">
+                                        <span>Sold Out</span>
+                                    </div>
+                                )}
+                                <button
+                                    class="card-wishlist"
+                                    aria-label={`Wishlist ${p.name}`}
+                                    onclick="event.preventDefault(); this.classList.toggle('active');"
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="14"
+                                        height="14"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="1.8"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    >
+                                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                                    </svg>
+                                </button>
+                                {p.inStock && (
+                                    <div class="card-cta">
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="13"
+                                            height="13"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        >
+                                            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                                            <line
+                                                x1="3"
+                                                y1="6"
+                                                x2="21"
+                                                y2="6"
+                                            />
+                                            <path d="M16 10a4 4 0 0 1-8 0" />
+                                        </svg>
+                                        Buy Now
+                                    </div>
+                                )}
+                            </div>
+                            <div class="card-body">
+                                <span class="card-cat">{p.category}</span>
+                                <h2 class="card-name">{p.name}</h2>
+                                <div class="card-rating">
+                                    <span class="card-stars">
+                                        {"★".repeat(Math.floor(p.rating))}
+                                        {"☆".repeat(5 - Math.floor(p.rating))}
+                                    </span>
+                                    <span class="card-rating-num">
+                                        {p.rating}
+                                    </span>
+                                    <span class="card-rating-count">
+                                        ({p.reviews})
+                                    </span>
+                                </div>
+                                <div class="card-price-row">
+                                    <span class="card-price">₹{p.price}</span>
+                                    <span class="card-mrp">₹{p.mrp}</span>
+                                    <span class="card-disc">{disc}% off</span>
+                                </div>
+                            </div>
+                        </a>
+                    );
+                })
+            }
+        </div>
+
+        <!-- Empty state -->
+        <div class="empty-state" id="empty-state">
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="48"
+                height="48"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1"
+                ><path
+                    d="M3 3l1.88 5.76a1 1 0 0 0 .95.69h14.34a1 1 0 0 0 .95-.69L23 3"
+                ></path><path d="M9 14v1a3 3 0 0 0 6 0v-1"></path><path
+                    d="M3 3H2"></path>
+            </svg>
+            <p>Nothing here yet — try another category.</p>
+        </div>
+    </section>
+
+    <!-- ── LOAD MORE ── -->
+    <div class="load-more-wrap" id="load-more-wrap" style="display:none;">
+        <button class="load-more-btn" id="load-more-btn">
+            Load more pieces
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                ><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path>
+            </svg>
+        </button>
+    </div>
+
+    <!-- ── RECOMMENDATIONS ── -->
+    <div class="reco-section" id="reco-section">
+        <div class="reco-divider">
+            <div class="reco-divider-inner">
+                <div>
+                    <p class="reco-eyebrow">Curated for you</p>
+                    <h2 class="reco-title">
+                        Explore our <em>recommendations</em>
+                    </h2>
+                </div>
+                <a href="#" class="reco-arrow-link">
+                    See all
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="13"
+                        height="13"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        ><path d="M7 17L17 7"></path><path d="M7 7h10v10"
+                        ></path>
+                    </svg>
+                </a>
+            </div>
+            <div class="reco-grid">
+                {
+                    recommendations.map((p) => {
+                        const disc = Math.round((1 - p.price / p.mrp) * 100);
+                        const tagClass =
+                            p.tag === "New"
+                                ? "tag-new"
+                                : p.tag === "Top Rated" || p.tag === "Fan Fav"
+                                ? "tag-gold"
+                                : "";
+                        return (
+                            <a
+                                href={`/productdetail?id=${p.id}`}
+                                class="prod-card"
+                                aria-label={`${p.name} — ₹${p.price}`}
+                            >
+                                <div class="card-img-wrap">
+                                    <Image
+                                        src={p.img}
+                                        alt={p.name}
+                                        class="card-img"
+                                        loading="lazy"
+                                    />
+                                    {p.tag && (
+                                        <span class={`card-tag ${tagClass}`}>
+                                            {p.tag}
+                                        </span>
+                                    )}
+                                    <button
+                                        class="card-wishlist"
+                                        aria-label={`Wishlist ${p.name}`}
+                                        onclick="event.preventDefault(); this.classList.toggle('active');"
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="14"
+                                            height="14"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="1.8"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        >
+                                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                                        </svg>
+                                    </button>
+                                    <div class="card-cta">
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="13"
+                                            height="13"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        >
+                                            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                                            <line
+                                                x1="3"
+                                                y1="6"
+                                                x2="21"
+                                                y2="6"
+                                            />
+                                            <path d="M16 10a4 4 0 0 1-8 0" />
+                                        </svg>
+                                        Buy Now
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <span class="card-cat">{p.category}</span>
+                                    <h2 class="card-name">{p.name}</h2>
+                                    <div class="card-rating">
+                                        <span class="card-stars">
+                                            {"★".repeat(Math.floor(p.rating))}
+                                            {"☆".repeat(
+                                                5 - Math.floor(p.rating)
+                                            )}
+                                        </span>
+                                        <span class="card-rating-num">
+                                            {p.rating}
+                                        </span>
+                                        <span class="card-rating-count">
+                                            ({p.reviews})
+                                        </span>
+                                    </div>
+                                    <div class="card-price-row">
+                                        <span class="card-price">
+                                            ₹{p.price}
+                                        </span>
+                                        <span class="card-mrp">₹{p.mrp}</span>
+                                        <span class="card-disc">
+                                            {disc}% off
+                                        </span>
+                                    </div>
+                                </div>
+                            </a>
+                        );
+                    })
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- ── FOOTER STRIP ── -->
+    <div class="shop-footer-strip">
+        <span
+            >© {new Date().getFullYear()} Sunflora Studio — Handmade with care.</span
+        >
+        <span>Hooked in India · <a href="/">Back to home</a></span>
+    </div>
+
+    <script is:inline>
+        // ── Category filter ──────────────────────────────────────────
+        const catBtns = document.querySelectorAll(".cat-btn");
+        const grid = document.getElementById("product-grid");
+        const cards = Array.from(grid.querySelectorAll(".prod-card"));
+        const countEl = document.getElementById("result-count");
+        const emptyEl = document.getElementById("empty-state");
+        const sortSel = document.getElementById("sort-select");
+
+        let activeCategory = "All";
+
+        // Parse query parameter to pre-filter
+        const urlParams = new URLSearchParams(window.location.search);
+        const categoryParam = urlParams.get("category");
+        if (categoryParam) {
+            const decodedCat = decodeURIComponent(categoryParam);
+            const matchedBtn = Array.from(catBtns).find(
+                (btn) => btn.dataset.cat.toLowerCase() === decodedCat.toLowerCase()
+            );
+            if (matchedBtn) {
+                catBtns.forEach((b) => {
+                    b.classList.remove("active");
+                    b.setAttribute("aria-selected", "false");
+                });
+                matchedBtn.classList.add("active");
+                matchedBtn.setAttribute("aria-selected", "true");
+                activeCategory = matchedBtn.dataset.cat;
+                
+                // Scroll the category button into view on mobile
+                matchedBtn.scrollIntoView({
+                    behavior: "auto",
+                    block: "nearest",
+                    inline: "center",
+                });
+            }
+        }
+
+        function filterAndSort() {
+            const sort = sortSel.value;
+
+            // Determine filtered set
+            let filtered = cards.filter((c) => {
+                if (activeCategory === "All") return true;
+                return c.dataset.category === activeCategory;
+            });
+
+            // Sort
+            filtered = [...filtered].sort((a, b) => {
+                if (sort === "price-asc")
+                    return Number(a.dataset.price) - Number(b.dataset.price);
+                if (sort === "price-desc")
+                    return Number(b.dataset.price) - Number(a.dataset.price);
+                if (sort === "rating")
+                    return Number(b.dataset.rating) - Number(a.dataset.rating);
+                if (sort === "new")
+                    return Number(b.dataset.new) - Number(a.dataset.new);
+                return 0; // default = DOM order
+            });
+
+            // Hide all first
+            cards.forEach((c) => {
+                c.style.display = "none";
+                c.style.animationName = "none";
+            });
+
+            // Re-show filtered and trigger animation
+            filtered.forEach((c, i) => {
+                c.style.display = "";
+                // Restart animation with staggered delay
+                requestAnimationFrame(() => {
+                    c.style.animationName = "";
+                    c.style.animationDelay = i * 0.06 + "s";
+                    c.style.animationDuration = "0.45s";
+                    c.style.opacity = "0";
+                    c.style.animationName = "cardIn";
+                });
+            });
+
+            // Update count
+            countEl.textContent = filtered.length;
+
+            // Empty state
+            emptyEl.classList.toggle("show", filtered.length === 0);
+        }
+
+        catBtns.forEach((btn) => {
+            btn.addEventListener("click", () => {
+                catBtns.forEach((b) => {
+                    b.classList.remove("active");
+                    b.setAttribute("aria-selected", "false");
+                });
+                btn.classList.add("active");
+                btn.setAttribute("aria-selected", "true");
+                activeCategory = btn.dataset.cat;
+
+                // Scroll active btn into view on mobile
+                btn.scrollIntoView({
+                    behavior: "smooth",
+                    block: "nearest",
+                    inline: "center",
+                });
+
+                filterAndSort();
+            });
+        });
+
+        sortSel.addEventListener("change", filterAndSort);
+
+        // Run initial filter on page load
+        filterAndSort();
+
+        // ── Wishlist persistence (session) ───────────────────────────
+        document.querySelectorAll(".card-wishlist").forEach((btn) => {
+            btn.addEventListener("click", (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                btn.classList.toggle("active");
+                const svgPath = btn.querySelector("path");
+                if (svgPath) {
+                    const isActive = btn.classList.contains("active");
+                    svgPath.setAttribute(
+                        "fill",
+                        isActive ? "currentColor" : "none"
+                    );
+                }
+            });
+        });
+
+        // ── Recommendation section reveal on scroll ──────────────────
+        const recoSection = document.getElementById("reco-section");
+        if (recoSection) {
+            const recoCards = recoSection.querySelectorAll(".prod-card");
+            recoCards.forEach((c) => {
+                c.style.opacity = "0";
+                c.style.animationName = "none";
+            });
+
+            const recoObserver = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            recoCards.forEach((c, i) => {
+                                c.style.animationDelay = i * 0.1 + "s";
+                                c.style.animationDuration = "0.55s";
+                                c.style.animationName = "cardIn";
+                            });
+                            recoObserver.disconnect();
+                        }
+                    });
+                },
+                { threshold: 0.1 }
+            );
+            recoObserver.observe(recoSection);
+        }
+    </script>
+</Layout>
