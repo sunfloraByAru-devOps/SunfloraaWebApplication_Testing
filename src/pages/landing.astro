@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
 import HERO from '../assets/sun_on_desk.png';
 import STARS from '../assets/stars.png';
@@ -8,12 +9,12 @@ import SUN_CLOSEUP from '../assets/sun_on_desk_closeup.png';
 import SPIDEY from '../assets/spiderman.jpg';
 
 const offerings = [
-  { num: "01", name: "Sunshine Amigurumi", sub: "Best seller · 24 pieces", price: "from ₹ 649", tag: "Best seller", img: SUN_CLOSEUP.src, href: "#cta" },
-  { num: "02", name: "Lil' Dino Keychain", sub: "New arrival · 18 pieces", price: "from ₹ 249", tag: "New", img: DINO.src, href: "#cta" },
-  { num: "03", name: "Sun & Moon Pair", sub: "Set of 2 · 12 pieces", price: "from ₹ 449", tag: "Set of 2", img: SUNMOON.src, href: "#cta" },
-  { num: "04", name: "Spidey Hanging", sub: "Limited run · 9 pieces", price: "from ₹ 549", tag: "Limited", img: SPIDEY.src, href: "#cta" },
-  { num: "05", name: "Crochet Stars", sub: "Wall hangings · new", price: "from ₹ 399", tag: "New", img: STARS.src, href: "#cta" },
-  { num: "06", name: "Custom Orders", sub: "By request · any idea", price: "Quote on inquiry", tag: "Custom", img: HERO.src, href: "#cta" },
+  { num: "01", name: "Sunshine Amigurumi", sub: "Best seller · 24 pieces", price: "from ₹ 649", tag: "Best seller", img: SUN_CLOSEUP, href: "#cta" },
+  { num: "02", name: "Lil' Dino Keychain", sub: "New arrival · 18 pieces", price: "from ₹ 249", tag: "New", img: DINO, href: "#cta" },
+  { num: "03", name: "Sun & Moon Pair", sub: "Set of 2 · 12 pieces", price: "from ₹ 449", tag: "Set of 2", img: SUNMOON, href: "#cta" },
+  { num: "04", name: "Spidey Hanging", sub: "Limited run · 9 pieces", price: "from ₹ 549", tag: "Limited", img: SPIDEY, href: "#cta" },
+  { num: "05", name: "Crochet Stars", sub: "Wall hangings · new", price: "from ₹ 399", tag: "New", img: STARS, href: "#cta" },
+  { num: "06", name: "Custom Orders", sub: "By request · any idea", price: "Quote on inquiry", tag: "Custom", img: HERO, href: "#cta" },
 ];
 ---
 
@@ -24,12 +25,12 @@ const offerings = [
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --amber:   #C8862C;
-      --dark:    #1A1815;
-      --light:   #EFE8DA;
-      --grain:   #E5DFD1;
-      --muted:   #4A453E;
-      --border:  rgba(26,24,21,0.12);
+      --amber:   #C8862C;;
+      --dark:    #000000;
+      --light:   #FFFFFF;
+      --grain:   #FFFFFF;
+      --muted:   #666666;
+      --border:  rgba(0,0,0,0.1);
     }
 
     body {
@@ -292,7 +293,7 @@ const offerings = [
       display: flex; align-items: center; justify-content: space-between;
       margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border);
     }
-    .offering-price { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; color: var(--amber); }
+    .offering-price { font-family: 'Inter', sans-serif; font-size: 1.4rem; color: #000000; }
     .offering-arrow { display: inline-block; transition: transform 0.4s; color: var(--amber); }
 
     /* ─── TESTIMONIALS (MasterClass quote wall) ─── */
@@ -383,8 +384,9 @@ const offerings = [
     .plan-name { font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase; }
     .plan.featured .plan-name { color: var(--amber); }
     .plan-price {
-      font-family: 'Cormorant Garamond', serif; font-size: 3.5rem; line-height: 1;
+      font-family: 'Inter', sans-serif; font-size: 3.5rem; line-height: 1;
       letter-spacing: -0.03em;
+      color: #000000;
     }
     .plan-price sup { font-size: 1.5rem; vertical-align: top; margin-top: 0.5rem; }
     .plan-price sub { font-size: 0.9rem; }
@@ -519,7 +521,7 @@ const offerings = [
     </div>
 
     <div class="hero-right">
-      <img src={HERO.src} alt="Crochet sunshine on pegboard" />
+      <Image src={HERO} alt="Crochet sunshine on pegboard" />
       <div class="hero-badge">
         <p>"She brings the sun indoors."</p>
         <small>— Anika, returning customer</small>
@@ -564,7 +566,7 @@ const offerings = [
   <section class="proof-section">
     <div class="proof-grid">
         <div class="proof-visual">
-          <img src={SUN_CLOSEUP.src} alt="Close-up of crochet sunshine" />
+          <Image src={SUN_CLOSEUP} alt="Close-up of crochet sunshine" />
           <div class="proof-play">
             <div class="play-btn" aria-label="Watch our story">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg>
@@ -625,37 +627,37 @@ const offerings = [
           {
             num: "01", name: "Sunshine Amigurumi", sub: "Best seller · 24 pieces",
             price: "from ₹ 649", tag: "Best seller",
-            img: SUN_CLOSEUP.src, href: "#cta"
+            img: SUN_CLOSEUP, href: "#cta"
           },
           {
             num: "02", name: "Lil' Dino Keychain", sub: "New arrival · 18 pieces",
             price: "from ₹ 249", tag: "New",
-            img: DINO.src, href: "#cta"
+            img: DINO, href: "#cta"
           },
           {
             num: "03", name: "Sun & Moon Pair", sub: "Set of 2 · 12 pieces",
             price: "from ₹ 449", tag: "Set of 2",
-            img: SUNMOON.src, href: "#cta"
+            img: SUNMOON, href: "#cta"
           },
           {
             num: "04", name: "Spidey Hanging", sub: "Limited run · 9 pieces",
             price: "from ₹ 549", tag: "Limited",
-            img: SPIDEY.src, href: "#cta"
+            img: SPIDEY, href: "#cta"
           },
           {
             num: "05", name: "Crochet Stars", sub: "Wall hangings · new",
             price: "from ₹ 399", tag: "New",
-            img: STARS.src, href: "#cta"
+            img: STARS, href: "#cta"
           },
           {
             num: "06", name: "Custom Orders", sub: "By request · any idea",
             price: "Quote on inquiry", tag: "Custom",
-            img: HERO.src, href: "#cta"
+            img: HERO, href: "#cta"
           },
         ].map(o => (
           <a href={o.href} class="offering-card reveal">
             <div class="offering-img-wrap">
-              <img src={o.img} alt={o.name} class="offering-img" />
+              <Image src={o.img} alt={o.name} class="offering-img" />
               <span class="offering-tag">{o.tag}</span>
             </div>
             <div class="offering-body">

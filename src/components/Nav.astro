@@ -1,4 +1,6 @@
 ---
+import Logo from '../assets/logo.png';
+
 const links = [
   { label: "Shop", href: "#featured" },
   { label: "Story", href: "#story" },
@@ -14,11 +16,8 @@ const links = [
   class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 py-6"
 >
   <div class="max-w-[1400px] mx-auto px-6 md:px-12 flex items-center justify-between">
-    <a href="#top" data-testid="nav-logo" class="flex items-center gap-2">
-      <span class="font-serif-display text-3xl md:text-[34px] italic font-medium tracking-tight text-[#1A1815]">
-        Sunflora
-      </span>
-      <span class="w-2.5 h-2.5 rounded-full bg-[#C8862C] -ml-1 mt-3"></span>
+    <a href="#top" data-testid="nav-logo" class="flex items-center logo-wrap">
+      <img src={Logo.src} alt="Sunflora" class="logo-img" style="mix-blend-mode: multiply;" />
     </a>
 
     <nav class="hidden md:flex items-center gap-10">
@@ -26,7 +25,7 @@ const links = [
         <a
           href={l.href}
           data-testid={`nav-link-${l.label.toLowerCase()}`}
-          class="hover-underline text-sm tracking-wide text-[#1A1815]/80 hover:text-[#1A1815]"
+          class="nav-link hover-underline text-sm tracking-wide"
         >
           {l.label}
         </a>
@@ -36,36 +35,24 @@ const links = [
     <a
       href="#cta"
       data-testid="nav-cta-button"
-      class="hidden md:inline-flex items-center gap-2 bg-[#1A1815] text-[#EFE8DA] px-5 py-2.5 text-sm tracking-wide hover:bg-[#C8862C] transition-colors duration-500"
+      class="nav-cta hidden md:inline-flex items-center gap-2 px-5 py-2.5 text-sm tracking-wide transition-all duration-500"
     >
       Inquire
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg>
     </a>
 
-    <button id="mobile-toggle" data-testid="mobile-menu-toggle" class="md:hidden text-[#1A1815]" aria-label="Toggle menu">
+    <button id="mobile-toggle" data-testid="mobile-menu-toggle" class="md:hidden nav-link" aria-label="Toggle menu">
       <svg id="icon-menu" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
       <svg id="icon-close" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hidden"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
   </div>
 
-  <!-- Mobile menu -->
-  <div
-    id="mobile-menu"
-    class="md:hidden hidden bg-[#EFE8DA] border-t border-[rgba(26,24,21,0.08)] overflow-hidden"
-  >
+  <div id="mobile-menu" class="md:hidden hidden bg-[#EFE8DA] border-t border-[rgba(26,24,21,0.08)] overflow-hidden">
     <div class="px-6 py-6 flex flex-col gap-5">
       {links.map(l => (
-        <a
-          href={l.href}
-          class="mobile-nav-link font-serif-display text-3xl italic text-[#1A1815]"
-        >
-          {l.label}
-        </a>
+        <a href={l.href} class="mobile-nav-link font-serif-display text-3xl italic text-[#1A1815]">{l.label}</a>
       ))}
-      <a
-        href="#cta"
-        class="mobile-nav-link mt-2 inline-flex items-center gap-2 bg-[#1A1815] text-[#EFE8DA] px-5 py-3 text-sm w-fit"
-      >
+      <a href="#cta" class="mobile-nav-link mt-2 inline-flex items-center gap-2 bg-[#1A1815] text-[#EFE8DA] px-5 py-3 text-sm w-fit">
         Inquire
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg>
       </a>
@@ -73,25 +60,102 @@ const links = [
   </div>
 </header>
 
+<style>
+  .logo-wrap {
+    position: relative;
+    padding: 6px 16px 6px 12px;
+    border-radius: 40px;
+    background: transparent;
+    box-shadow: none;
+    transition: opacity 0.4s ease;
+    isolation: isolate;
+    z-index: 10;
+  }
+
+  /* Sunbeam cone falling from above */
+  .logo-wrap::before {
+    content: '';
+    position: absolute;
+    top: -80px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 260px;
+    height: 180px;
+    background: radial-gradient(
+      ellipse 55% 100% at 50% 0%,
+      rgba(255, 220, 130, 0.65) 0%,
+      rgba(245, 190, 80,  0.40) 25%,
+      rgba(230, 160, 50,  0.20) 50%,
+      rgba(210, 140, 40,  0.08) 72%,
+      transparent 100%
+    );
+    pointer-events: none;
+    z-index: -1;
+    animation: beamBreath 4s ease-in-out infinite;
+  }
+
+  /* Removed ::after entirely — was causing the visible line */
+
+  [data-scrolled] .logo-wrap::before {
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  @keyframes beamBreath {
+    0%, 100% { opacity: 0.95; transform: translateX(-50%) scaleX(1);    }
+    50%       { opacity: 1;    transform: translateX(-50%) scaleX(1.10); }
+  }
+
+  .logo-img {
+    height: 36px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+  }
+
+  .nav-link {
+    color: rgba(239, 232, 218, 0.88);
+    transition: color 0.4s ease;
+  }
+  .nav-link:hover { color: #EFE8DA; }
+
+  [data-scrolled] .nav-link { color: rgba(26, 24, 21, 0.8); }
+  [data-scrolled] .nav-link:hover { color: #1A1815; }
+
+  .nav-cta {
+    color: #EFE8DA;
+    border: 1px solid rgba(239,232,218,0.45);
+    background: rgba(239,232,218,0.08);
+  }
+  .nav-cta:hover { background: rgba(239,232,218,0.18); }
+
+  [data-scrolled] .nav-cta {
+    background: #1A1815;
+    color: #EFE8DA;
+    border-color: transparent;
+  }
+  [data-scrolled] .nav-cta:hover { background: #C8862C; }
+</style>
+
 <script>
-  const header = document.getElementById('site-header')!;
-  const toggle = document.getElementById('mobile-toggle')!;
-  const menu = document.getElementById('mobile-menu')!;
-  const iconMenu = document.getElementById('icon-menu')!;
+  const header    = document.getElementById('site-header')!;
+  const toggle    = document.getElementById('mobile-toggle')!;
+  const menu      = document.getElementById('mobile-menu')!;
+  const iconMenu  = document.getElementById('icon-menu')!;
   const iconClose = document.getElementById('icon-close')!;
 
-  // Scroll shrink
   window.addEventListener('scroll', () => {
     if (window.scrollY > 30) {
-      header.classList.add('py-4', 'backdrop-blur-md', 'bg-[#EFE8DA]/80', 'border-b', 'border-[rgba(26,24,21,0.08)]');
+      header.setAttribute('data-scrolled', '');
+      header.classList.add('py-4', 'backdrop-blur-md', 'bg-[#EFE8DA]/90', 'border-b', 'border-[rgba(26,24,21,0.08)]');
       header.classList.remove('py-6');
     } else {
-      header.classList.remove('py-4', 'backdrop-blur-md', 'bg-[#EFE8DA]/80', 'border-b', 'border-[rgba(26,24,21,0.08)]');
+      header.removeAttribute('data-scrolled');
+      header.classList.remove('py-4', 'backdrop-blur-md', 'bg-[#EFE8DA]/90', 'border-b', 'border-[rgba(26,24,21,0.08)]');
       header.classList.add('py-6');
     }
   });
 
-  // Mobile toggle
   toggle.addEventListener('click', () => {
     const isOpen = !menu.classList.contains('hidden');
     menu.classList.toggle('hidden', isOpen);
@@ -99,7 +163,6 @@ const links = [
     iconClose.classList.toggle('hidden', isOpen);
   });
 
-  // Close on link click
   document.querySelectorAll('.mobile-nav-link').forEach(link => {
     link.addEventListener('click', () => {
       menu.classList.add('hidden');

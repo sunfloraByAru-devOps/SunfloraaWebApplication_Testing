@@ -1,105 +1,400 @@
 ---
-import HERO from '../assets/sun_on_desk.png';
+import BG_EMPTY from '../assets/ChatGPT Image May 24, 2026, 03_59_57 PM.png';
+import BG_FULL from '../assets/ChatGPT Image May 24, 2026, 03_59_49 PM.png';
 ---
 
-<section id="top" data-testid="hero-section" class="relative pt-36 md:pt-44 pb-24 md:pb-32 overflow-hidden">
-  <div class="max-w-[1400px] mx-auto px-6 md:px-12 grid grid-cols-12 gap-8 items-end">
+<div class="hero-wrap" id="heroWrap">
+  <div class="hero" id="hero">
+    <div class="bg-layer bg-full" id="bgFull" style={`background-image: url('${BG_FULL.src}');`}></div>
+    <div class="bg-layer bg-empty" id="bgEmpty" style={`background-image: url('${BG_EMPTY.src}');`}></div>
 
-    <div class="col-span-12 lg:col-span-7 hero-text-block">
-      <div class="flex items-center gap-3 mb-8 fade-up">
-        <span class="w-10 h-px bg-[#C8862C]"></span>
-        <span class="uppercase tracking-[0.28em] text-xs text-[#C8862C] font-medium">
-          Est. handmade — one stitch at a time
-        </span>
+    <div class="edge-fade"></div>
+
+    <!-- STRONGER overlay — covers full left 42% solidly, then fades -->
+    <div class="bg-overlay"></div>
+
+    <div class="content">
+      <div class="eyebrow">
+        <span class="eyebrow-line"></span>
+        <span class="eyebrow-text">Est. handmade — one stitch at a time</span>
       </div>
-<h1 class="font-hero-heading text-[56px] sm:text-7xl lg:text-[112px] leading-[0.95] tracking-tighter text-[#1A1815]">
-  Soft little <em class="italic font-light">things</em><br>
-  made <span class="squiggle">slowly</span>,<br>
-  made with <span class="text-[#C8862C] italic">love</span>.
-</h1>
-      <p class="fade-up mt-10 max-w-xl text-[15px] md:text-[17px] leading-[1.7] text-[#4A453E]">
-        Sunflora is a small crochet studio crafting heirloom-feel keepsakes —
-        sun-bright amigurumi, blooming flowers, and tiny companions that travel
-        on bag straps and bedside tables. Each piece is hooked, stitched, and
-        whispered to by hand.
+
+      <h1 class="headline">
+        <span class="line1">Your desk misses</span>
+        <span class="line2">something alive.</span>
+      </h1>
+
+      <p class="sub">
+        Handcrocheted companions, flowers, and sunshine —
+        made slowly, made to stay.
       </p>
 
-      <div class="fade-up mt-10 flex flex-wrap items-center gap-5">
-        <a
-          href="#featured"
-          data-testid="hero-explore-button"
-          class="inline-flex items-center gap-2 bg-[#1A1815] text-[#EFE8DA] px-7 py-4 text-sm tracking-wider uppercase hover:bg-[#C8862C] transition-colors duration-500"
-        >
-          Explore the collection
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg>
-        </a>
-        <a
-          href="#story"
-          data-testid="hero-story-button"
-          class="inline-flex items-center gap-2 text-[#1A1815] text-sm tracking-wider uppercase border-b border-[#1A1815] pb-1 hover:text-[#C8862C] hover:border-[#C8862C] transition-colors"
-        >
-          Our story
-        </a>
-      </div>
-
-      <div class="fade-up mt-16 flex items-center gap-8 text-xs uppercase tracking-[0.2em] text-[#4A453E]">
-        <div class="flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C8862C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg>
-          Hand-crocheted
-        </div>
-        <div class="hidden sm:flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C8862C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-          Small batch
-        </div>
-        <div class="hidden md:flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C8862C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.88 5.76a1 1 0 0 0 .95.69h6.05l-4.9 3.56a1 1 0 0 0-.36 1.12L17.5 20l-4.9-3.56a1 1 0 0 0-1.18 0L6.5 20l1.88-5.87a1 1 0 0 0-.36-1.12L3.12 9.45h6.05a1 1 0 0 0 .95-.69L12 3z"/></svg>
-          Custom welcome
-        </div>
+      <div class="cta-row">
+        <button class="btn-primary" onclick="document.getElementById('featured')?.scrollIntoView({ behavior: 'smooth' })">Explore the collection</button>
+        <button class="btn-ghost" onclick="document.getElementById('story')?.scrollIntoView({ behavior: 'smooth' })">Our story</button>
       </div>
     </div>
 
-    <div class="col-span-12 lg:col-span-5 relative hero-img-block">
-      <div class="absolute -inset-4 bg-[#C8862C]/15 -z-10 translate-x-6 translate-y-6"></div>
-      <img
-        src={HERO.src}
-        alt="Crochet sunshine on pegboard"
-        data-testid="hero-image"
-        class="w-full aspect-[4/5] object-cover grayscale-[0.05]"
-      />
-      <div class="absolute -bottom-6 -left-6 bg-[#EFE8DA] border border-[rgba(26,24,21,0.12)] px-5 py-4 max-w-[220px]">
-        <p class="font-serif-display italic text-[#1A1815] text-lg leading-snug">
-          "She brings the sun indoors."
-        </p>
-        <p class="text-[10px] uppercase tracking-[0.2em] text-[#4A453E] mt-2">— Anika, returning customer</p>
-      </div>
+    <div class="tag absence-tag" id="absenceTag">
+      <span class="tag-dot"></span>
+      <span class="tag-text">Something's missing…</span>
+    </div>
+
+    <div class="tag presence-tag" id="presenceTag">
+      <span class="tag-dot"></span>
+      <span class="tag-text">There it is.</span>
+    </div>
+
+    <div class="scroll-cue">
+      <div class="scroll-line"></div>
+      <span class="scroll-word">Scroll</span>
     </div>
   </div>
-
-  <div class="hidden md:flex absolute bottom-6 left-1/2 -translate-x-1/2 flex-col items-center gap-2 text-[10px] uppercase tracking-[0.3em] text-[#4A453E]">
-    <span>Scroll</span>
-    <span class="w-px h-12 bg-[#4A453E] animate-pulse"></span>
-  </div>
-</section>
+</div>
 
 <style>
-  .hero-text-block > * {
-    opacity: 0;
-    transform: translateY(28px);
-    animation: fadeUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  }
-  .hero-text-block > *:nth-child(1) { animation-delay: 0.05s; }
-  .hero-text-block > *:nth-child(2) { animation-delay: 0.17s; }
-  .hero-text-block > *:nth-child(3) { animation-delay: 0.29s; }
-  .hero-text-block > *:nth-child(4) { animation-delay: 0.41s; }
-  .hero-text-block > *:nth-child(5) { animation-delay: 0.53s; }
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap');
 
-  .hero-img-block {
+  :root {
+    --cream: #EFE8DA;
+    --ink:   #1A1815;
+    --gold:  #C8862C;
+    --muted: #4A453E;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .hero-wrap {
+    width: 100%;
+    padding: 0 4vw;
+    background: #ffffff;
+  }
+
+  .hero {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    max-height: 920px;
+    overflow: hidden;
+    border-radius: 6px;
+    background: var(--ink);
+    font-family: 'Jost', sans-serif;
+  }
+
+  .bg-layer {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center center;
+  }
+
+  .bg-full  { opacity: 1; }
+  .bg-empty { opacity: 0; }
+
+  .edge-blur-left,
+  .edge-blur-right {
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 5px;
+    z-index: 1;
+    pointer-events: none;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+  .edge-blur-left  { left: 0; }
+  .edge-blur-right { right: 0; }
+
+  .edge-fade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+
+  background:
+    linear-gradient(
+      to right,
+      rgba(255,255,255,1) 0px,
+      rgba(255,255,255,1) 10px,
+      rgba(255,255,255,0) 32px
+    ),
+linear-gradient(
+  to left,
+  rgba(255,255,255,1) 0px,
+  rgba(255,255,255,1) 18px,
+  rgba(255,255,255,0.4) 20px,
+  rgba(255,255,255,0) 34px
+);
+}
+  /* ── STRONGER overlay: solid dark band covers left ~38%, then dissolves ── */
+  .bg-overlay {
+  position: absolute;
+  inset: 0;
+  background: 
+    /* Left dark pocket for text — starts after the nav zone */
+    linear-gradient(
+      to right,
+      rgba(18,15,12,0.45) 0%,
+      rgba(18,15,12,0.65) 20%,
+      rgba(18,15,12,0.42) 36%,
+      rgba(18,15,12,0.14) 54%,
+      rgba(18,15,12,0.00) 68%
+    ),
+    /* Top vignette — very light, only covers a thin strip so nav stays clear */
+    linear-gradient(
+      to bottom,
+      rgba(18,15,12,0.08) 0%,
+      rgba(18,15,12,0.04) 6%,
+      transparent 14%
+    );
+  z-index: 3;
+}
+
+  /* ── Content block ──
+     Vertically centered in the hero, left-anchored.
+     Kept within the first ~34% of width so it never
+     touches the lamp or pegboard.
+  ── */
+  .content {
+    position: absolute;
+    z-index: 4;
+    left: 6%;
+    /* True vertical center instead of bottom-anchored */
+    top: 50%;
+    transform: translateY(-50%);
+    max-width: 380px;
+
+    /* Subtle frosted backdrop — catches any bleed-through light */
+    background: radial-gradient(
+      ellipse 110% 90% at 0% 50%,
+      rgba(18,15,12,0.22) 0%,
+      transparent 100%
+    );
+    padding: 8px 0;
+  }
+
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 22px;
     opacity: 0;
-    transform: translateY(40px);
-    animation: fadeUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+    animation: fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.25s forwards;
+  }
+
+  .eyebrow-line {
+    width: 32px;
+    height: 1px;
+    background: var(--gold);
+    flex-shrink: 0;
+  }
+
+  .eyebrow-text {
+    font-size: 9px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 500;
+  }
+
+  .headline {
+    font-family: 'Playfair Display', serif;
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+    opacity: 0;
+    animation: fadeUp 0.9s cubic-bezier(0.16,1,0.3,1) 0.4s forwards;
+  }
+
+  .headline .line1 {
+    /* Scaled down from 4.5vw — less aggressive at wide viewports */
+    font-size: clamp(28px, 3.4vw, 46px);
+    font-weight: 400;
+    display: block;
+    color: var(--cream);
+    /* Stronger text shadow replaces reliance on the bg overlay alone */
+    text-shadow: 0 2px 18px rgba(10,8,6,0.85), 0 1px 4px rgba(10,8,6,0.6);
+  }
+
+  .headline .line2 {
+    font-size: clamp(28px, 3.4vw, 46px);
+    font-weight: 300;
+    font-style: italic;
+    display: block;
+    color: var(--gold);
+    text-shadow: 0 2px 18px rgba(10,8,6,0.85), 0 1px 4px rgba(10,8,6,0.5);
+  }
+
+  .sub {
+    margin-top: 16px;
+    font-size: 13px;
+    line-height: 1.7;
+    color: rgba(239,232,218,0.82);
+    font-weight: 300;
+    max-width: 320px;
+    opacity: 0;
+    animation: fadeUp 0.9s cubic-bezier(0.16,1,0.3,1) 0.55s forwards;
+    text-shadow: 0 1px 8px rgba(10,8,6,0.7);
+  }
+
+  .cta-row {
+    margin-top: 28px;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    opacity: 0;
+    animation: fadeUp 0.9s cubic-bezier(0.16,1,0.3,1) 0.7s forwards;
+  }
+
+  .btn-primary {
+    background: var(--gold);
+    color: var(--ink);
+    border: none;
+    padding: 12px 24px;
+    font-family: 'Jost', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  .btn-primary:hover { background: var(--cream); }
+
+  .btn-ghost {
+    font-family: 'Jost', sans-serif;
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--cream);
+    background: none;
+    border: none;
+    border-bottom: 1px solid rgba(239,232,218,0.38);
+    padding-bottom: 3px;
+    cursor: pointer;
+    transition: color 0.3s, border-color 0.3s;
+  }
+  .btn-ghost:hover { color: var(--gold); border-color: var(--gold); }
+
+  .tag {
+    position: absolute;
+    bottom: 32px;
+    left: 6%;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+  .tag.visible { opacity: 1; }
+
+  .tag-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--gold);
+    animation: pulse 1.8s ease-in-out infinite;
+  }
+  .presence-tag .tag-dot { animation-delay: 0.3s; }
+
+  .tag-text {
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(239,232,218,0.58);
+  }
+
+  .scroll-cue {
+    position: absolute;
+    bottom: 32px;
+    right: 5%;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    opacity: 0;
+    animation: fadeIn 1s ease 1.5s forwards;
+  }
+
+  .scroll-word {
+    font-size: 8px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(239,232,218,0.4);
+    writing-mode: vertical-rl;
+  }
+
+  .scroll-line {
+    width: 1px;
+    height: 38px;
+    background: rgba(239,232,218,0.2);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .scroll-line::after {
+    content: '';
+    position: absolute;
+    top: -100%; left: 0;
+    width: 100%; height: 100%;
+    background: var(--gold);
+    animation: scrollDrop 2s ease-in-out 1.7s infinite;
   }
 
   @keyframes fadeUp {
-    to { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.4; transform: scale(0.7); }
+  }
+  @keyframes scrollDrop {
+    0%   { top: -100%; }
+    100% { top: 200%; }
   }
 </style>
+
+<script>
+  const bgFull      = document.getElementById('bgFull')      as HTMLElement;
+  const bgEmpty     = document.getElementById('bgEmpty')     as HTMLElement;
+  const absenceTag  = document.getElementById('absenceTag')  as HTMLElement;
+  const presenceTag = document.getElementById('presenceTag') as HTMLElement;
+
+  const VANISH  = 'cubic-bezier(0.7, 0, 0.84, 0)';
+  const EASE_IN = 'cubic-bezier(0.16, 1, 0.3, 1)';
+
+  function tr(el: HTMLElement, ms: number, easing: string) {
+    el.style.transition = `opacity ${ms}ms ${easing}`;
+  }
+
+  tr(bgFull, 0, VANISH);
+  tr(bgEmpty, 0, VANISH);
+  bgFull.style.opacity  = '1';
+  bgEmpty.style.opacity = '0';
+
+  setTimeout(() => {
+    tr(bgFull,  700, VANISH);
+    tr(bgEmpty, 700, EASE_IN);
+    bgFull.style.opacity  = '0';
+    bgEmpty.style.opacity = '1';
+    absenceTag.classList.add('visible');
+  }, 3000);
+
+  setTimeout(() => {
+    absenceTag.classList.remove('visible');
+    tr(bgFull,  700, VANISH);
+    tr(bgEmpty, 700, VANISH);
+    bgFull.style.opacity  = '1';
+    bgEmpty.style.opacity = '0';
+  }, 9000);
+
+  setTimeout(() => {
+    presenceTag.classList.add('visible');
+  }, 9800);
+</script>
