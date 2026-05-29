@@ -1,0 +1,9 @@
+{
+  "name": "sunflora",
+  "kv_namespaces": [
+    {
+      "binding": "SESSION",
+      "id": "4452b63379334ad8843a4a5ae5b236e9"
+    }
+  ]
+}
