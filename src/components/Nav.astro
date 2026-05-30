@@ -5,7 +5,6 @@ const links = [
   { label: "Shop", href: "/productlist" },
   { label: "Story", href: "/#story" },
   { label: "Customs", href: "/#custom" },
-  { label: "Journal", href: "/#gallery" },
   { label: "FAQ", href: "/#faq" },
 ];
 ---
@@ -64,46 +63,9 @@ const links = [
   .logo-wrap {
     position: relative;
     padding: 6px 16px 6px 12px;
-    border-radius: 40px;
     background: transparent;
-    box-shadow: none;
     transition: opacity 0.4s ease;
-    isolation: isolate;
     z-index: 10;
-  }
-
-  /* Sunbeam cone falling from above */
-  .logo-wrap::before {
-    content: '';
-    position: absolute;
-    top: -80px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 260px;
-    height: 180px;
-    background: radial-gradient(
-      ellipse 55% 100% at 50% 0%,
-      rgba(255, 220, 130, 0.65) 0%,
-      rgba(245, 190, 80,  0.40) 25%,
-      rgba(230, 160, 50,  0.20) 50%,
-      rgba(210, 140, 40,  0.08) 72%,
-      transparent 100%
-    );
-    pointer-events: none;
-    z-index: -1;
-    animation: beamBreath 4s ease-in-out infinite;
-  }
-
-  /* Removed ::after entirely — was causing the visible line */
-
-  [data-scrolled] .logo-wrap::before {
-    opacity: 0;
-    transition: opacity 0.4s ease;
-  }
-
-  @keyframes beamBreath {
-    0%, 100% { opacity: 0.95; transform: translateX(-50%) scaleX(1);    }
-    50%       { opacity: 1;    transform: translateX(-50%) scaleX(1.10); }
   }
 
   .logo-img {
@@ -124,10 +86,15 @@ const links = [
 
   .nav-cta {
     color: #EFE8DA;
-    border: 1px solid rgba(239,232,218,0.45);
-    background: rgba(239,232,218,0.08);
+    border: 1px solid rgba(239, 232, 218, 0.4);
+    background: transparent;
+    border-radius: 4px;
+    transition: all 0.3s ease;
   }
-  .nav-cta:hover { background: rgba(239,232,218,0.18); }
+  .nav-cta:hover {
+    background: rgba(239, 232, 218, 0.1);
+    border-color: rgba(239, 232, 218, 0.85);
+  }
 
   [data-scrolled] .nav-cta {
     background: #1A1815;
