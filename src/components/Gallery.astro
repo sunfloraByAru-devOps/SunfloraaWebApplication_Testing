@@ -1,4 +1,7 @@
 ---
+import { supabase } from '../lib/supabase';
+import { getImageUrl } from '../lib/images';
+
 import HERO from '../assets/sun_on_desk.png';
 import STARS from '../assets/stars.png';
 import DINO from '../assets/green-dino.jpg';
@@ -6,14 +9,28 @@ import SUNMOON from '../assets/sun_and_moon.jpg';
 import SUN_CLOSEUP from '../assets/sun_on_desk_closeup.png';
 import SPIDEY from '../assets/spiderman.jpg';
 
-const tiles = [
-  { src: HERO,        span: "md:col-span-2 md:row-span-2", alt: "Crochet sun on pegboard" },
-  { src: STARS,       span: "", alt: "Crochet stars" },
-  { src: DINO,        span: "", alt: "Dino keychain" },
-  { src: SUNMOON,     span: "md:col-span-2", alt: "Sun and moon set" },
-  { src: SUN_CLOSEUP, span: "", alt: "Sun close-up" },
-  { src: SPIDEY,      span: "", alt: "Spidey hanging" },
+const { data: dbTiles } = await supabase
+  .from('gallery_items')
+  .select('storage_path, alt_text, span_class, instagram_url, display_order')
+  .eq('is_active', true)
+  .order('display_order');
+
+const localTiles = [
+  { src: HERO.src,        span: "md:col-span-2 md:row-span-2", alt: "Crochet sun on pegboard" },
+  { src: STARS.src,       span: "", alt: "Crochet stars" },
+  { src: DINO.src,        span: "", alt: "Dino keychain" },
+  { src: SUNMOON.src,     span: "md:col-span-2", alt: "Sun and moon set" },
+  { src: SUN_CLOSEUP.src, span: "", alt: "Sun close-up" },
+  { src: SPIDEY.src,      span: "", alt: "Spidey hanging" },
 ];
+
+const tiles = dbTiles && dbTiles.length > 0
+  ? dbTiles.map(t => ({
+      src: getImageUrl(t.storage_path, 'gallery-images'),
+      span: t.span_class ?? '',
+      alt: t.alt_text ?? '',
+    }))
+  : localTiles;
 ---
 
 <section id="gallery" data-testid="gallery" class="py-24 md:py-32">
@@ -51,9 +68,10 @@ const tiles = [
       {tiles.map((t) => (
         <div class={`fade-up relative overflow-hidden ${t.span}`}>
           <img
-            src={t.src.src}
+            src={t.src}
             alt={t.alt}
             class="w-full h-full object-cover hover:scale-105 transition-transform duration-[1500ms] ease-out"
+            loading="lazy"
           />
         </div>
       ))}

@@ -2,6 +2,7 @@
 import { Image } from "astro:assets";
 import Layout from "../layouts/Layout.astro";
 import Nav from "../components/Nav.astro";
+import SPIDEY from "../assets/spiderman.jpg";
 
 import PRODUCT_MAIN from "../assets/sun_on_desk.png";
 import PRODUCT_CLOSE from "../assets/sun_on_desk_closeup.png";
@@ -9,7 +10,7 @@ import PRODUCT_DETAIL from "../assets/stars.png";
 import PRODUCT_LIFE from "../assets/spiderman.jpg";
 import DINO from "../assets/green-dino.jpg";
 import SUNMOON from "../assets/sun_and_moon.jpg";
-import SPIDEY from "../assets/spiderman.jpg";
+import { getImageUrl } from "../lib/images";
 
 import { createClient } from "@supabase/supabase-js";
 
@@ -21,7 +22,8 @@ const supabase = createClient(
 const initialProductId = Astro.url.searchParams.get("id") || "1";
 const productId = initialProductId;
 
-const { data } = await supabase
+// Fetch all active products
+const { data: allDbProducts } = await supabase
   .from("products")
   .select(
     `
@@ -34,18 +36,96 @@ const { data } = await supabase
     customer_insights(label, display_order,
       customer_insight_options(text, pct, display_order)
     ),
-    reviews!inner(id, stars, title, body, guest_name, author:profiles(full_name),
-      is_verified, created_at, helpful_count, unhelpful_count,
+    reviews(id, stars, title, body, guest_name, author:profiles(full_name),
+      is_verified, created_at, helpful_count, unhelpful_count, is_approved,
       review_photos(storage_path)
     )
   `,
   )
-  .eq("id", productId)
-  .eq("reviews.is_approved", true)
-  .single();
+  .eq("is_active", true);
 
-const product = data
-  ? {
+// Fetch all products_with_image for related sections
+const { data: rawRelated } = await supabase
+  .from("products_with_image")
+  .select(
+    "id, name, category_name, base_price, base_mrp, tag, primary_image_path",
+  )
+  .eq("is_active", true);
+
+const getFallbackImage = (id: number) => {
+  const cat =
+    id === 1 || id === 6 || id === 7 || id === 12
+      ? "Amigurumi"
+      : id === 2 || id === 4 || id === 11
+        ? "Keychains"
+        : id === 3 || id === 8
+          ? "Flower Stems"
+          : id === 9
+            ? "Bouquets"
+            : "Wall Hangings";
+
+  const categoryLower = cat.toLowerCase();
+  if (categoryLower.includes("amigurumi")) {
+    return PRODUCT_MAIN.src;
+  } else if (categoryLower.includes("keychain")) {
+    return SPIDEY.src;
+  } else if (categoryLower.includes("hanging")) {
+    return PRODUCT_DETAIL.src;
+  } else if (
+    categoryLower.includes("bouquet") ||
+    categoryLower.includes("stem") ||
+    categoryLower.includes("flower")
+  ) {
+    return PRODUCT_CLOSE.src;
+  } else {
+    return SUNMOON.src;
+  }
+};
+
+const getRelatedProducts = (currentId: any) => {
+  return (rawRelated || [])
+    .filter((r) => r.id !== currentId)
+    .slice(0, 3)
+    .map((r) => {
+      const cat = r.category_name || "";
+      let fallbackImgSrc = PRODUCT_MAIN.src;
+      const categoryLower = cat.toLowerCase();
+      if (categoryLower.includes("amigurumi")) {
+        fallbackImgSrc = PRODUCT_MAIN.src;
+      } else if (categoryLower.includes("keychain")) {
+        fallbackImgSrc = SPIDEY.src;
+      } else if (categoryLower.includes("hanging")) {
+        fallbackImgSrc = PRODUCT_DETAIL.src;
+      } else if (
+        categoryLower.includes("bouquet") ||
+        categoryLower.includes("stem") ||
+        categoryLower.includes("flower")
+      ) {
+        fallbackImgSrc = PRODUCT_CLOSE.src;
+      } else {
+        fallbackImgSrc = SUNMOON.src;
+      }
+
+      return {
+        id: r.id,
+        name: r.name,
+        tag: r.tag || "",
+        price: r.base_price,
+        mrp: r.base_mrp,
+        img: r.primary_image_path
+          ? supabase.storage
+              .from("product-images")
+              .getPublicUrl(r.primary_image_path).data.publicUrl
+          : fallbackImgSrc,
+      };
+    });
+};
+
+const mappedProducts: Record<string, any> = {};
+
+if (allDbProducts) {
+  for (const data of allDbProducts) {
+    mappedProducts[data.id] = {
       num: String(data.id).padStart(2, "0"),
       name: data.name,
       brand: "Sunflora Studio",
@@ -53,7 +133,9 @@ const product = data
       tagline: data.tagline || "",
       sku: data.sku || `SFL-${data.id}`,
       rating: data.avg_rating || 0,
-      reviewCount: data.reviews?.length || 0,
+      reviewCount: (data.reviews || []).filter(
+        (r: any) => r.is_approved === true,
+      ).length,
       price: data.base_price,
       mrp: data.base_mrp,
       description: data.description,
@@ -81,31 +163,38 @@ const product = data
       includes: (data.product_includes || [])
         .sort((a: any, b: any) => a.display_order - b.display_order)
         .map((i: any) => i.item),
-      reviews: (data.reviews || []).map((r: any) => ({
-        id: r.id,
-        stars: r.stars,
-        title: r.title,
-        date: new Date(r.created_at).toLocaleDateString("en-GB", {
-          day: "numeric",
-          month: "short",
-          year: "numeric",
-        }),
-        helpful: r.helpful_count,
-        unhelpful: r.unhelpful_count,
-        author: r.author?.full_name || r.guest_name || "Anonymous",
-        verified: r.is_verified,
-        body: r.body,
-        photos: (r.review_photos || []).map(
-          (p: any) =>
-            supabase.storage.from("review-images").getPublicUrl(p.storage_path)
-              .data.publicUrl,
-        ),
-      })),
+      reviews: (data.reviews || [])
+        .filter((r: any) => r.is_approved === true)
+        .map((r: any) => ({
+          id: r.id,
+          stars: r.stars,
+          title: r.title,
+          date: new Date(r.created_at).toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          }),
+          helpful: r.helpful_count,
+          unhelpful: r.unhelpful_count,
+          author: r.author?.full_name || r.guest_name || "Anonymous",
+          verified: r.is_verified,
+          body: r.body,
+          photos: (r.review_photos || []).map(
+            (p: any) =>
+              supabase.storage
+                .from("review-images")
+                .getPublicUrl(p.storage_path).data.publicUrl,
+          ),
+        })),
       ratingBreakdown: [5, 4, 3, 2, 1].map((star) => ({
         stars: star,
-        count: (data.reviews || []).filter((r: any) => r.stars === star).length,
+        count: (data.reviews || []).filter(
+          (r: any) => r.is_approved === true && r.stars === star,
+        ).length,
       })),
-      totalRatings: data.reviews?.length || 0,
+      totalRatings: (data.reviews || []).filter(
+        (r: any) => r.is_approved === true,
+      ).length,
       customerInsights: (data.customer_insights || [])
         .sort((a: any, b: any) => a.display_order - b.display_order)
         .map((ci: any) => ({
@@ -118,38 +207,50 @@ const product = data
             })),
         })),
       productCode: data.sku,
-      related: [] as Array<{ id: number; img: string; name: string; tag: string; price: number; mrp: number }>,
-      images: (data.product_images || [])
-        .sort((a: any, b: any) => a.display_order - b.display_order)
-        .map(
-          (img: any) =>
-            supabase.storage
-              .from("product-images")
-              .getPublicUrl(img.storage_path).data.publicUrl,
-        ),
-    }
-  : {
-      name: "Product Not Found",
-      brand: "Sunflora Studio",
-      description:
-        "This product could not be found or has no approved reviews.",
-      price: 0,
-      mrp: 0,
-      images: [],
-      sizes: [],
-      colors: [],
-      details: [],
-      includes: [],
-      reviews: [],
-      ratingBreakdown: [],
-      customerInsights: [],
-      related: [] as Array<{ id: number; img: string; name: string; tag: string; price: number; mrp: number }>,
+      related: getRelatedProducts(data.id),
+      images:
+        data.product_images && data.product_images.length > 0
+          ? data.product_images
+              .sort((a: any, b: any) => a.display_order - b.display_order)
+              .map((img: any) => ({
+                src: getImageUrl(img.storage_path),
+                alt: img.alt_text || data.name || "",
+              }))
+          : [{ src: getFallbackImage(data.id), alt: data.name || "" }],
     };
+  }
+}
+
+// Fallback if no products are found in database
+if (Object.keys(mappedProducts).length === 0) {
+  mappedProducts["1"] = {
+    name: "Product Not Found",
+    brand: "Sunflora Studio",
+    description: "This product could not be found or has no approved reviews.",
+    price: 0,
+    mrp: 0,
+    images: [] as any[],
+    sizes: [],
+    colors: [],
+    details: [],
+    includes: [],
+    reviews: [],
+    ratingBreakdown: [] as any[],
+    customerInsights: [],
+    related: [],
+  };
+}
+
+// Determine initial product for server-side HTML rendering
+const product =
+  mappedProducts[productId] ||
+  Object.values(mappedProducts)[0] ||
+  mappedProducts["1"];
 
 const images = product.images;
 const discount =
   product.mrp > 0 ? Math.round((1 - product.price / product.mrp) * 100) : 0;
-const productsJson = JSON.stringify({ [initialProductId]: product });
+const productsJson = JSON.stringify(mappedProducts);
 ---
 
 <Layout
@@ -1665,14 +1766,14 @@ const productsJson = JSON.stringify({ [initialProductId]: product });
       <!-- 1. THUMBNAIL STRIP -->
       <div class="thumb-strip" id="thumb-strip">
         {
-          images.map((src: string, i: number) => (
+          images.map((img: any, i: number) => (
             <button
               class={`thumb-btn${i === 0 ? " active" : ""}`}
               data-index={i}
-              data-src={src}
+              data-src={img.src}
               aria-label={`View image ${i + 1}`}
             >
-              <img src={src} alt="" loading="lazy" />
+              <img src={img.src} alt={img.alt} loading="lazy" />
             </button>
           ))
         }
@@ -1681,7 +1782,11 @@ const productsJson = JSON.stringify({ [initialProductId]: product });
       <!-- 2. MAIN IMAGE -->
       <div style="position: relative;">
         <div class="main-image-wrap" id="main-image-wrap">
-          <img src={images[0]} alt={product.name} id="main-img" />
+          <img
+            src={images[0]?.src}
+            alt={images[0]?.alt || product.name}
+            id="main-img"
+          />
           <span
             class="img-tag"
             id="img-tag"
@@ -1753,24 +1858,28 @@ const productsJson = JSON.stringify({ [initialProductId]: product });
         </div>
 
         <!-- Color -->
-        <div class="color-section">
-          <div class="section-label">
-            Colour <span id="color-label">— {product.colors[0].name}</span>
-          </div>
-          <div class="color-row" id="color-container">
-            {
-              product.colors.map((c: typeof product.colors[0], i: number) => (
-                <button
-                  class={`color-swatch${i === 0 ? " active" : ""}${c.border ? " border-swatch" : ""}`}
-                  style={`background:${c.hex}`}
-                  data-name={c.name}
-                  aria-label={c.name}
-                  title={c.name}
-                />
-              ))
-            }
-          </div>
-        </div>
+        {
+          product.colors && product.colors.length > 0 && (
+            <div class="color-section">
+              <div class="section-label">
+                Colour <span id="color-label">— {product.colors[0]?.name}</span>
+              </div>
+              <div class="color-row" id="color-container">
+                {product.colors.map(
+                  (c: (typeof product.colors)[0], i: number) => (
+                    <button
+                      class={`color-swatch${i === 0 ? " active" : ""}${c.border ? " border-swatch" : ""}`}
+                      style={`background:${c.hex}`}
+                      data-name={c.name}
+                      aria-label={c.name}
+                      title={c.name}
+                    />
+                  ),
+                )}
+              </div>
+            </div>
+          )
+        }
 
         <!-- Size -->
         <div class="size-section">
@@ -1795,7 +1904,7 @@ const productsJson = JSON.stringify({ [initialProductId]: product });
           </div>
           <div class="size-grid" id="sizes-container">
             {
-              product.sizes.map((s: typeof product.sizes[0], i: number) => (
+              product.sizes.map((s: (typeof product.sizes)[0], i: number) => (
                 <button
                   class={`size-btn${i === 0 ? " active" : ""}`}
                   data-price={s.price}
@@ -2059,7 +2168,7 @@ const productsJson = JSON.stringify({ [initialProductId]: product });
               <table class="details-table">
                 <tbody id="details-table-body">
                   {
-                    product.details.map((d: typeof product.details[0]) => (
+                    product.details.map((d: (typeof product.details)[0]) => (
                       <tr>
                         <td>{d.label}</td>
                         <td>{d.value}</td>
@@ -2288,7 +2397,7 @@ const productsJson = JSON.stringify({ [initialProductId]: product });
         </div>
         <div class="rating-bars" id="rating-bars-container">
           {
-            product.ratingBreakdown.map((row) => {
+            product.ratingBreakdown.map((row: any) => {
               const pct = Math.round((row.count / product.totalRatings) * 100);
               const isLow = row.stars >= 2;
               return (
@@ -2316,22 +2425,24 @@ const productsJson = JSON.stringify({ [initialProductId]: product });
         <div class="insights-title">What Customers Said</div>
         <div class="insights-rows" id="insights-container">
           {
-            product.customerInsights.map((ins: typeof product.customerInsights[0]) => (
-              <div class="insight-row">
-                <div class="insight-row-label">{ins.label}</div>
-                <div class="insight-bar-wrap">
-                  <div class="insight-bar-track">
-                    <div
-                      class="insight-bar-fill"
-                      style={`width:${ins.options[0].pct}%`}
-                    />
+            product.customerInsights.map(
+              (ins: (typeof product.customerInsights)[0]) => (
+                <div class="insight-row">
+                  <div class="insight-row-label">{ins.label}</div>
+                  <div class="insight-bar-wrap">
+                    <div class="insight-bar-track">
+                      <div
+                        class="insight-bar-fill"
+                        style={`width:${ins.options[0].pct}%`}
+                      />
+                    </div>
+                    <span class="insight-bar-label">
+                      {ins.options[0].text} ({ins.options[0].pct}%)
+                    </span>
                   </div>
-                  <span class="insight-bar-label">
-                    {ins.options[0].text} ({ins.options[0].pct}%)
-                  </span>
                 </div>
-              </div>
-            ))
+              ),
+            )
           }
         </div>
         <button class="insights-link" id="view-details-btn">
@@ -2424,7 +2535,7 @@ const productsJson = JSON.stringify({ [initialProductId]: product });
 
       <div class="reviews-list" id="reviews-list-container">
         {
-          product.reviews.map((r: typeof product.reviews[0]) => {
+          product.reviews.map((r: (typeof product.reviews)[0]) => {
             const starColor =
               r.stars >= 4 ? "" : r.stars === 3 ? " mid" : " low";
             const words = r.body.split(" ");
@@ -2595,24 +2706,26 @@ const productsJson = JSON.stringify({ [initialProductId]: product });
         style="padding: 1rem 1.5rem 1.5rem; display: flex; flex-direction: column; gap: 1.5rem;"
       >
         {
-          product.customerInsights.map((ins: typeof product.customerInsights[0]) => (
-            <div class="dialog-insight-group">
-              <div class="dialog-insight-label">{ins.label}</div>
-              {ins.options.map((opt: typeof ins.options[0], oi: number) => (
-                <div class="dialog-bar-row">
-                  <span class={`dialog-bar-name${oi === 0 ? " bold" : ""}`}>
-                    {opt.text} ({opt.pct}%)
-                  </span>
-                  <div class="dialog-bar-track">
-                    <div
-                      class={`dialog-bar-fill${oi === 0 ? " primary" : ""}`}
-                      style={`width:${opt.pct}%`}
-                    />
+          product.customerInsights.map(
+            (ins: (typeof product.customerInsights)[0]) => (
+              <div class="dialog-insight-group">
+                <div class="dialog-insight-label">{ins.label}</div>
+                {ins.options.map((opt: (typeof ins.options)[0], oi: number) => (
+                  <div class="dialog-bar-row">
+                    <span class={`dialog-bar-name${oi === 0 ? " bold" : ""}`}>
+                      {opt.text} ({opt.pct}%)
+                    </span>
+                    <div class="dialog-bar-track">
+                      <div
+                        class={`dialog-bar-fill${oi === 0 ? " primary" : ""}`}
+                        style={`width:${opt.pct}%`}
+                      />
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          ))
+                ))}
+              </div>
+            ),
+          )
         }
       </div>
     </div>
@@ -2626,7 +2739,7 @@ const productsJson = JSON.stringify({ [initialProductId]: product });
     </div>
     <div class="related-grid" id="related-grid-container">
       {
-        product.related.map((o: typeof product.related[0]) => {
+        product.related.map((o: (typeof product.related)[0]) => {
           const relDisc = Math.round((1 - o.price / o.mrp) * 100);
           return (
             <a href={`/productdetail?id=${o.id}`} class="related-card">
@@ -2709,8 +2822,9 @@ const productsJson = JSON.stringify({ [initialProductId]: product });
 
     // 1. Get Product from URL Params
     const urlParams = new URLSearchParams(window.location.search);
-    const productId = parseInt(urlParams.get("id")) || 1;
-    const product = products[productId] || products[1];
+    const productId = urlParams.get("id") || "1";
+    const product =
+      products[productId] || products["1"] || Object.values(products)[0];
 
     // 2. Hydration Function
     function hydratePDP(product) {
@@ -2787,32 +2901,40 @@ const productsJson = JSON.stringify({ [initialProductId]: product });
 
       // 3. Color swatches setup
       const colorLabel = document.getElementById("color-label");
-      if (colorLabel) colorLabel.textContent = "— " + product.colors[0].name;
-
       const colorContainer = document.getElementById("color-container");
-      if (colorContainer) {
-        colorContainer.innerHTML = product.colors
-          .map(
-            (c, i) => `
-        <button
-          class="color-swatch${i === 0 ? " active" : ""}${c.border ? " border-swatch" : ""}"
-          style="background:${c.hex};"
-          data-name="${c.name}"
-          aria-label="${c.name}"
-          title="${c.name}"
-        ></button>
-      `,
-          )
-          .join("");
+      const colorSectionEl = document.querySelector(".color-section");
 
-        const swatches = colorContainer.querySelectorAll(".color-swatch");
-        swatches.forEach((swatch) => {
-          swatch.addEventListener("click", () => {
-            swatches.forEach((s) => s.classList.remove("active"));
-            swatch.classList.add("active");
-            if (colorLabel) colorLabel.textContent = "— " + swatch.dataset.name;
+      if (product.colors && product.colors.length > 0) {
+        if (colorSectionEl) colorSectionEl.style.display = "";
+        if (colorLabel) colorLabel.textContent = "— " + product.colors[0].name;
+
+        if (colorContainer) {
+          colorContainer.innerHTML = product.colors
+            .map(
+              (c, i) => `
+          <button
+            class="color-swatch${i === 0 ? " active" : ""}${c.border ? " border-swatch" : ""}"
+            style="background:${c.hex};"
+            data-name="${c.name}"
+            aria-label="${c.name}"
+            title="${c.name}"
+          ></button>
+        `,
+            )
+            .join("");
+
+          const swatches = colorContainer.querySelectorAll(".color-swatch");
+          swatches.forEach((swatch) => {
+            swatch.addEventListener("click", () => {
+              swatches.forEach((s) => s.classList.remove("active"));
+              swatch.classList.add("active");
+              if (colorLabel)
+                colorLabel.textContent = "— " + swatch.dataset.name;
+            });
           });
-        });
+        }
+      } else {
+        if (colorSectionEl) colorSectionEl.style.display = "none";
       }
 
       // 4. Size grid setup
@@ -3129,19 +3251,19 @@ const productsJson = JSON.stringify({ [initialProductId]: product });
       const mainImg = document.getElementById("main-img");
       const thumbStrip = document.getElementById("thumb-strip");
       if (thumbStrip && mainImg) {
-        mainImg.src = product.images[0];
-        mainImg.alt = product.name;
+        mainImg.src = product.images[0]?.src || "";
+        mainImg.alt = product.images[0]?.alt || product.name;
 
         thumbStrip.innerHTML = product.images
           .map(
-            (src, i) => `
+            (img, i) => `
         <button
           class="thumb-btn${i === 0 ? " active" : ""}"
           data-index="${i}"
-          data-src="${src}"
+          data-src="${img.src}"
           aria-label="View image ${i + 1}"
         >
-          <img src="${src}" alt="" loading="lazy" />
+          <img src="${img.src}" alt="${img.alt || ""}" loading="lazy" />
         </button>
       `,
           )

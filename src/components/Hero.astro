@@ -1,12 +1,16 @@
 ---
-import BG_EMPTY from '../assets/ChatGPT Image May 24, 2026, 03_59_57 PM.png';
-import BG_FULL from '../assets/ChatGPT Image May 24, 2026, 03_59_49 PM.png';
+import { getImageUrl } from '../lib/images';
+import BG_EMPTY_LOCAL from '../assets/ChatGPT Image May 24, 2026, 03_59_57 PM.png';
+import BG_FULL_LOCAL from '../assets/ChatGPT Image May 24, 2026, 03_59_49 PM.png';
+
+const bgFull  = getImageUrl('hero/hero-with-items.png', 'gallery-images') || BG_FULL_LOCAL.src;
+const bgEmpty = getImageUrl('hero/hero-empty-desk.png', 'gallery-images') || BG_EMPTY_LOCAL.src;
 ---
 
 <div class="hero-wrap" id="heroWrap">
   <div class="hero" id="hero">
-    <div class="bg-layer bg-full" id="bgFull" style={`background-image: url('${BG_FULL.src}');`}></div>
-    <div class="bg-layer bg-empty" id="bgEmpty" style={`background-image: url('${BG_EMPTY.src}');`}></div>
+    <div class="bg-layer bg-full" id="bgFull" style={`background-image: url('${bgFull}');`}></div>
+    <div class="bg-layer bg-empty" id="bgEmpty" style={`background-image: url('${bgEmpty}');`}></div>
 
     <div class="edge-fade"></div>
 

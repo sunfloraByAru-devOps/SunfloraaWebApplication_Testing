@@ -1,5 +1,8 @@
 ---
+import { getImageUrl } from '../lib/images';
 import FOUNDER from '../assets/ldki.jpg';   
+
+const founderUrl = getImageUrl('story/founder.jpg', 'gallery-images') || FOUNDER.src;
 ---
 
 <section id="story" data-testid="brand-story" class="py-24 md:py-32 bg-[#E5DFD1] border-y border-[rgba(26,24,21,0.08)]">
@@ -8,7 +11,7 @@ import FOUNDER from '../assets/ldki.jpg';
     <div class="col-span-12 lg:col-span-5 fade-up">
       <div class="relative">
         <div class="absolute -inset-4 border border-[#C8862C] -z-10 translate-x-5 translate-y-5"></div>
-        <img src={FOUNDER.src} alt="Sunflora founder" data-testid="founder-image" class="w-full aspect-[4/5] object-cover" />
+        <img src={founderUrl} alt="Sunflora founder" data-testid="founder-image" class="w-full aspect-[4/5] object-cover" />
       </div>
     </div>
 

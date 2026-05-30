@@ -8,8 +8,10 @@ import SUNMOON from "../assets/sun_and_moon.jpg";
 import SPIDEY from "../assets/spiderman.jpg";
 import STARS from "../assets/stars.png";
 import HERO from "../assets/sun_on_desk.png";
+import { getImageUrl } from "../lib/images";
 
 import { createClient } from "@supabase/supabase-js";
+
 
 const supabase = createClient(
     import.meta.env.SUPABASE_URL,
@@ -30,23 +32,37 @@ const { data: products } = await supabase
 
 // ── All products ──────────────────────────────────────────
 const allProducts =
-    products?.map((p) => ({
-        id: p.id,
-        name: p.name,
-        category: p.category_name,
-        price: p.base_price,
-        mrp: p.base_mrp,
-        rating: p.avg_rating,
-        reviews: p.review_count,
-        tag: p.tag,
-        img: p.primary_image_path
-            ? supabase.storage
-                  .from("product-images")
-                  .getPublicUrl(p.primary_image_path).data.publicUrl
-            : HERO.src,
-        isNew: p.is_new,
-        inStock: p.in_stock,
-    })) || [];
+    products?.map((p) => {
+        const categoryLower = (p.category_name || "").toLowerCase();
+        let fallbackImg = HERO;
+        if (categoryLower.includes("amigurumi")) {
+            fallbackImg = HERO;
+        } else if (categoryLower.includes("keychain")) {
+            fallbackImg = SPIDEY;
+        } else if (categoryLower.includes("hanging")) {
+            fallbackImg = STARS;
+        } else if (categoryLower.includes("bouquet") || categoryLower.includes("stem") || categoryLower.includes("flower")) {
+            fallbackImg = SUN_CLOSEUP;
+        } else if (categoryLower.includes("custom")) {
+            fallbackImg = SUNMOON;
+        }
+
+        return {
+            id: p.id,
+            name: p.name,
+            category: p.category_name,
+            price: p.base_price,
+            mrp: p.base_mrp,
+            rating: p.avg_rating,
+            reviews: p.review_count,
+            tag: p.tag,
+            img: p.primary_image_path
+                ? getImageUrl(p.primary_image_path)
+                : fallbackImg.src,
+            isNew: p.is_new,
+            inStock: p.in_stock,
+        };
+    }) || [];
 
 // ── Recommendation products (shown after 8 main products) ──
 const recommendations = [
@@ -59,7 +75,7 @@ const recommendations = [
         rating: 4.9,
         reviews: 22,
         tag: "Top Rated",
-        img: SUN_CLOSEUP,
+        img: SUN_CLOSEUP.src,
     },
     {
         id: 10,
@@ -70,7 +86,7 @@ const recommendations = [
         rating: 4.7,
         reviews: 14,
         tag: "New",
-        img: STARS,
+        img: STARS.src,
     },
     {
         id: 11,
@@ -81,7 +97,7 @@ const recommendations = [
         rating: 4.8,
         reviews: 19,
         tag: "Bundle",
-        img: SPIDEY,
+        img: SPIDEY.src,
     },
     {
         id: 12,
@@ -92,9 +108,10 @@ const recommendations = [
         rating: 5.0,
         reviews: 11,
         tag: "Fan Fav",
-        img: HERO,
+        img: HERO.src,
     },
 ];
+
 
 const categories = [
     "All",
@@ -921,7 +938,7 @@ const categories = [
                             aria-label={`${p.name} — ₹${p.price}`}
                         >
                             <div class="card-img-wrap">
-                                <Image
+                                <img
                                     src={p.img}
                                     alt={p.name}
                                     class="card-img"
@@ -1093,7 +1110,7 @@ const categories = [
                                 aria-label={`${p.name} — ₹${p.price}`}
                             >
                                 <div class="card-img-wrap">
-                                    <Image
+                                    <img
                                         src={p.img}
                                         alt={p.name}
                                         class="card-img"

@@ -3,6 +3,10 @@
 // NOT the dark-background ChatGPT photo — the transparent bg blends into the beige section
 import CrochetCatHero from '../assets/crochet-cat-hero.png';
 import Cat1 from '../assets/cat-1.png';
+import { getImageUrl } from '../lib/images';
+
+const catHeroUrl  = getImageUrl('site/custom-section-cat.png') || CrochetCatHero.src;
+const catSizeUrl  = getImageUrl('site/size-guide-cat.png') || Cat1.src;
 
 const sizes = [
   {
@@ -124,7 +128,7 @@ const features = [
       <!-- Hero cat — desktop only -->
       <div class="cat-hero-wrap fade-up">
         <img
-          src={CrochetCatHero.src}
+          src={catHeroUrl}
           alt="Crochet cat amigurumi with made for you tag"
           loading="lazy"
           class="cat-hero-img"
@@ -220,7 +224,7 @@ const features = [
                 {!s.isCustom ? (
                   <div class="size-img-wrap">
                     <img
-                      src={Cat1.src}
+                      src={catSizeUrl}
                       alt={s.imageAlt}
                       loading="lazy"
                       class="size-img"
@@ -899,8 +903,8 @@ const features = [
 
   import { createClient } from '@supabase/supabase-js'
   const supabase = createClient(
-    import.meta.env.PUBLIC_SUPABASE_URL,
-    import.meta.env.PUBLIC_SUPABASE_ANON_KEY
+    import.meta.env.SUPABASE_URL,
+    import.meta.env.SUPABASE_KEY
   )
 
   document.querySelector('[data-testid="custom-cta-button"]')?.addEventListener('click', async () => {
