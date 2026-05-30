@@ -9,113 +9,44 @@ import SPIDEY from "../assets/spiderman.jpg";
 import STARS from "../assets/stars.png";
 import HERO from "../assets/sun_on_desk.png";
 
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+    import.meta.env.SUPABASE_URL,
+    import.meta.env.SUPABASE_KEY,
+);
+
+const { data: products } = await supabase
+    .from("products_with_image") // the convenience view
+    .select(
+        `
+    id, name, category_name, base_price, base_mrp,
+    avg_rating, review_count, tag, is_new, in_stock,
+    primary_image_path
+  `,
+    )
+    .eq("is_active", true)
+    .order("display_order");
+
 // ── All products ──────────────────────────────────────────
-const allProducts = [
-    {
-        id: 1,
-        name: "Sunshine Amigurumi",
-        category: "Amigurumi",
-        price: 649,
-        mrp: 899,
-        rating: 4.9,
-        reviews: 24,
-        tag: "Best Seller",
-        img: SUN_CLOSEUP,
-        isNew: false,
-        inStock: true,
-    },
-    {
-        id: 2,
-        name: "Lil' Dino Keychain",
-        category: "Keychains",
-        price: 249,
-        mrp: 349,
-        rating: 4.7,
-        reviews: 18,
-        tag: "New",
-        img: DINO,
-        isNew: true,
-        inStock: true,
-    },
-    {
-        id: 3,
-        name: "Sun & Moon Stem",
-        category: "Flower Stems",
-        price: 449,
-        mrp: 599,
-        rating: 4.8,
-        reviews: 12,
-        tag: "Set of 2",
-        img: SUNMOON,
-        isNew: false,
-        inStock: true,
-    },
-    {
-        id: 4,
-        name: "Spidey Hanging Charm",
-        category: "Keychains",
-        price: 299,
-        mrp: 399,
-        rating: 4.7,
-        reviews: 9,
-        tag: "Limited",
-        img: SPIDEY,
-        isNew: false,
-        inStock: true,
-    },
-    {
-        id: 5,
-        name: "Crochet Stars Set",
-        category: "Wall Hangings",
-        price: 399,
-        mrp: 549,
-        rating: 4.9,
-        reviews: 15,
-        tag: "New",
-        img: STARS,
-        isNew: true,
-        inStock: true,
-    },
-    {
-        id: 6,
-        name: "Golden Sunshine Desk Piece",
-        category: "Amigurumi",
-        price: 749,
-        mrp: 999,
-        rating: 5.0,
-        reviews: 31,
-        tag: "Fan Fav",
-        img: HERO,
-        isNew: false,
-        inStock: true,
-    },
-    {
-        id: 7,
-        name: "Mini Dino Amigurumi",
-        category: "Amigurumi",
-        price: 549,
-        mrp: 699,
-        rating: 4.8,
-        reviews: 8,
-        tag: null,
-        img: DINO,
-        isNew: false,
-        inStock: false,
-    },
-    {
-        id: 8,
-        name: "Moon Stem Single",
-        category: "Flower Stems",
-        price: 299,
-        mrp: 399,
-        rating: 4.6,
-        reviews: 7,
-        tag: null,
-        img: SUNMOON,
-        isNew: false,
-        inStock: true,
-    },
-];
+const allProducts =
+    products?.map((p) => ({
+        id: p.id,
+        name: p.name,
+        category: p.category_name,
+        price: p.base_price,
+        mrp: p.base_mrp,
+        rating: p.avg_rating,
+        reviews: p.review_count,
+        tag: p.tag,
+        img: p.primary_image_path
+            ? supabase.storage
+                  .from("product-images")
+                  .getPublicUrl(p.primary_image_path).data.publicUrl
+            : HERO.src,
+        isNew: p.is_new,
+        inStock: p.in_stock,
+    })) || [];
 
 // ── Recommendation products (shown after 8 main products) ──
 const recommendations = [
@@ -346,7 +277,9 @@ const categories = [
             text-transform: uppercase;
             color: rgba(239, 232, 218, 0.5);
             cursor: pointer;
-            transition: color 0.25s, border-color 0.25s;
+            transition:
+                color 0.25s,
+                border-color 0.25s;
             white-space: nowrap;
         }
         .cat-btn:hover {
@@ -450,7 +383,9 @@ const categories = [
             flex-direction: column;
             text-decoration: none;
             color: inherit;
-            transition: box-shadow 0.35s, transform 0.35s;
+            transition:
+                box-shadow 0.35s,
+                transform 0.35s;
             position: relative;
         }
         .prod-card:hover {
@@ -526,7 +461,10 @@ const categories = [
             justify-content: center;
             cursor: pointer;
             color: var(--ink-lt);
-            transition: background 0.2s, color 0.2s, transform 0.2s;
+            transition:
+                background 0.2s,
+                color 0.2s,
+                transform 0.2s;
             z-index: 2;
             flex-shrink: 0;
         }
@@ -574,7 +512,9 @@ const categories = [
             text-align: center;
             opacity: 0;
             transform: translateY(8px);
-            transition: opacity 0.3s, transform 0.3s;
+            transition:
+                opacity 0.3s,
+                transform 0.3s;
             z-index: 4;
             display: flex;
             align-items: center;
@@ -706,7 +646,9 @@ const categories = [
             text-decoration: none;
             border-bottom: 1px solid var(--border);
             padding-bottom: 2px;
-            transition: color 0.2s, border-color 0.2s;
+            transition:
+                color 0.2s,
+                border-color 0.2s;
             white-space: nowrap;
             align-self: flex-end;
         }
@@ -766,7 +708,9 @@ const categories = [
             text-transform: uppercase;
             cursor: pointer;
             border-radius: 3px;
-            transition: background 0.3s, color 0.3s;
+            transition:
+                background 0.3s,
+                color 0.3s;
         }
         .load-more-btn:hover {
             background: var(--ink);
@@ -962,8 +906,8 @@ const categories = [
                         p.tag === "New"
                             ? "tag-new"
                             : p.tag === "Fan Fav" || p.tag === "Top Rated"
-                            ? "tag-gold"
-                            : "";
+                              ? "tag-gold"
+                              : "";
                     return (
                         <a
                             href={`/productdetail?id=${p.id}`}
@@ -982,6 +926,8 @@ const categories = [
                                     alt={p.name}
                                     class="card-img"
                                     loading="lazy"
+                                    width={300}
+                                    height={300}
                                 />
                                 {p.tag && (
                                     <span class={`card-tag ${tagClass}`}>
@@ -1138,8 +1084,8 @@ const categories = [
                             p.tag === "New"
                                 ? "tag-new"
                                 : p.tag === "Top Rated" || p.tag === "Fan Fav"
-                                ? "tag-gold"
-                                : "";
+                                  ? "tag-gold"
+                                  : "";
                         return (
                             <a
                                 href={`/productdetail?id=${p.id}`}
@@ -1208,7 +1154,7 @@ const categories = [
                                         <span class="card-stars">
                                             {"★".repeat(Math.floor(p.rating))}
                                             {"☆".repeat(
-                                                5 - Math.floor(p.rating)
+                                                5 - Math.floor(p.rating),
                                             )}
                                         </span>
                                         <span class="card-rating-num">
@@ -1261,7 +1207,8 @@ const categories = [
         if (categoryParam) {
             const decodedCat = decodeURIComponent(categoryParam);
             const matchedBtn = Array.from(catBtns).find(
-                (btn) => btn.dataset.cat.toLowerCase() === decodedCat.toLowerCase()
+                (btn) =>
+                    btn.dataset.cat.toLowerCase() === decodedCat.toLowerCase(),
             );
             if (matchedBtn) {
                 catBtns.forEach((b) => {
@@ -1271,7 +1218,7 @@ const categories = [
                 matchedBtn.classList.add("active");
                 matchedBtn.setAttribute("aria-selected", "true");
                 activeCategory = matchedBtn.dataset.cat;
-                
+
                 // Scroll the category button into view on mobile
                 matchedBtn.scrollIntoView({
                     behavior: "auto",
@@ -1366,7 +1313,7 @@ const categories = [
                     const isActive = btn.classList.contains("active");
                     svgPath.setAttribute(
                         "fill",
-                        isActive ? "currentColor" : "none"
+                        isActive ? "currentColor" : "none",
                     );
                 }
             });
@@ -1394,7 +1341,7 @@ const categories = [
                         }
                     });
                 },
-                { threshold: 0.1 }
+                { threshold: 0.1 },
             );
             recoObserver.observe(recoSection);
         }

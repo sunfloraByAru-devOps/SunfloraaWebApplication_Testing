@@ -896,4 +896,44 @@ const features = [
     uploadZone.addEventListener('dragleave', () => { uploadZone.style.borderColor = ''; });
     uploadZone.addEventListener('drop', e => { e.preventDefault(); uploadZone.style.borderColor = ''; });
   }
+
+  import { createClient } from '@supabase/supabase-js'
+  const supabase = createClient(
+    import.meta.env.PUBLIC_SUPABASE_URL,
+    import.meta.env.PUBLIC_SUPABASE_ANON_KEY
+  )
+
+  document.querySelector('[data-testid="custom-cta-button"]')?.addEventListener('click', async () => {
+    // 1. Upload inspiration image if provided
+    let inspirationPath: string | null = null
+    const fileInput = document.getElementById('inspiration-upload') as HTMLInputElement
+    if (fileInput?.files?.[0]) {
+      const file = fileInput.files[0]
+      const ext = file.name.split('.').pop()
+      const path = `${crypto.randomUUID()}.${ext}`
+      await supabase.storage.from('custom-order-uploads').upload(path, file)
+      inspirationPath = path
+    }
+
+    // 2. Insert custom order row
+    const { data: order, error } = await supabase
+      .from('custom_orders')
+      .insert({
+        creation_name:    (document.getElementById('creation-name') as HTMLInputElement).value,
+        size_label:       document.querySelector('.size-card--active .size-label')?.textContent ?? '',
+        email:            (document.getElementById('email') as HTMLInputElement).value,
+        phone:            (document.getElementById('phone') as HTMLInputElement).value,
+        description:      (document.getElementById('tell-us') as HTMLTextAreaElement).value,
+        inspiration_path: inspirationPath,
+      })
+      .select('ref_number, creation_name, size_label, email, description')
+      .single()
+
+    if (error) { console.error(error); return }
+
+    // 3. Trigger confirmation email
+    await supabase.functions.invoke('send-custom-order-confirmation', { body: order })
+
+    alert(`Your order has been received! Reference: ${order.ref_number}`)
+  })
 </script>
