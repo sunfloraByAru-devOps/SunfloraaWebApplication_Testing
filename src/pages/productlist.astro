@@ -1,5 +1,4 @@
 ---
-import { Image } from "astro:assets";
 import Layout from "../layouts/Layout.astro";
 import Nav from "../components/Nav.astro";
 import SUN_CLOSEUP from "../assets/sun_on_desk_closeup.png";
@@ -18,6 +17,16 @@ const supabase = createClient(
     import.meta.env.SUPABASE_KEY,
 );
 
+function getFallbackImg(categoryName: string | null): string {
+    const cat = (categoryName || "").toLowerCase()
+    if (cat.includes("amigurumi"))                                               return HERO.src
+    if (cat.includes("keychain"))                                                return SPIDEY.src
+    if (cat.includes("hanging"))                                                 return STARS.src
+    if (cat.includes("bouquet") || cat.includes("stem") || cat.includes("flower")) return SUN_CLOSEUP.src
+    if (cat.includes("custom"))                                                  return SUNMOON.src
+    return HERO.src
+}
+
 const { data: products } = await supabase
     .from("products_with_image") // the convenience view
     .select(
@@ -31,97 +40,63 @@ const { data: products } = await supabase
     .order("display_order");
 
 // ── All products ──────────────────────────────────────────
-const allProducts =
-    products?.map((p) => {
-        const categoryLower = (p.category_name || "").toLowerCase();
-        let fallbackImg = HERO;
-        if (categoryLower.includes("amigurumi")) {
-            fallbackImg = HERO;
-        } else if (categoryLower.includes("keychain")) {
-            fallbackImg = SPIDEY;
-        } else if (categoryLower.includes("hanging")) {
-            fallbackImg = STARS;
-        } else if (categoryLower.includes("bouquet") || categoryLower.includes("stem") || categoryLower.includes("flower")) {
-            fallbackImg = SUN_CLOSEUP;
-        } else if (categoryLower.includes("custom")) {
-            fallbackImg = SUNMOON;
-        }
+const allProducts = products?.map((p) => {
+    const rating = parseFloat(String(p.avg_rating)) || 0
+    const reviewCount = p.review_count || 0
 
-        return {
-            id: p.id,
-            name: p.name,
-            category: p.category_name,
-            price: p.base_price,
-            mrp: p.base_mrp,
-            rating: p.avg_rating,
-            reviews: p.review_count,
-            tag: p.tag,
-            img: p.primary_image_path
-                ? getImageUrl(p.primary_image_path)
-                : fallbackImg.src,
-            isNew: p.is_new,
-            inStock: p.in_stock,
-        };
-    }) || [];
+    return {
+        id: p.id,
+        name: p.name,
+        category: p.category_name,
+        price: p.base_price,
+        mrp: p.base_mrp,
+        rating,
+        reviews: reviewCount,
+        tag: p.tag,
+        img: p.primary_image_path
+            ? getImageUrl(p.primary_image_path, 'product-images')
+            : getFallbackImg(p.category_name),
+        isNew: p.is_new,
+        inStock: p.in_stock,
+    };
+}) || [];
 
 // ── Recommendation products (shown after 8 main products) ──
-const recommendations = [
-    {
-        id: 9,
-        name: "Sunshine Bouquet",
-        category: "Bouquets",
-        price: 1299,
-        mrp: 1699,
-        rating: 4.9,
-        reviews: 22,
-        tag: "Top Rated",
-        img: SUN_CLOSEUP.src,
-    },
-    {
-        id: 10,
-        name: "Galaxy Star Mobile",
-        category: "Wall Hangings",
-        price: 599,
-        mrp: 799,
-        rating: 4.7,
-        reviews: 14,
-        tag: "New",
-        img: STARS.src,
-    },
-    {
-        id: 11,
-        name: "Spidey + Dino Duo",
-        category: "Keychains",
-        price: 499,
-        mrp: 649,
-        rating: 4.8,
-        reviews: 19,
-        tag: "Bundle",
-        img: SPIDEY.src,
-    },
-    {
-        id: 12,
-        name: "Sunrise Amigurumi",
-        category: "Amigurumi",
-        price: 699,
-        mrp: 899,
-        rating: 5.0,
-        reviews: 11,
-        tag: "Fan Fav",
-        img: HERO.src,
-    },
-];
+const { data: recoData } = await supabase
+    .from("products_with_image")
+    .select("id, name, category_name, base_price, base_mrp, avg_rating, review_count, tag, primary_image_path")
+    .eq("is_active", true)
+    .order("avg_rating", { ascending: false })
+    .limit(4)
 
+const recommendations = (recoData || []).map((p) => {
+    const rating = parseFloat(String(p.avg_rating)) || 0
+    return {
+        id: p.id,
+        name: p.name,
+        category: p.category_name,
+        price: p.base_price,
+        mrp: p.base_mrp,
+        rating,
+        reviews: p.review_count || 0,
+        tag: p.tag,
+        img: p.primary_image_path
+            ? getImageUrl(p.primary_image_path, 'product-images')
+            : getFallbackImg(p.category_name),
+    };
+})
+
+
+const { data: dbCategories } = await supabase
+    .from("categories")
+    .select("name")
+    .eq("is_active", true)
+    .order("display_order")
 
 const categories = [
     "All",
-    "Amigurumi",
-    "Keychains",
-    "Flower Stems",
-    "Wall Hangings",
-    "Bouquets",
-    "Customs",
-];
+    ...(dbCategories?.map((c) => c.name) ?? ["Amigurumi","Keychains","Flower Stems","Wall Hangings","Bouquets","Customs"])
+]
 ---
 
 <Layout
@@ -1006,8 +981,8 @@ const categories = [
                                 <h2 class="card-name">{p.name}</h2>
                                 <div class="card-rating">
                                     <span class="card-stars">
-                                        {"★".repeat(Math.floor(p.rating))}
-                                        {"☆".repeat(5 - Math.floor(p.rating))}
+                                        {"★".repeat(Math.floor(p.rating || 0))}
+                                        {"☆".repeat(5 - Math.floor(p.rating || 0))}
                                     </span>
                                     <span class="card-rating-num">
                                         {p.rating}
@@ -1169,9 +1144,9 @@ const categories = [
                                     <h2 class="card-name">{p.name}</h2>
                                     <div class="card-rating">
                                         <span class="card-stars">
-                                            {"★".repeat(Math.floor(p.rating))}
+                                            {"★".repeat(Math.floor(p.rating || 0))}
                                             {"☆".repeat(
-                                                5 - Math.floor(p.rating),
+                                                5 - Math.floor(p.rating || 0),
                                             )}
                                         </span>
                                         <span class="card-rating-num">
