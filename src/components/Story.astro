@@ -2,7 +2,10 @@
 import { getImageUrl } from '../lib/images';
 import FOUNDER from '../assets/ldki.jpg';   
 
-const founderUrl = getImageUrl('story/founder.jpg', 'gallery-images') || FOUNDER.src;
+const founderPath = null; // 'story/founder.jpg'
+const founderUrl = founderPath
+  ? getImageUrl(founderPath, 'gallery-images')
+  : FOUNDER.src;
 ---
 
 <section id="story" data-testid="brand-story" class="py-24 md:py-32 bg-[#E5DFD1] border-y border-[rgba(26,24,21,0.08)]">

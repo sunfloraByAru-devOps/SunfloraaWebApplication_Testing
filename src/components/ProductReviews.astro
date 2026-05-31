@@ -1,0 +1,378 @@
+---
+interface Props {
+  product: {
+    rating: number;
+    totalRatings: number;
+    ratingBreakdown: Array<{
+      stars: number;
+      count: number;
+    }>;
+    customerInsights: Array<{
+      label: string;
+      options: Array<{
+        text: string;
+        pct: number;
+      }>;
+    }>;
+    reviews: Array<{
+      id: string;
+      stars: number;
+      title: string;
+      body: string;
+      photos?: string[];
+      author: string;
+      verified: boolean;
+      date: string;
+      helpful: number;
+      unhelpful: number;
+    }>;
+    productCode: string;
+  };
+}
+
+const { product } = Astro.props;
+---
+
+<div class="reviews-wrapper">
+  <section class="reviews-section" id="reviews">
+    <h2 class="reviews-section-title">Ratings &amp; Reviews</h2>
+
+    <!-- Rating overview -->
+    <div class="ratings-overview">
+      <div class="rating-score-block">
+        <span class="rating-score-num">{product.rating}</span>
+        <div class="rating-score-stars">★★★★★</div>
+        <div class="rating-score-total" id="rating-score-total">
+          {(product.totalRatings / 1000).toFixed(1)}k<br />Verified Buyers
+        </div>
+      </div>
+      <div class="rating-bars" id="rating-bars-container">
+        {
+          product.ratingBreakdown.map((row: any) => {
+            const pct = Math.round((row.count / product.totalRatings) * 100);
+            const isLow = row.stars >= 2;
+            return (
+              <div class="rating-bar-row">
+                <span class="rating-bar-label">{row.stars}</span>
+                <span class="rating-bar-star">★</span>
+                <div class="rating-bar-track">
+                  <div
+                    class={`rating-bar-fill${isLow ? " low" : ""}`}
+                    style={`width:${pct}%`}
+                  />
+                </div>
+                <span class="rating-bar-count">
+                  {row.count.toLocaleString("en-IN")}
+                </span>
+              </div>
+            );
+          })
+        }
+      </div>
+    </div>
+
+    <!-- Customer Insights — crochet-specific -->
+    <div class="insights-block">
+      <div class="insights-title">What Customers Said</div>
+      <div class="insights-rows" id="insights-container">
+        {
+          product.customerInsights.map(
+            (ins: any) => (
+              <div class="insight-row">
+                <div class="insight-row-label">{ins.label}</div>
+                <div class="insight-bar-wrap">
+                  <div class="insight-bar-track">
+                    <div
+                      class="insight-bar-fill"
+                      style={`width:${ins.options[0].pct}%`}
+                    />
+                  </div>
+                  <span class="insight-bar-label">
+                    {ins.options[0].text} ({ins.options[0].pct}%)
+                  </span>
+                </div>
+              </div>
+            ),
+          )
+        }
+      </div>
+      <button class="insights-link" id="view-details-btn">
+        View Details
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="11"
+          height="11"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          ><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg
+        >
+      </button>
+    </div>
+
+    <!-- Customer Photos strip (aggregated from all reviews) -->
+    <div class="customer-photos-section">
+      <div class="customer-photos-title">Customer Photos (7801)</div>
+      <div class="customer-photos-strip">
+        <div class="customer-photo-thumb">
+          <img
+            src="https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=200&h=200&fit=crop"
+            alt="Customer photo"
+            loading="lazy"
+          />
+        </div>
+        <div class="customer-photo-thumb">
+          <img
+            src="https://images.unsplash.com/photo-1591462584501-0a8d0c0a1d56?w=200&h=200&fit=crop"
+            alt="Customer photo"
+            loading="lazy"
+          />
+        </div>
+        <div class="customer-photo-thumb">
+          <img
+            src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=200&h=200&fit=crop"
+            alt="Customer photo"
+            loading="lazy"
+          />
+        </div>
+        <div class="customer-photo-thumb">
+          <img
+            src="https://images.unsplash.com/photo-1612198188060-c7c2a3b66eae?w=200&h=200&fit=crop"
+            alt="Customer photo"
+            loading="lazy"
+          />
+        </div>
+        <div class="customer-photo-thumb">
+          <img
+            src="https://images.unsplash.com/photo-1608501078713-8e445a709b39?w=200&h=200&fit=crop"
+            alt="Customer photo"
+            loading="lazy"
+          />
+        </div>
+        <div class="customer-photo-thumb">
+          <img
+            src="https://images.unsplash.com/photo-1617196034183-421b4040ed20?w=200&h=200&fit=crop"
+            alt="Customer photo"
+            loading="lazy"
+          />
+        </div>
+        <div class="customer-photo-thumb">
+          <img
+            src="https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=200&h=200&fit=crop"
+            alt="Customer photo"
+            loading="lazy"
+          />
+        </div>
+        <div class="customer-photo-thumb">
+          <img
+            src="https://images.unsplash.com/photo-1602173574767-37ac01994b2a?w=200&h=200&fit=crop"
+            alt="Customer photo"
+            loading="lazy"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Reviews list -->
+    <div class="reviews-list-header">
+      <span class="reviews-list-title">Customer Reviews</span>
+      <span class="reviews-list-count"
+        >({product.reviews.length * 11357} reviews)</span
+      >
+    </div>
+
+    <div class="reviews-list" id="reviews-list-container">
+      {
+        product.reviews.map((r: any) => {
+          const starColor =
+            r.stars >= 4 ? "" : r.stars === 3 ? " mid" : " low";
+          const words = r.body.split(" ");
+          const preview = words.slice(0, 22).join(" ");
+          const overflow = words.slice(22).join(" ");
+          return (
+            <div class="review-card">
+              <div class="review-top">
+                <span class={`review-stars-pill${starColor}`}>
+                  {r.stars} ★
+                </span>
+                <span class="review-title">{r.title}</span>
+              </div>
+
+              <div class="review-body-wrap">
+                <span class="review-body-text">{preview}</span>
+                <span
+                  class="review-body-overflow hidden"
+                  id={`overflow-${r.id}`}
+                >
+                  {" "}
+                  {overflow}
+                </span>
+                <button
+                  class="review-read-more"
+                  data-id={r.id}
+                  id={`rm-${r.id}`}
+                >
+                  ... Read more
+                </button>
+              </div>
+
+              {r.photos && r.photos.length > 0 && (
+                <div class="review-photos">
+                  {r.photos.map((photo: string, pi: number) => (
+                    <div class="review-photo">
+                      <img
+                        src={photo}
+                        alt={`Review photo ${pi + 1}`}
+                        loading="lazy"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div class="review-meta">
+                <span class="review-author">{r.author}</span>
+                {r.verified && (
+                  <span class="review-verified">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="11"
+                      height="11"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    Verified Buyer
+                  </span>
+                )}
+                <span class="review-date">{r.date}</span>
+              </div>
+              <div class="review-helpful">
+                Was this review helpful?
+                <button class="helpful-btn">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="11"
+                    height="11"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z" />
+                    <path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" />
+                  </svg>
+                  Yes ({r.helpful})
+                </button>
+                <button class="helpful-btn">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="11"
+                    height="11"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z" />
+                    <path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17" />
+                  </svg>
+                  No ({r.unhelpful})
+                </button>
+              </div>
+            </div>
+          );
+        })
+      }
+    </div>
+
+    <a href="#reviews" class="view-all-reviews">
+      View all {product.reviews.length * 11357} reviews
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        ><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg
+      >
+    </a>
+
+    <div class="product-code-row">
+      <span
+        >Product Code: <span id="product-code-val">{product.productCode}</span></span
+      >
+      <span
+        >Seller: <a href="#" style="color:var(--amber);text-decoration:none;"
+          >View Supplier Information</a
+        ></span
+      >
+    </div>
+  </section>
+</div>
+
+<!-- INSIGHTS DIALOG -->
+<div
+  class="insights-dialog-overlay"
+  id="insights-overlay"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Customer Insights Details"
+>
+  <div class="insights-dialog">
+    <div class="insights-dialog-header">
+      <span class="insights-dialog-title"
+        >What customers say about this product</span
+      >
+      <button
+        class="insights-dialog-close"
+        id="insights-close"
+        aria-label="Close">×</button
+      >
+    </div>
+    <div
+      class="insights-dialog-body"
+      id="dialog-insights-container"
+      style="padding: 1rem 1.5rem 1.5rem; display: flex; flex-direction: column; gap: 1.5rem;"
+    >
+      {
+        product.customerInsights.map(
+          (ins: any) => (
+            <div class="dialog-insight-group">
+              <div class="dialog-insight-label">{ins.label}</div>
+              {ins.options.map((opt: any, oi: number) => (
+                <div class="dialog-bar-row">
+                  <span class={`dialog-bar-name${oi === 0 ? " bold" : ""}`}>
+                    {opt.text} ({opt.pct}%)
+                  </span>
+                  <div class="dialog-bar-track">
+                    <div
+                      class={`dialog-bar-fill${oi === 0 ? " primary" : ""}`}
+                      style={`width:${opt.pct}%`}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ),
+        )
+      }
+    </div>
+  </div>
+</div>

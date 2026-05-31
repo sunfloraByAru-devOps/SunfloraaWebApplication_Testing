@@ -1,0 +1,151 @@
+---
+interface Product {
+  id: number;
+  name: string;
+  category: string | null;
+  price: number;
+  mrp: number;
+  rating: number;
+  reviews: number;
+  tag: string | null;
+  img: string;
+  isNew: boolean;
+  inStock: boolean;
+}
+interface Props {
+  products: Product[];
+}
+const { products } = Astro.props;
+---
+<section class="products-section" aria-label="Products">
+    <div class="product-grid" id="product-grid">
+        {
+            products.map((p) => {
+                const disc = Math.round((1 - p.price / p.mrp) * 100);
+                const tagClass =
+                    p.tag === "New"
+                        ? "tag-new"
+                        : p.tag === "Fan Fav" || p.tag === "Top Rated"
+                          ? "tag-gold"
+                          : "";
+                return (
+                    <a
+                        href={`/productdetail?id=${p.id}`}
+                        class={`prod-card${
+                            !p.inStock ? " out-of-stock" : ""
+                        }`}
+                        data-category={p.category}
+                        data-price={p.price}
+                        data-rating={p.rating}
+                        data-new={p.isNew ? "1" : "0"}
+                        aria-label={`${p.name} — ₹${p.price}`}
+                    >
+                        <div class="card-img-wrap">
+                            <img
+                                src={p.img}
+                                alt={p.name}
+                                class="card-img"
+                                loading="lazy"
+                                width={300}
+                                height={300}
+                            />
+                            {p.tag && (
+                                <span class={`card-tag ${tagClass}`}>
+                                    {p.tag}
+                                </span>
+                            )}
+                            {!p.inStock && (
+                                <div class="out-of-stock-badge">
+                                    <span>Sold Out</span>
+                                </div>
+                            )}
+                            <button
+                                class="card-wishlist"
+                                aria-label={`Wishlist ${p.name}`}
+                                onclick="event.preventDefault(); this.classList.toggle('active');"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="14"
+                                    height="14"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.8"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                                </svg>
+                            </button>
+                            {p.inStock && (
+                                <div class="card-cta">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="13"
+                                        height="13"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    >
+                                        <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                                        <line
+                                            x1="3"
+                                            y1="6"
+                                            x2="21"
+                                            y2="6"
+                                        />
+                                        <path d="M16 10a4 4 0 0 1-8 0" />
+                                    </svg>
+                                    Buy Now
+                                </div>
+                            )}
+                        </div>
+                        <div class="card-body">
+                            <span class="card-cat">{p.category}</span>
+                            <h2 class="card-name">{p.name}</h2>
+                            <div class="card-rating">
+                                <span class="card-stars">
+                                    {"★".repeat(Math.floor(p.rating || 0))}
+                                    {"☆".repeat(5 - Math.floor(p.rating || 0))}
+                                </span>
+                                <span class="card-rating-num">
+                                    {p.rating}
+                                </span>
+                                <span class="card-rating-count">
+                                    ({p.reviews})
+                                </span>
+                            </div>
+                            <div class="card-price-row">
+                                <span class="card-price">₹{p.price}</span>
+                                <span class="card-mrp">₹{p.mrp}</span>
+                                <span class="card-disc">{disc}% off</span>
+                            </div>
+                        </div>
+                    </a>
+                );
+            })
+        }
+    </div>
+
+    <!-- Empty state -->
+    <div class="empty-state" id="empty-state">
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="48"
+            height="48"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1"
+            ><path
+                d="M3 3l1.88 5.76a1 1 0 0 0 .95.69h14.34a1 1 0 0 0 .95-.69L23 3"
+            ></path><path d="M9 14v1a3 3 0 0 0 6 0v-1"></path><path
+                d="M3 3H2"></path>
+        </svg>
+        <p>Nothing here yet — try another category.</p>
+    </div>
+</section>

@@ -1,0 +1,19 @@
+---
+interface Props {
+  productCount: number;
+}
+const { productCount } = Astro.props;
+---
+<div class="shop-header">
+    <div class="shop-header-inner">
+        <div>
+            <div class="shop-eyebrow">Give All You Need</div>
+            <h1 class="shop-title">
+                Everything<br />we <em>make.</em>
+            </h1>
+        </div>
+        <div class="shop-meta">
+            <span>{productCount}</span> pieces available
+        </div>
+    </div>
+</div>

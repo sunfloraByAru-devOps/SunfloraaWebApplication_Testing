@@ -1,0 +1,27 @@
+---
+interface Props {
+  categories: string[];
+}
+const { categories } = Astro.props;
+---
+<div class="category-bar-wrap">
+    <div
+        class="category-bar"
+        id="category-bar"
+        role="tablist"
+        aria-label="Product categories"
+    >
+        {
+            categories.map((cat, i) => (
+                <button
+                    class={`cat-btn${i === 0 ? " active" : ""}`}
+                    data-cat={cat}
+                    role="tab"
+                    aria-selected={i === 0 ? "true" : "false"}
+                >
+                    {cat}
+                </button>
+            ))
+        }
+    </div>
+</div>

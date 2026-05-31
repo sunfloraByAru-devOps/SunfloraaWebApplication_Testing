@@ -2,17 +2,16 @@
 import { getImageUrl } from '../lib/images';
 import BG_EMPTY_LOCAL from '../assets/ChatGPT Image May 24, 2026, 03_59_57 PM.png';
 import BG_FULL_LOCAL from '../assets/ChatGPT Image May 24, 2026, 03_59_49 PM.png';
-const bgFull =
-  getImageUrl('hero/hero-with-items.png', 'gallery-images') ||
-  BG_FULL_LOCAL;
-console.log(
-  'bgEmpty:',
-  getImageUrl('hero/hero-empty-desk.png', 'gallery-images')
-);
 
-const bgEmpty =
-  getImageUrl('hero/hero-empty-desk.png', 'gallery-images') ||
-  BG_EMPTY_LOCAL;
+const heroWithItemsPath = null; // Update this when dynamic path is available
+const bgFull = heroWithItemsPath
+  ? getImageUrl(heroWithItemsPath, 'gallery-images')
+  : BG_FULL_LOCAL.src;
+
+const heroEmptyDeskPath = null; // Update this when dynamic path is available
+const bgEmpty = heroEmptyDeskPath
+  ? getImageUrl(heroEmptyDeskPath, 'gallery-images')
+  : BG_EMPTY_LOCAL.src;
 ---
 
 <div class="hero-wrap" id="heroWrap">

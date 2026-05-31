@@ -1,0 +1,76 @@
+---
+interface Props {
+  product: {
+    related: Array<{
+      id: string;
+      img: string;
+      name: string;
+      price: number;
+      mrp: number;
+      tag: string;
+    }>;
+  };
+}
+
+const { product } = Astro.props;
+---
+
+<section class="related-section">
+  <div class="related-head">
+    <h2>You might also love</h2>
+    <a href="/#offerings" class="see-all">See all →</a>
+  </div>
+  <div class="related-grid" id="related-grid-container">
+    {
+      product.related.map((o: any) => {
+        const relDisc = Math.round((1 - o.price / o.mrp) * 100);
+        return (
+          <a href={`/productdetail?id=${o.id}`} class="related-card">
+            <div class="related-img-wrap">
+              <img src={o.img} alt={o.name} />
+              <span class="related-badge">{o.tag}</span>
+            </div>
+            <div class="related-body">
+              <span class="related-brand">Sunflora Studio</span>
+              <span class="related-name">{o.name}</span>
+              <div class="related-price-row">
+                <span class="related-price">₹ {o.price}</span>
+                <span class="related-mrp">₹ {o.mrp}</span>
+                <span class="related-disc">({relDisc}% OFF)</span>
+              </div>
+            </div>
+          </a>
+        );
+      })
+    }
+    <a
+      href="/#offerings"
+      class="related-card"
+      style="align-items:center;justify-content:center;min-height:200px;border-style:dashed;background:transparent;color:var(--muted);"
+    >
+      <div style="text-align:center;padding:1.5rem;">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="28"
+          height="28"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          ><line x1="12" y1="5" x2="12" y2="19"></line><line
+            x1="5"
+            y1="12"
+            x2="19"
+            y2="12"></line></svg
+        >
+        <p
+          style="margin-top:0.5rem;font-size:0.75rem;letter-spacing:0.08em;text-transform:uppercase;"
+        >
+          View All
+        </p>
+      </div>
+    </a>
+  </div>
+</section>

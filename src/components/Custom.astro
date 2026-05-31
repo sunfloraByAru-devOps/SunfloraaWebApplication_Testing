@@ -5,8 +5,15 @@ import CrochetCatHero from '../assets/crochet-cat-hero.png';
 import Cat1 from '../assets/cat-1.png';
 import { getImageUrl } from '../lib/images';
 
-const catHeroUrl  = getImageUrl('site/custom-section-cat.png') || CrochetCatHero.src;
-const catSizeUrl  = getImageUrl('site/size-guide-cat.png') || Cat1.src;
+const customSectionCatPath = null; // 'site/custom-section-cat.png'
+const catHeroUrl = customSectionCatPath
+  ? getImageUrl(customSectionCatPath)
+  : CrochetCatHero.src;
+
+const sizeGuideCatPath = null; // 'site/size-guide-cat.png'
+const catSizeUrl = sizeGuideCatPath
+  ? getImageUrl(sizeGuideCatPath)
+  : Cat1.src;
 
 const sizes = [
   {

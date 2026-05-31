@@ -1,0 +1,148 @@
+---
+interface Recommendation {
+  id: number;
+  name: string;
+  category: string | null;
+  price: number;
+  mrp: number;
+  rating: number;
+  reviews: number;
+  tag: string | null;
+  img: string;
+}
+interface Props {
+  recommendations: Recommendation[];
+}
+const { recommendations } = Astro.props;
+---
+<div class="reco-section" id="reco-section">
+    <div class="reco-divider">
+        <div class="reco-divider-inner">
+            <div>
+                <p class="reco-eyebrow">Curated for you</p>
+                <h2 class="reco-title">
+                    Explore our <em>recommendations</em>
+                </h2>
+            </div>
+            <a href="#" class="reco-arrow-link">
+                See all
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="13"
+                    height="13"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    ><path d="M7 17L17 7"></path><path d="M7 7h10v10"
+                    ></path>
+                </svg>
+            </a>
+        </div>
+        <div class="reco-grid">
+            {
+                recommendations.map((p) => {
+                    const disc = Math.round((1 - p.price / p.mrp) * 100);
+                    const tagClass =
+                        p.tag === "New"
+                            ? "tag-new"
+                            : p.tag === "Top Rated" || p.tag === "Fan Fav"
+                              ? "tag-gold"
+                              : "";
+                    return (
+                        <a
+                            href={`/productdetail?id=${p.id}`}
+                            class="prod-card"
+                            aria-label={`${p.name} — ₹${p.price}`}
+                        >
+                            <div class="card-img-wrap">
+                                <img
+                                    src={p.img}
+                                    alt={p.name}
+                                    class="card-img"
+                                    loading="lazy"
+                                />
+                                {p.tag && (
+                                    <span class={`card-tag ${tagClass}`}>
+                                        {p.tag}
+                                    </span>
+                                )}
+                                <button
+                                    class="card-wishlist"
+                                    aria-label={`Wishlist ${p.name}`}
+                                    onclick="event.preventDefault(); this.classList.toggle('active');"
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="14"
+                                        height="14"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="1.8"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    >
+                                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                                    </svg>
+                                </button>
+                                <div class="card-cta">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="13"
+                                        height="13"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    >
+                                        <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                                        <line
+                                            x1="3"
+                                            y1="6"
+                                            x2="21"
+                                            y2="6"
+                                        />
+                                        <path d="M16 10a4 4 0 0 1-8 0" />
+                                    </svg>
+                                    Buy Now
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <span class="card-cat">{p.category}</span>
+                                <h2 class="card-name">{p.name}</h2>
+                                <div class="card-rating">
+                                    <span class="card-stars">
+                                        {"★".repeat(Math.floor(p.rating || 0))}
+                                        {"☆".repeat(
+                                            5 - Math.floor(p.rating || 0),
+                                        )}
+                                    </span>
+                                    <span class="card-rating-num">
+                                        {p.rating}
+                                    </span>
+                                    <span class="card-rating-count">
+                                        ({p.reviews})
+                                    </span>
+                                </div>
+                                <div class="card-price-row">
+                                    <span class="card-price">
+                                        ₹{p.price}
+                                    </span>
+                                    <span class="card-mrp">₹{p.mrp}</span>
+                                    <span class="card-disc">
+                                        {disc}% off
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    );
+                })
+            }
+        </div>
+    </div>
+</div>

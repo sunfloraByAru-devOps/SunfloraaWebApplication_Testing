@@ -1,0 +1,74 @@
+---
+interface Props {
+  product: {
+    name: string;
+    tag: string | null;
+  };
+  images: Array<{
+    src: string;
+    alt: string;
+  }>;
+}
+
+const { product, images } = Astro.props;
+---
+
+<!-- 1. THUMBNAIL STRIP -->
+<div class="thumb-strip" id="thumb-strip">
+  {
+    images.map((img: any, i: number) => (
+      <button
+        class={`thumb-btn${i === 0 ? " active" : ""}`}
+        data-index={i}
+        data-src={img.src}
+        aria-label={`View image ${i + 1}`}
+      >
+        <img src={img.src} alt={img.alt} loading="lazy" />
+      </button>
+    ))
+  }
+</div>
+
+<!-- 2. MAIN IMAGE -->
+<div style="position: relative;">
+  <div class="main-image-wrap" id="main-image-wrap">
+    <img
+      src={images[0]?.src}
+      alt={images[0]?.alt || product.name}
+      id="main-img"
+    />
+    <span
+      class="img-tag"
+      id="img-tag"
+      style={product.tag ? "" : "display: none;"}>{product.tag}</span
+    >
+    <button
+      class="main-img-nav main-img-nav--prev"
+      id="img-prev"
+      aria-label="Previous image"
+    >
+      <svg width="8" height="14" viewBox="0 0 8 14" fill="none"
+        ><path
+          d="M7 1L1 7L7 13"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"></path></svg
+      >
+    </button>
+    <button
+      class="main-img-nav main-img-nav--next"
+      id="img-next"
+      aria-label="Next image"
+    >
+      <svg width="8" height="14" viewBox="0 0 8 14" fill="none"
+        ><path
+          d="M1 1L7 7L1 13"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"></path></svg
+      >
+    </button>
+  </div>
+</div>

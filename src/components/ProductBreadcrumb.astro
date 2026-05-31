@@ -1,0 +1,19 @@
+---
+interface Props {
+  product: {
+    name: string;
+  };
+}
+
+const { product } = Astro.props;
+---
+
+<div class="breadcrumb">
+  <a href="/">Home</a>
+  <span class="breadcrumb-sep">›</span>
+  <a href="/#offerings">Collections</a>
+  <span class="breadcrumb-sep">›</span>
+  <a href="/#offerings">Amigurumi</a>
+  <span class="breadcrumb-sep">›</span>
+  <span class="breadcrumb-current">{product.name}</span>
+</div>

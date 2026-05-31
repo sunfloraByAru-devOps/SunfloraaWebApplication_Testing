@@ -1,0 +1,25 @@
+---
+interface Props {
+  productCount: number;
+}
+const { productCount } = Astro.props;
+---
+<div class="controls-row">
+    <p class="results-label">
+        Showing <strong id="result-count">{productCount}</strong> pieces
+    </p>
+    <div class="sort-wrap">
+        <span class="sort-label">Sort</span>
+        <select
+            class="sort-select"
+            id="sort-select"
+            aria-label="Sort products"
+        >
+            <option value="default">Featured</option>
+            <option value="price-asc">Price: Low → High</option>
+            <option value="price-desc">Price: High → Low</option>
+            <option value="rating">Top Rated</option>
+            <option value="new">Newest First</option>
+        </select>
+    </div>
+</div>
