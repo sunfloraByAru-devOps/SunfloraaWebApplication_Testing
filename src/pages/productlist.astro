@@ -98,9 +98,16 @@ const { data: dbCategories } = await supabase
     .eq("is_active", true)
     .order("display_order")
 
+// Extract unique categories directly from products as a reliable fallback
+const uniqueCategories = [...new Set(products?.map(p => p.category_name).filter(Boolean))];
+
 const categories = [
     "All",
-    ...(dbCategories?.map((c) => c.name) ?? ["Amigurumi","Keychains","Flower Stems","Wall Hangings","Bouquets","Customs"])
+    ...(dbCategories && dbCategories.length > 0 
+        ? dbCategories.map((c) => c.name) 
+        : uniqueCategories.length > 0 
+            ? uniqueCategories 
+            : ["Amigurumi", "Keychains", "Flower Stems", "Wall Hangings", "Bouquets", "Customs"])
 ]
 ---
 
