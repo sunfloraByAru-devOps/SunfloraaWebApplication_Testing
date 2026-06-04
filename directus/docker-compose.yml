@@ -1,0 +1,21 @@
+services:
+  directus:
+    image: directus/directus:latest
+    ports:
+      - "8055:8055"
+
+    environment:
+      KEY: wekkyaraoooopooooop0987654321oiuytr
+      SECRET: om-secretwisrccccccc
+
+      DB_CLIENT: pg
+
+      DB_HOST: aws-1-ap-northeast-2.pooler.supabase.com
+      DB_PORT: 6543
+      DB_DATABASE: postgres
+
+      DB_USER: postgres.btmwojmtkeadxdzlfdqi
+      DB_PASSWORD: AruJaiswal@ths
+
+      ADMIN_EMAIL: sunflorabyaru@gmail.com
+      ADMIN_PASSWORD: Aru_jaiswal_Party

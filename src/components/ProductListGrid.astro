@@ -30,7 +30,7 @@ const { products } = Astro.props;
                           : "";
                 return (
                     <a
-                        href={`/productdetail?id=${p.id}`}
+                        href={`/productdetail/${p.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')}`}
                         class={`prod-card${
                             !p.inStock ? " out-of-stock" : ""
                         }`}

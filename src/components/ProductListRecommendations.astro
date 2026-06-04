@@ -53,7 +53,7 @@ const { recommendations } = Astro.props;
                               : "";
                     return (
                         <a
-                            href={`/productdetail?id=${p.id}`}
+                            href={`/productdetail/${p.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')}`}
                             class="prod-card"
                             aria-label={`${p.name} — ₹${p.price}`}
                         >

@@ -226,6 +226,7 @@ const categories = [
 
             // Re-show filtered and trigger animation
             filtered.forEach((c, i) => {
+                grid.appendChild(c); // Physically reorder in DOM
                 c.style.display = "";
                 // Restart animation with staggered delay
                 requestAnimationFrame(() => {

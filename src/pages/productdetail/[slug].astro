@@ -1,32 +1,46 @@
 ---
 import { Image } from "astro:assets";
-import Layout from "../layouts/Layout.astro";
-import Nav from "../components/Nav.astro";
-import SPIDEY from "../assets/spiderman.jpg";
+import Layout from "../../layouts/Layout.astro";
+import Nav from "../../components/Nav.astro";
+import SPIDEY from "../../assets/spiderman.jpg";
 
-import PRODUCT_MAIN from "../assets/sun_on_desk.png";
-import PRODUCT_CLOSE from "../assets/sun_on_desk_closeup.png";
-import PRODUCT_DETAIL from "../assets/stars.png";
-import PRODUCT_LIFE from "../assets/spiderman.jpg";
-import DINO from "../assets/green-dino.jpg";
-import SUNMOON from "../assets/sun_and_moon.jpg";
-import { getImageUrl } from "../lib/images";
+import PRODUCT_MAIN from "../../assets/sun_on_desk.png";
+import PRODUCT_CLOSE from "../../assets/sun_on_desk_closeup.png";
+import PRODUCT_DETAIL from "../../assets/stars.png";
+import PRODUCT_LIFE from "../../assets/spiderman.jpg";
+import DINO from "../../assets/green-dino.jpg";
+import SUNMOON from "../../assets/sun_and_moon.jpg";
+import { getImageUrl } from "../../lib/images";
 
 import { createClient } from "@supabase/supabase-js";
-import ProductBreadcrumb from "../components/ProductBreadcrumb.astro";
-import ProductGallery from "../components/ProductGallery.astro";
-import ProductInfo from "../components/ProductInfo.astro";
-import ProductReviews from "../components/ProductReviews.astro";
-import RelatedProducts from "../components/RelatedProducts.astro";
-import "../styles/productdetail.css";
+import ProductBreadcrumb from "../../components/ProductBreadcrumb.astro";
+import ProductGallery from "../../components/ProductGallery.astro";
+import ProductInfo from "../../components/ProductInfo.astro";
+import ProductReviews from "../../components/ProductReviews.astro";
+import RelatedProducts from "../../components/RelatedProducts.astro";
+import "../../styles/productdetail.css";
 
 const supabase = createClient(
   import.meta.env.SUPABASE_URL,
   import.meta.env.SUPABASE_KEY,
 );
 
-const initialProductId = Astro.url.searchParams.get("id") || "1";
-const productId = initialProductId;
+export async function getStaticPaths() {
+  const { createClient } = await import("@supabase/supabase-js");
+  const supabase = createClient(
+    import.meta.env.SUPABASE_URL,
+    import.meta.env.SUPABASE_KEY,
+  );
+  const { data } = await supabase.from("products").select("name").eq("is_active", true);
+  const paths = (data || []).map((p: any) => ({
+    params: { slug: p.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') }
+  }));
+  paths.push({ params: { slug: "product-not-found" } });
+  return paths;
+}
+
+const initialProductSlug = Astro.params.slug || "sunshine-amigurumi";
+const productSlug = initialProductSlug;
 
 // Fetch all active products
 const { data: allDbProducts } = await supabase
@@ -116,6 +130,7 @@ const getRelatedProducts = (currentId: any) => {
       return {
         id: r.id,
         name: r.name,
+        slug: r.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, ''),
         tag: r.tag || "",
         price: r.base_price,
         mrp: r.base_mrp,
@@ -132,7 +147,10 @@ const mappedProducts: Record<string, any> = {};
 
 if (allDbProducts) {
   for (const data of allDbProducts) {
-    mappedProducts[data.id] = {
+    const slug = data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+    mappedProducts[slug] = {
+      id: data.id,
+      slug: slug,
       num: String(data.id).padStart(2, "0"),
       name: data.name,
       brand: "Sunflora Studio",
@@ -225,7 +243,9 @@ if (allDbProducts) {
 
 // Fallback if no products are found in database
 if (Object.keys(mappedProducts).length === 0) {
-  mappedProducts["1"] = {
+  mappedProducts["product-not-found"] = {
+    id: 1,
+    slug: "product-not-found",
     name: "Product Not Found",
     brand: "Sunflora Studio",
     description: "This product could not be found or has no approved reviews.",
@@ -245,9 +265,9 @@ if (Object.keys(mappedProducts).length === 0) {
 
 // Determine initial product for server-side HTML rendering
 const product =
-  mappedProducts[productId] ||
+  mappedProducts[productSlug] ||
   Object.values(mappedProducts)[0] ||
-  mappedProducts["1"];
+  mappedProducts["product-not-found"];
 
 const images = product.images;
 const discount =
@@ -300,10 +320,10 @@ const productsJson = JSON.stringify(mappedProducts);
   <script is:inline define:vars={{ productsJson }}>
     const products = JSON.parse(productsJson);
 
-    // 1. Get Product from URL Params
-    const urlParams = new URLSearchParams(window.location.search);
-    const productId = urlParams.get("id") || "1";
-    const product = products[productId] || Object.values(products)[0];
+    // 1. Get Product from URL Path
+    const pathParts = window.location.pathname.split('/').filter(Boolean);
+    const productSlug = pathParts[pathParts.length - 1] || "sunshine-amigurumi";
+    const product = products[productSlug] || Object.values(products)[0];
 
     // 2. Hydration Function
     function hydratePDP(product) {
@@ -698,7 +718,7 @@ const productsJson = JSON.stringify(mappedProducts);
             .map((o) => {
               const relDisc = Math.round((1 - o.price / o.mrp) * 100);
               return `
-          <a href="/productdetail?id=${o.id}" class="related-card">
+          <a href="/productdetail/${o.slug}" class="related-card">
             <div class="related-img-wrap">
               <img src="${o.img}" alt="${o.name}" />
               ${o.tag ? `<span class="related-badge">${o.tag}</span>` : ""}
