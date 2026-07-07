@@ -1,0 +1,177 @@
+---
+/* Service/Trust Bar — On-Time Delivery, Easy Returns, etc. */
+const services = [
+  {
+    icon: "truck",
+    title: "On-Time Delivery",
+    desc: "Always on time, every time.",
+  },
+  {
+    icon: "return",
+    title: "Easy Returns",
+    desc: "Hassle free returns within 7 days.",
+  },
+  {
+    icon: "custom",
+    title: "Further Customizations",
+    desc: "Need a tweak? We've got you.",
+  },
+  {
+    icon: "support",
+    title: "Customer Support",
+    desc: "We're here for you, always.",
+  },
+];
+---
+
+<section class="service-bar">
+  <div class="kn-container">
+    <div class="service-grid">
+      {
+        services.map((s) => (
+          <div class="service-item kn-fade-up">
+            <div class="service-icon">
+              {s.icon === "truck" && (
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect x="1" y="3" width="15" height="13" />
+                  <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+                  <circle cx="5.5" cy="18.5" r="2.5" />
+                  <circle cx="18.5" cy="18.5" r="2.5" />
+                </svg>
+              )}
+              {s.icon === "return" && (
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polyline points="1 4 1 10 7 10" />
+                  <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+                </svg>
+              )}
+              {s.icon === "custom" && (
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="12" cy="12" r="3" />
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                </svg>
+              )}
+              {s.icon === "support" && (
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                </svg>
+              )}
+            </div>
+            <div>
+              <p class="service-title">{s.title}</p>
+              <p class="service-desc">{s.desc}</p>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .service-bar {
+    background: var(--kn-white);
+    padding: 40px 0;
+    border-top: 1px solid var(--kn-taupe-light);
+    border-bottom: 1px solid var(--kn-taupe-light);
+  }
+
+  .service-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
+  }
+
+  .service-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px;
+    border-radius: var(--kn-radius-md);
+    transition: background 0.3s ease;
+  }
+
+  .service-item:hover {
+    background: rgba(253, 242, 233, 0.5);
+  }
+
+  .service-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--kn-cream-alt);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--kn-rose);
+    flex-shrink: 0;
+  }
+
+  .service-title {
+    font-family: var(--kn-font-body);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--kn-brown);
+    margin-bottom: 3px;
+  }
+
+  .service-desc {
+    font-family: var(--kn-font-body);
+    font-size: 12px;
+    color: var(--kn-brown-muted);
+    line-height: 1.5;
+  }
+
+  @media (max-width: 1024px) {
+    .service-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .service-grid {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .service-item {
+      padding: 12px;
+    }
+  }
+</style>

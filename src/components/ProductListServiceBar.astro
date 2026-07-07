@@ -1,0 +1,278 @@
+---
+import HANDS from "../assets/crochet_hands_making.png";
+---
+
+<section class="trust-banner-section">
+  <div class="trust-banner-container">
+    <div class="trust-banner-card">
+      
+      <!-- Wavy background deco -->
+      <div class="trust-yarn-deco">
+        <svg viewBox="0 0 800 200" fill="none" xmlns="http://www.w3.org/2000/svg" class="trust-yarn-svg">
+          <path d="M-50,150 Q100,120 200,160 T400,140 T600,160 T850,130" stroke="#8B4557" stroke-width="1" stroke-dasharray="4 4" fill="none" opacity="0.3" />
+        </svg>
+      </div>
+
+      <div class="trust-left">
+        <span class="trust-eyebrow">Handmade with love ♡</span>
+        <h3 class="trust-heading">Each piece is<br />a labor of <span class="script-love">love.</span></h3>
+        <p class="trust-sub">Thank you for supporting handmade and small dreams. ♡</p>
+      </div>
+
+      <div class="trust-middle">
+        <div class="trust-item">
+          <div class="trust-icon-box">
+            <!-- Hand holding heart icon -->
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 21a9 9 0 0 0 9-9c0-1.2-.4-2.3-1-3.2L12 3 4 8.8C3.4 9.7 3 10.8 3 12a9 9 0 0 0 9 9z" />
+              <path d="M12 11.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z" />
+            </svg>
+          </div>
+          <div class="trust-text">
+            <span class="trust-title">Handcrafted</span>
+            <span class="trust-desc">with care</span>
+          </div>
+        </div>
+
+        <div class="trust-item">
+          <div class="trust-icon-box">
+            <!-- Yarn ball icon (represented by concentric circles) -->
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 6a6 6 0 1 0 0 12 6 6 0 0 0 0-12z" />
+              <path d="M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z" />
+            </svg>
+          </div>
+          <div class="trust-text">
+            <span class="trust-title">Premium</span>
+            <span class="trust-desc">Quality Yarns</span>
+          </div>
+        </div>
+
+        <div class="trust-item">
+          <div class="trust-icon-box">
+            <!-- Heart icon -->
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+            </svg>
+          </div>
+          <div class="trust-text">
+            <span class="trust-title">Made to order</span>
+            <span class="trust-desc">just for you</span>
+          </div>
+        </div>
+
+        <div class="trust-item">
+          <div class="trust-icon-box">
+            <!-- Box / Gift icon -->
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="21 8 21 21 3 21 3 8" />
+              <rect x="1" y="3" width="22" height="5" />
+              <line x1="12" y1="8" x2="12" y2="21" />
+            </svg>
+          </div>
+          <div class="trust-text">
+            <span class="trust-title">Thoughtful</span>
+            <span class="trust-desc">Packaging</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="trust-right">
+        <div class="crochet-circle-frame">
+          <img src={HANDS.src} alt="Hands crocheting" class="crochet-circle-img" />
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<style>
+  .trust-banner-section {
+    padding: 2rem clamp(1.25rem, 5vw, 5rem) 4rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    background: transparent;
+  }
+
+  .trust-banner-container {
+    width: 100%;
+  }
+
+  .trust-banner-card {
+    background: #FFF0F2; /* Soft warm pink-beige matching mockup */
+    border: 1px solid rgba(139, 69, 87, 0.15);
+    border-radius: 28px;
+    padding: 3rem 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .trust-yarn-deco {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .trust-yarn-svg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .trust-left {
+    position: relative;
+    z-index: 1;
+    max-width: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .trust-eyebrow {
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #8B4557;
+    font-weight: 600;
+  }
+
+  .trust-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    line-height: 1.15;
+    font-weight: 600;
+    color: #5C3D2E;
+  }
+
+  .script-love {
+    font-family: 'Dancing Script', cursive;
+    color: #8B4557;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 2.5rem;
+    margin-left: 2px;
+  }
+
+  .trust-sub {
+    font-size: 0.85rem;
+    color: #6B5B4E;
+    line-height: 1.5;
+  }
+
+  .trust-middle {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem 1.5rem;
+    flex: 1;
+  }
+
+  .trust-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .trust-icon-box {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #8B4557;
+    border: 1px solid rgba(139, 69, 87, 0.15);
+    flex-shrink: 0;
+  }
+
+  .trust-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .trust-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #5C3D2E;
+  }
+
+  .trust-desc {
+    font-size: 0.85rem;
+    color: #6B5B4E;
+  }
+
+  .trust-right {
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+  }
+
+  .crochet-circle-frame {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 6px solid #FFF8F0;
+    box-shadow: 0 8px 24px rgba(92, 61, 46, 0.12);
+  }
+
+  .crochet-circle-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  @media (max-width: 1100px) {
+    .trust-banner-card {
+      padding: 2.5rem;
+      gap: 2rem;
+    }
+    .trust-middle {
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .trust-banner-card {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 2rem;
+    }
+    .trust-left {
+      max-width: 100%;
+    }
+    .trust-middle {
+      grid-template-columns: repeat(2, 1fr);
+      width: 100%;
+      gap: 1.5rem;
+    }
+    .trust-right {
+      align-self: center;
+      margin-top: 1rem;
+    }
+  }
+
+  @media (max-width: 500px) {
+    .trust-middle {
+      grid-template-columns: 1fr;
+    }
+    .trust-heading {
+      font-size: 1.8rem;
+    }
+    .crochet-circle-frame {
+      width: 130px;
+      height: 130px;
+    }
+  }
+</style>

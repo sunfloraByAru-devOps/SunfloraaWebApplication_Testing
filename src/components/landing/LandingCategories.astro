@@ -1,0 +1,187 @@
+---
+const categories = [
+  {
+    name: "Flower Bouquets",
+    img: "/images/landing/cat-bouquet.png",
+    price: "₹999",
+    link: "/productlist?category=Bouquets",
+  },
+  {
+    name: "Soft Toys",
+    img: "/images/landing/cat-soft-toys.png",
+    price: "₹499",
+    link: "/productlist?category=Amigurumi",
+  },
+  {
+    name: "Home Decor",
+    img: "/images/landing/cat-home-decor.png",
+    price: "₹399",
+    link: "/productlist?category=Wall Hangings",
+  },
+  {
+    name: "Wearables & Accessories",
+    img: "/images/landing/cat-wearables.png",
+    price: "₹249",
+    link: "/productlist?category=Keychains",
+  },
+];
+---
+
+<section id="categories" class="kn-section cat-section">
+  <div class="kn-container">
+    <!-- Section Header -->
+    <div class="cat-header kn-fade-up">
+      <span class="cat-floral">🌸</span>
+      <h2 class="kn-section-title">Shop by Categories</h2>
+      <p class="kn-section-subtitle">
+        Handpicked with love, it's stitched to perfection
+      </p>
+    </div>
+
+    <!-- Category Grid -->
+    <div class="cat-grid">
+      {
+        categories.map((cat, i) => (
+          <a
+            href={cat.link}
+            class={`cat-card kn-fade-up`}
+            style={`transition-delay: ${i * 0.1}s`}
+          >
+            <div class="cat-img-wrap">
+              <img
+                src={cat.img}
+                alt={cat.name}
+                loading="lazy"
+                class="cat-img"
+              />
+            </div>
+            <div class="cat-info">
+              <h3 class="cat-name">{cat.name}</h3>
+              <p class="cat-price">
+                From <strong>{cat.price}</strong>
+              </p>
+              <span class="cat-link">Explore All →</span>
+            </div>
+          </a>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .cat-section {
+    background: var(--kn-white);
+  }
+
+  .cat-header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .cat-floral {
+    font-size: 28px;
+    display: block;
+    margin-bottom: 12px;
+  }
+
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+  }
+
+  .cat-card {
+    background: var(--kn-cream);
+    border-radius: var(--kn-radius-lg);
+    overflow: hidden;
+    text-decoration: none;
+    transition:
+      transform 0.4s ease,
+      box-shadow 0.4s ease;
+    border: 1px solid transparent;
+  }
+
+  .cat-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 48px rgba(92, 61, 46, 0.12);
+    border-color: var(--kn-taupe);
+  }
+
+  .cat-img-wrap {
+    width: 100%;
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: var(--kn-cream-alt);
+  }
+
+  .cat-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+
+  .cat-card:hover .cat-img {
+    transform: scale(1.06);
+  }
+
+  .cat-info {
+    padding: 18px 20px 20px;
+  }
+
+  .cat-name {
+    font-family: var(--kn-font-heading);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--kn-brown);
+    margin-bottom: 4px;
+  }
+
+  .cat-price {
+    font-family: var(--kn-font-body);
+    font-size: 13px;
+    color: var(--kn-brown-muted);
+    margin-bottom: 10px;
+  }
+
+  .cat-price strong {
+    color: var(--kn-brown);
+    font-weight: 600;
+  }
+
+  .cat-link {
+    font-family: var(--kn-font-body);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--kn-rose);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: gap 0.3s ease;
+  }
+
+  .cat-card:hover .cat-link {
+    gap: 8px;
+  }
+
+  @media (max-width: 1024px) {
+    .cat-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .cat-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+    .cat-info {
+      padding: 12px 14px 16px;
+    }
+    .cat-name {
+      font-size: 15px;
+    }
+  }
+</style>

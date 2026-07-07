@@ -1,0 +1,193 @@
+ ---
+import SUNSHINE from '../assets/Sunshine_Amigurumi_1.png';
+import DINO from '../assets/Lil_Dino_keychain_1-removebg-preview.png';
+import TURTLE from '../assets/turtle-removebg-preview.png';
+import SUNMOON from '../assets/Sun_moon_1.png';
+import SPIDEY from '../assets/spiderman-removebg-preview.png';
+import STARS from '../assets/stars.png';
+import BOUQUET from '../assets/Lily_bouquet_1.png';
+import SUNFLOWERPOT from '../assets/Sunflower_Pot_1-removebg-preview.png';
+
+const bestSellers = [
+  { name: 'Sunshine Amigurumi', price: '₹ 649', bg: '#FAE1A0', img: SUNSHINE },
+  { name: "Lil' Dino Keychain", price: '₹ 249', bg: '#D6E8C8', img: DINO },
+  { name: 'Turtle Plushie',     price: '₹ 549', bg: '#C8DFF2', img: TURTLE },
+  { name: 'Sun & Moon Pair',    price: '₹ 449', bg: '#F2C4A0', img: SUNMOON },
+  { name: 'Spidey Charm',       price: '₹ 249', bg: '#E8D0F0', img: SPIDEY },
+];
+
+const newArrivals = [
+  { name: 'Crochet Stars',        price: '₹ 399', bg: '#FAE1A0', img: STARS },
+  { name: 'Lily Bouquet',         price: '₹ 699', bg: '#F4D4C8', img: BOUQUET },
+  { name: 'Sunflower Pot',        price: '₹ 549', bg: '#D6E8C8', img: SUNFLOWERPOT },
+  { name: 'Sunshine Amigurumi',   price: '₹ 649', bg: '#C8DFF2', img: SUNSHINE },
+  { name: "Lil' Dino Keychain",   price: '₹ 249', bg: '#E8D0F0', img: DINO },
+];
+
+function toSlug(name: string) {
+  return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+}
+
+const rows = [
+  { id: 'bestsellers-row', label: 'Best Sellers', items: bestSellers },
+  { id: 'newarrivals-row', label: 'New Arrivals',  items: newArrivals },
+];
+---
+
+<section id="bestsellers" data-testid="best-sellers" class="py-24 md:py-32 bg-[#E5DFD1]/50 relative">
+  <div class="max-w-[1400px] mx-auto px-6 md:px-12">
+
+    <div class="mb-14 fade-up">
+      <p class="text-xs uppercase tracking-[0.28em] text-[#C8862C] mb-4">Handpicked</p>
+      <h2 class="font-serif-display text-5xl md:text-6xl lg:text-7xl text-[#1A1815] leading-none tracking-tight">
+        <span class="squiggle" data-stitch-target>Loved twice</span>, made new.
+      </h2>
+    </div>
+
+    {rows.map((row) => (
+      <div class="mb-16 last:mb-0">
+        <div class="flex items-end justify-between mb-6 fade-up">
+          <h3 class="font-serif-display text-2xl md:text-3xl text-[#1A1815] italic">{row.label}</h3>
+          <div class="hidden md:flex items-center gap-3">
+            <button
+              type="button"
+              aria-label={`Scroll ${row.label} left`}
+              class="row-nav"
+              data-scroll-target={row.id}
+              data-dir="-1"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <button
+              type="button"
+              aria-label={`Scroll ${row.label} right`}
+              class="row-nav"
+              data-scroll-target={row.id}
+              data-dir="1"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div id={row.id} class="product-row fade-up">
+          {row.items.map((p) => (
+            <a
+              href={`/productdetail/${toSlug(p.name)}`}
+              class="product-card group"
+              style={`background:${p.bg};`}
+            >
+              <div class="product-card-img">
+                <img src={p.img.src} alt={p.name} loading="lazy" />
+              </div>
+              <div class="product-card-meta">
+                <span class="product-card-name">{p.name}</span>
+                <span class="product-card-price">{p.price}</span>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  .product-row {
+    display: flex;
+    gap: 1.1rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-bottom: 4px;
+  }
+  .product-row::-webkit-scrollbar { display: none; }
+
+  .product-card {
+    scroll-snap-align: start;
+    flex: 0 0 auto;
+    width: clamp(150px, 22vw, 220px);
+    aspect-ratio: 3 / 4;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    text-decoration: none;
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s;
+  }
+  .product-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 34px rgba(26, 24, 21, 0.16);
+  }
+
+  .product-card-img {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.4rem 1.4rem 3.4rem;
+  }
+  .product-card-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 10px 20px rgba(26, 24, 21, 0.14));
+    transition: transform 0.7s ease-out;
+  }
+  .product-card:hover .product-card-img img { transform: scale(1.06) rotate(-1.5deg); }
+
+  .product-card-meta {
+    position: relative;
+    z-index: 2;
+    padding: 0.9rem 1rem 1.1rem;
+    background: linear-gradient(to top, rgba(26,24,21,0.16), transparent);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .product-card-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.15rem;
+    color: #1A1815;
+  }
+  .product-card-price {
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    color: #6B471E;
+  }
+
+  .row-nav {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid rgba(26,24,21,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1A1815;
+    background: transparent;
+    cursor: pointer;
+    transition: background 0.3s, color 0.3s, border-color 0.3s;
+  }
+  .row-nav:hover {
+    background: #1A1815;
+    color: #EFE8DA;
+    border-color: #1A1815;
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('.row-nav').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const targetId = btn.dataset.scrollTarget;
+      const dir = Number(btn.dataset.dir || '1');
+      const row = targetId ? document.getElementById(targetId) : null;
+      if (!row) return;
+      const cardWidth = row.querySelector('.product-card')?.clientWidth || 200;
+      row.scrollBy({ left: dir * (cardWidth + 18) * 2, behavior: 'smooth' });
+    });
+  });
+</script>

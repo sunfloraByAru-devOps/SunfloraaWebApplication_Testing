@@ -1,0 +1,275 @@
+---
+/* Custom Orders section — split layout:
+   Left: Text + features + CTA
+   Right: Image with "Your idea, Our Creation" tag
+*/
+const features = [
+  { icon: "share", title: "Share Your Idea", desc: "Tell us what you need" },
+  { icon: "design", title: "We Design It", desc: "We create and customize" },
+  { icon: "handcraft", title: "Handcrafted", desc: "Carefully made by hand" },
+  { icon: "deliver", title: "Delivered", desc: "Safe to your doorstep" },
+];
+---
+
+<section id="custom-orders" class="kn-section custom-section">
+  <div class="kn-container">
+    <div class="custom-grid">
+      <!-- Left Content -->
+      <div class="custom-content kn-fade-up">
+        <span class="custom-label">MADE JUST FOR YOU ♡</span>
+        <h2 class="custom-heading">
+          Custom Orders,<br />
+          Crafted for <em class="custom-you">You</em>
+        </h2>
+        <p class="custom-desc">
+          Have something unique? We'll bring your ideas to life with care and
+          creativity.
+        </p>
+
+        <div class="custom-features">
+          {
+            features.map((f) => (
+              <div class="custom-feature">
+                <div class="feature-dot" />
+                <div>
+                  <p class="feature-name">{f.title}</p>
+                  <p class="feature-desc">{f.desc}</p>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+
+        <a href="#contact" class="kn-btn-primary custom-cta">
+          Start Your Custom Order
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path>
+          </svg>
+        </a>
+      </div>
+
+      <!-- Right Image -->
+      <div class="custom-image-wrap kn-fade-up">
+        <div class="custom-image-card">
+          <img
+            src="/images/landing/custom-hands.png"
+            alt="Hands crocheting a custom order"
+            loading="lazy"
+            class="custom-img"
+          />
+          <div class="custom-tag">
+            <span class="tag-line1">Your idea,</span>
+            <span class="tag-line2">Our Creation</span>
+          </div>
+        </div>
+        <!-- Decorative yarn curl -->
+        <svg
+          class="custom-yarn-deco"
+          viewBox="0 0 120 200"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M60 0 C30 40, 90 80, 60 120 S30 160, 60 200"
+            stroke="#D4708F"
+            stroke-width="1.5"
+            fill="none"
+            stroke-linecap="round"
+            opacity="0.25"></path>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .custom-section {
+    background: var(--kn-cream-alt);
+  }
+
+  .custom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+
+  .custom-label {
+    font-family: var(--kn-font-body);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    color: var(--kn-brown-muted);
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  .custom-heading {
+    font-family: var(--kn-font-heading);
+    font-size: clamp(30px, 3.5vw, 48px);
+    font-weight: 700;
+    color: var(--kn-brown);
+    line-height: 1.15;
+    margin-bottom: 16px;
+  }
+
+  .custom-you {
+    font-family: var(--kn-font-script);
+    color: var(--kn-rose);
+    font-style: normal;
+    font-size: 1.15em;
+  }
+
+  .custom-desc {
+    font-family: var(--kn-font-body);
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--kn-brown-light);
+    margin-bottom: 32px;
+    max-width: 420px;
+  }
+
+  .custom-features {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 36px;
+  }
+
+  .custom-feature {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .feature-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--kn-rose-light);
+    flex-shrink: 0;
+    margin-top: 5px;
+  }
+
+  .feature-name {
+    font-family: var(--kn-font-body);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--kn-brown);
+    margin-bottom: 2px;
+  }
+
+  .feature-desc {
+    font-family: var(--kn-font-body);
+    font-size: 12px;
+    color: var(--kn-brown-muted);
+  }
+
+  .custom-cta {
+    margin-top: 8px;
+  }
+
+  /* Image side */
+  .custom-image-wrap {
+    position: relative;
+    display: flex;
+    justify-content: center;
+  }
+
+  .custom-image-card {
+    position: relative;
+    border-radius: var(--kn-radius-lg);
+    overflow: hidden;
+    box-shadow: 0 16px 48px rgba(92, 61, 46, 0.12);
+  }
+
+  .custom-img {
+    display: block;
+    width: 100%;
+    max-width: 480px;
+    height: auto;
+    border-radius: var(--kn-radius-lg);
+  }
+
+  .custom-tag {
+    position: absolute;
+    bottom: 24px;
+    right: -8px;
+    background: rgba(255, 248, 240, 0.92);
+    backdrop-filter: blur(8px);
+    padding: 12px 20px;
+    border-radius: var(--kn-radius-sm);
+    box-shadow: 0 4px 16px rgba(92, 61, 46, 0.1);
+    display: flex;
+    flex-direction: column;
+    transform: rotate(-3deg);
+  }
+
+  .tag-line1,
+  .tag-line2 {
+    font-family: var(--kn-font-script);
+    color: var(--kn-rose);
+    line-height: 1.3;
+  }
+
+  .tag-line1 {
+    font-size: 14px;
+  }
+  .tag-line2 {
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .custom-yarn-deco {
+    position: absolute;
+    top: -20px;
+    right: -40px;
+    width: 120px;
+    height: 200px;
+    pointer-events: none;
+  }
+
+  @media (max-width: 1024px) {
+    .custom-grid {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+    .custom-image-wrap {
+      order: -1;
+    }
+    .custom-content {
+      text-align: center;
+    }
+    .custom-desc {
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .custom-features {
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .custom-features {
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+    .custom-img {
+      max-width: 340px;
+    }
+    .custom-tag {
+      display: none;
+    }
+  }
+</style>

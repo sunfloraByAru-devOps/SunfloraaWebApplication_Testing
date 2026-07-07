@@ -1,0 +1,144 @@
+---
+/* Story Banner — "Where Every Stitch Tells a Story" CTA */
+---
+
+<section id="story" class="story-banner">
+  <div class="story-inner">
+    <!-- Decorative yarn SVGs -->
+    <svg
+      class="story-yarn-left"
+      viewBox="0 0 150 300"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M10 0 C40 50, 0 100, 30 150 S60 250, 10 300"
+        stroke="rgba(255,255,255,0.15)"
+        stroke-width="2"
+        fill="none"
+        stroke-linecap="round"></path>
+    </svg>
+    <svg
+      class="story-yarn-right"
+      viewBox="0 0 150 300"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M140 0 C110 50, 150 100, 120 150 S90 250, 140 300"
+        stroke="rgba(255,255,255,0.15)"
+        stroke-width="2"
+        fill="none"
+        stroke-linecap="round"></path>
+    </svg>
+
+    <div class="story-content">
+      <h2 class="story-heading">
+        <span class="story-line1">Where Every Stitch</span>
+        <span class="story-line2"><em>Tells a Story</em> 💕</span>
+      </h2>
+      <p class="story-desc">
+        Thank you for supporting handmade and<br />
+        small business. You truly make a difference.
+      </p>
+      <a href="/productlist" class="story-cta"> Explore Collection </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .story-banner {
+    padding: 0 40px;
+    margin-bottom: 0;
+  }
+
+  .story-inner {
+    max-width: 1320px;
+    margin: 0 auto;
+    background: linear-gradient(135deg, #8b4557 0%, #6b3344 50%, #5a2a38 100%);
+    border-radius: var(--kn-radius-xl);
+    padding: 80px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .story-yarn-left,
+  .story-yarn-right {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 150px;
+    pointer-events: none;
+  }
+
+  .story-yarn-left {
+    left: 0;
+  }
+  .story-yarn-right {
+    right: 0;
+  }
+
+  .story-content {
+    position: relative;
+    z-index: 2;
+  }
+
+  .story-heading {
+    font-family: var(--kn-font-heading);
+    font-size: clamp(28px, 3.5vw, 44px);
+    font-weight: 700;
+    color: white;
+    line-height: 1.2;
+    margin-bottom: 16px;
+  }
+
+  .story-line1,
+  .story-line2 {
+    display: block;
+  }
+
+  .story-line2 em {
+    font-family: var(--kn-font-script);
+    font-style: normal;
+    font-size: 1.1em;
+  }
+
+  .story-desc {
+    font-family: var(--kn-font-body);
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.75);
+    line-height: 1.7;
+    margin-bottom: 28px;
+  }
+
+  .story-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: white;
+    color: var(--kn-rose);
+    font-family: var(--kn-font-body);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 14px 32px;
+    border-radius: var(--kn-radius-full);
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .story-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  }
+
+  @media (max-width: 640px) {
+    .story-banner {
+      padding: 0 20px;
+    }
+    .story-inner {
+      padding: 56px 24px;
+      border-radius: var(--kn-radius-lg);
+    }
+  }
+</style>

@@ -1,20 +1,26 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Nav from "../components/Nav.astro";
-import SUN_CLOSEUP from "../assets/sun_on_desk_closeup.png";
-import DINO from "../assets/green-dino.jpg";
-import SUNMOON from "../assets/sun_and_moon.jpg";
-import SPIDEY from "../assets/spiderman.jpg";
-import STARS from "../assets/stars.png";
-import HERO from "../assets/sun_on_desk.png";
-import { getImageUrl } from "../lib/images";
+import LandingNav from "../components/landing/LandingNav.astro";
+import LandingFooter from "../components/landing/LandingFooter.astro";
 
+// Import generated clean-name assets
+import BUNNY from "../assets/crochet_bunny.png";
+import TULIPS from "../assets/crochet_tulip_bouquet.png";
+import TOTE from "../assets/crochet_tote_bag.png";
+import BEANIE from "../assets/crochet_beanie.png";
+import BEAR from "../assets/crochet_teddy_bear.png";
+import KEYCHAIN from "../assets/crochet_daisy_keychain.png";
+import BASKET from "../assets/crochet_basket.png";
+import CLIPS from "../assets/crochet_hair_clips.png";
+
+import { getImageUrl } from "../lib/images";
 import { createClient } from "@supabase/supabase-js";
 import ProductListHeader from "../components/ProductListHeader.astro";
 import ProductListCategoryBar from "../components/ProductListCategoryBar.astro";
 import ProductListControls from "../components/ProductListControls.astro";
 import ProductListGrid from "../components/ProductListGrid.astro";
 import ProductListRecommendations from "../components/ProductListRecommendations.astro";
+import ProductListServiceBar from "../components/ProductListServiceBar.astro";
 import "../styles/productlist.css";
 
 const supabase = createClient(
@@ -22,14 +28,29 @@ const supabase = createClient(
     import.meta.env.SUPABASE_KEY,
 );
 
-function getFallbackImg(categoryName: string | null): string {
-    const cat = (categoryName || "").toLowerCase()
-    if (cat.includes("amigurumi"))                                               return HERO.src
-    if (cat.includes("keychain"))                                                return SPIDEY.src
-    if (cat.includes("hanging"))                                                 return STARS.src
-    if (cat.includes("bouquet") || cat.includes("stem") || cat.includes("flower")) return SUN_CLOSEUP.src
-    if (cat.includes("custom"))                                                  return SUNMOON.src
-    return HERO.src
+function getFallbackImg(name: string, categoryName: string | null): string {
+    const n = (name || "").toLowerCase();
+    const cat = (categoryName || "").toLowerCase();
+
+    // Map by exact name keywords first
+    if (n.includes("bunny")) return BUNNY.src;
+    if (n.includes("tulip") || n.includes("bouquet") || n.includes("flower")) return TULIPS.src;
+    if (n.includes("bag") || n.includes("tote")) return TOTE.src;
+    if (n.includes("beanie") || n.includes("cap") || n.includes("hat")) return BEANIE.src;
+    if (n.includes("bear") || n.includes("teddy")) return BEAR.src;
+    if (n.includes("keychain") || n.includes("daisy")) return KEYCHAIN.src;
+    if (n.includes("basket") || n.includes("pot")) return BASKET.src;
+    if (n.includes("clip") || n.includes("hair")) return CLIPS.src;
+
+    // Map by category keywords
+    if (cat.includes("soft") || cat.includes("toy") || cat.includes("amigurumi")) return BUNNY.src;
+    if (cat.includes("flower") || cat.includes("bouquet")) return TULIPS.src;
+    if (cat.includes("bag")) return TOTE.src;
+    if (cat.includes("wearable")) return BEANIE.src;
+    if (cat.includes("keychain") || cat.includes("accessory") || cat.includes("accessories")) return KEYCHAIN.src;
+    if (cat.includes("decor") || cat.includes("basket") || cat.includes("home")) return BASKET.src;
+
+    return BUNNY.src;
 }
 
 const { data: products } = await supabase
@@ -60,7 +81,7 @@ const allProducts = products?.map((p) => {
         tag: p.tag,
         img: p.primary_image_path
             ? getImageUrl(p.primary_image_path, 'product-images')
-            : getFallbackImg(p.category_name),
+            : getFallbackImg(p.name, p.category_name),
         isNew: p.is_new,
         inStock: p.in_stock,
     };
@@ -87,7 +108,7 @@ const recommendations = (recoData || []).map((p) => {
         tag: p.tag,
         img: p.primary_image_path
             ? getImageUrl(p.primary_image_path, 'product-images')
-            : getFallbackImg(p.category_name),
+            : getFallbackImg(p.name, p.category_name),
     };
 })
 
@@ -115,8 +136,8 @@ const categories = [
     title="Shop — Sunflora Handmade Crochet"
     description="Browse our full collection of handmade crochet pieces — amigurumi, keychains, florals and custom orders."
 >
-    <!-- ── NAV (reuse project Nav component) ── -->
-    <Nav />
+    <!-- ── NAV ── -->
+    <LandingNav />
 
     <!-- ── SHOP HEADER ── -->
     <ProductListHeader productCount={allProducts.length} />
@@ -152,15 +173,15 @@ const categories = [
     <!-- ── RECOMMENDATIONS ── -->
     <ProductListRecommendations recommendations={recommendations} />
 
-    <!-- ── FOOTER STRIP ── -->
-    <div class="shop-footer-strip">
-        <span>© {new Date().getFullYear()} Sunflora Studio — Handmade with care.</span>
-        <span>Hooked in India · <a href="/">Back to home</a></span>
-    </div>
+    <!-- ── SERVICE TRUST BAR ── -->
+    <ProductListServiceBar />
+
+    <!-- ── FOOTER ── -->
+    <LandingFooter />
 
     <script is:inline>
         // ── Category filter ──────────────────────────────────────────
-        const catBtns = document.querySelectorAll(".cat-btn");
+        const catBtns = document.querySelectorAll(".cat-pill-btn");
         const grid = document.getElementById("product-grid");
         const cards = Array.from(grid.querySelectorAll(".prod-card"));
         const countEl = document.getElementById("result-count");
@@ -169,9 +190,19 @@ const categories = [
 
         let activeCategory = "All";
 
+        function getCatDisplayLabel(cat) {
+            if (cat.toLowerCase() === 'all') return 'All Products';
+            if (cat.toLowerCase() === 'amigurumi') return 'Soft Toys';
+            if (cat.toLowerCase() === 'bouquets') return 'Flower Bouquets';
+            if (cat.toLowerCase() === 'flower stems') return 'Flower Stems';
+            if (cat.toLowerCase() === 'wall hangings') return 'Home Decor';
+            if (cat.toLowerCase() === 'keychains') return 'Accessories';
+            return cat;
+        }
+
         // Parse query parameter to pre-filter
         const urlParams = new URLSearchParams(window.location.search);
-        const categoryParam = urlParams.get("category");
+        const categoryParam = urlParams.get("category") || urlParams.get("cat");
         if (categoryParam) {
             const decodedCat = decodeURIComponent(categoryParam);
             const matchedBtn = Array.from(catBtns).find(
@@ -192,6 +223,7 @@ const categories = [
                     behavior: "auto",
                     block: "nearest",
                     inline: "center",
+                    behavior: "smooth"
                 });
             }
         }
@@ -239,10 +271,16 @@ const categories = [
             });
 
             // Update count
-            countEl.textContent = filtered.length;
+            if (countEl) countEl.textContent = filtered.length;
+
+            // Update heading title dynamically
+            const headingTitleEl = document.getElementById("category-heading-title");
+            if (headingTitleEl) {
+                headingTitleEl.textContent = getCatDisplayLabel(activeCategory);
+            }
 
             // Empty state
-            emptyEl.classList.toggle("show", filtered.length === 0);
+            if (emptyEl) emptyEl.classList.toggle("show", filtered.length === 0);
         }
 
         catBtns.forEach((btn) => {

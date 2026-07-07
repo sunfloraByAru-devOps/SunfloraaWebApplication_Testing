@@ -1,53 +1,62 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Nav from '../components/Nav.astro';
-import Hero from '../components/Hero.astro';
-import Marquee from '../components/Marquee.astro';
-import Featured from '../components/Featured.astro';
-import Story from '../components/Story.astro';
-import Categories from '../components/Categories.astro';
-import Custom from '../components/Custom.astro';
-import Packaging from '../components/Packaging.astro';
-import Testimonials from '../components/Testimonials.astro';
-import Gallery from '../components/Gallery.astro';
-import Faq from '../components/Faq.astro';
-import FinalCTA from '../components/FinalCTA.astro';
-import Footer from '../components/Footer.astro';
+import Layout from "../layouts/Layout.astro";
+import LandingNav from "../components/landing/LandingNav.astro";
+import LandingHero from "../components/landing/LandingHero.astro";
+import LandingCategories from "../components/landing/LandingCategories.astro";
+import LandingCustomOrders from "../components/landing/LandingCustomOrders.astro";
+import LandingServiceBar from "../components/landing/LandingServiceBar.astro";
+import LandingBestSellers from "../components/landing/LandingBestSellers.astro";
+import LandingNewArrivals from "../components/landing/LandingNewArrivals.astro";
+import LandingFounder from "../components/landing/LandingFounder.astro";
+import LandingStoryBanner from "../components/landing/LandingStoryBanner.astro";
+import LandingFooter from "../components/landing/LandingFooter.astro";
 ---
 
-<Layout title="Sunflora — Handmade Crochet Studio" description="One-of-a-kind crochet pieces made slowly, sent with love.">
-  <Nav />
-  <Hero />
-  <Marquee />
-  <Featured />
-
-  <Custom />
-  <Testimonials />
-  <Gallery />
-  <Story />
-  <Faq />
-  <FinalCTA />
-  <Footer />
+<Layout
+  title="Sunflora — Handmade Crochet, Made with Love ♡"
+  description="Handmade crochet creations crafted with love. Shop flower bouquets, soft toys, home decor, and custom orders."
+>
+  <LandingNav />
+  <LandingHero />
+  <LandingCategories />
+  <LandingCustomOrders />
+  <LandingServiceBar />
+  <LandingBestSellers />
+  <LandingNewArrivals />
+  <LandingFounder />
+  <LandingStoryBanner />
+  <LandingFooter />
 </Layout>
 
 <script>
   // Lenis smooth scroll
   (async () => {
-    const Lenis = (await import('lenis')).default;
-    const lenis = new Lenis({ duration: 1.2, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
-    const loop = (time: number) => { lenis.raf(time); requestAnimationFrame(loop); };
+    const Lenis = (await import("lenis")).default;
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    });
+    const loop = (time: number) => {
+      lenis.raf(time);
+      requestAnimationFrame(loop);
+    };
     requestAnimationFrame(loop);
   })();
 
   // Intersection Observer for fade-up animations
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(el => {
-      if (el.isIntersecting) {
-        el.target.classList.add('in-view');
-        observer.unobserve(el.target);
-      }
-    });
-  }, { threshold: 0.08, rootMargin: '-60px 0px' });
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((el) => {
+        if (el.isIntersecting) {
+          el.target.classList.add("in-view");
+          observer.unobserve(el.target);
+        }
+      });
+    },
+    { threshold: 0.08, rootMargin: "-60px 0px" },
+  );
 
-  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+  document
+    .querySelectorAll(".kn-fade-up")
+    .forEach((el) => observer.observe(el));
 </script>

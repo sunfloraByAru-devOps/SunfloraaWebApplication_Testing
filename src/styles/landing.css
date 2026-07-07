@@ -1,0 +1,198 @@
+/* ═══════════════════════════════════════════════════
+   KNOTIQUE LANDING PAGE — Design Tokens & Global Styles
+   ═══════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Inter:wght@300;400;500;600;700&family=Dancing+Script:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Knotique Colors */
+  --kn-cream: #FFF8F0;
+  --kn-cream-alt: #FDF2E9;
+  --kn-cream-dark: #F5E6D8;
+  --kn-rose: #8B4557;
+  --kn-rose-light: #D4708F;
+  --kn-rose-soft: #E8A0B0;
+  --kn-brown: #5C3D2E;
+  --kn-brown-light: #6B5B4E;
+  --kn-brown-muted: #9C8B7E;
+  --kn-taupe: #E8D5C4;
+  --kn-taupe-light: #F0E4D8;
+  --kn-white: #FFFFFF;
+  --kn-gold: #C8862C;
+  --kn-pink-bg: #FFF0F3;
+
+  /* Typography */
+  --kn-font-heading: 'Playfair Display', serif;
+  --kn-font-body: 'Inter', sans-serif;
+  --kn-font-script: 'Dancing Script', cursive;
+
+  /* Spacing */
+  --kn-section-py: 80px;
+  --kn-container-max: 1320px;
+  --kn-container-px: 40px;
+
+  /* Borders */
+  --kn-radius-sm: 8px;
+  --kn-radius-md: 12px;
+  --kn-radius-lg: 20px;
+  --kn-radius-xl: 28px;
+  --kn-radius-full: 9999px;
+}
+
+/* ── Decorative yarn SVG path (used as background/border decoration) ── */
+.yarn-deco {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ── Section wrapper ── */
+.kn-section {
+  padding: var(--kn-section-py) 0;
+  position: relative;
+}
+
+.kn-container {
+  max-width: var(--kn-container-max);
+  margin: 0 auto;
+  padding: 0 var(--kn-container-px);
+}
+
+/* ── Section headers ── */
+.kn-section-title {
+  font-family: var(--kn-font-heading);
+  font-size: clamp(28px, 3vw, 40px);
+  font-weight: 600;
+  color: var(--kn-brown);
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.kn-section-subtitle {
+  font-family: var(--kn-font-body);
+  font-size: 14px;
+  color: var(--kn-brown-muted);
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+/* ── Product cards ── */
+.kn-product-card {
+  background: var(--kn-white);
+  border-radius: var(--kn-radius-md);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.kn-product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(92, 61, 46, 0.1);
+}
+
+.kn-product-card .card-img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  display: block;
+}
+
+.kn-product-card .card-body {
+  padding: 14px 16px;
+}
+
+.kn-product-card .card-title {
+  font-family: var(--kn-font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--kn-brown);
+  margin-bottom: 4px;
+}
+
+.kn-product-card .card-price {
+  font-family: var(--kn-font-body);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--kn-rose);
+}
+
+/* ── Buttons ── */
+.kn-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--kn-rose);
+  color: var(--kn-white);
+  font-family: var(--kn-font-body);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 14px 28px;
+  border-radius: var(--kn-radius-full);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.kn-btn-primary:hover {
+  background: #73384A;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(139, 69, 87, 0.3);
+}
+
+.kn-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  color: var(--kn-brown);
+  font-family: var(--kn-font-body);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 14px 24px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.kn-btn-ghost:hover {
+  color: var(--kn-rose);
+}
+
+/* ── View All link ── */
+.kn-view-all {
+  font-family: var(--kn-font-body);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--kn-rose);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: gap 0.3s ease;
+}
+
+.kn-view-all:hover {
+  gap: 8px;
+}
+
+/* ── Fade-up animation ── */
+.kn-fade-up {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.kn-fade-up.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  :root {
+    --kn-section-py: 56px;
+    --kn-container-px: 20px;
+  }
+}

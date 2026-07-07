@@ -3,25 +3,201 @@ interface Props {
   categories: string[];
 }
 const { categories } = Astro.props;
+
+// Map category names to user-friendly titles matching the mockup if possible
+function getCatDisplayLabel(cat: string): string {
+  if (cat.toLowerCase() === 'all') return 'All Products';
+  if (cat.toLowerCase() === 'amigurumi') return 'Soft Toys';
+  if (cat.toLowerCase() === 'bouquets') return 'Flower Bouquets';
+  if (cat.toLowerCase() === 'flower stems') return 'Flower Stems';
+  if (cat.toLowerCase() === 'wall hangings') return 'Home Decor';
+  if (cat.toLowerCase() === 'keychains') return 'Accessories';
+  return cat;
+}
 ---
-<div class="category-bar-wrap">
+<div class="category-bar-wrap" id="category-bar-wrap">
+  <div class="category-bar-container">
+    
+    <!-- Category pills scroll list -->
     <div
-        class="category-bar"
-        id="category-bar"
-        role="tablist"
-        aria-label="Product categories"
+      class="category-pills-list"
+      id="category-bar"
+      role="tablist"
+      aria-label="Product categories"
     >
-        {
-            categories.map((cat, i) => (
-                <button
-                    class={`cat-btn${i === 0 ? " active" : ""}`}
-                    data-cat={cat}
-                    role="tab"
-                    aria-selected={i === 0 ? "true" : "false"}
-                >
-                    {cat}
-                </button>
-            ))
-        }
+      {
+        categories.map((cat, i) => (
+          <button
+            class={`cat-pill-btn${i === 0 ? " active" : ""}`}
+            data-cat={cat}
+            role="tab"
+            aria-selected={i === 0 ? "true" : "false"}
+          >
+            {getCatDisplayLabel(cat)}
+          </button>
+        ))
+      }
     </div>
+
+    <!-- Sort Wrap and decorative flower -->
+    <div class="category-bar-right">
+      <div class="sort-dropdown-wrap">
+        <label for="sort-select" class="sort-dropdown-label">Sort by:</label>
+        <select
+          class="sort-dropdown-select"
+          id="sort-select"
+          aria-label="Sort products"
+        >
+          <option value="default">Newest</option>
+          <option value="price-asc">Price: Low → High</option>
+          <option value="price-desc">Price: High → Low</option>
+          <option value="rating">Top Rated</option>
+          <option value="new">New Arrivals</option>
+        </select>
+        <div class="sort-select-arrow">
+          <svg width="10" height="6" viewBox="0 0 10 6" fill="none">
+            <path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+      
+      <!-- Flower decoration ornament -->
+      <span class="flower-ornament-deco">❀</span>
+    </div>
+
+  </div>
 </div>
+
+<style>
+  .category-bar-wrap {
+    background: #FFF8F0;
+    border-bottom: 1px solid rgba(232, 213, 196, 0.4);
+    padding: 1.5rem clamp(1.25rem, 5vw, 5rem);
+    position: sticky;
+    top: 72px; /* sticky below LandingNav */
+    z-index: 40;
+    transition: all 0.3s ease;
+  }
+
+  .category-bar-container {
+    max-width: 1320px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+
+  .category-pills-list {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    flex: 1;
+    padding: 4px 0;
+  }
+
+  .category-pills-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .cat-pill-btn {
+    flex-shrink: 0;
+    padding: 0.75rem 1.4rem;
+    border-radius: 9999px;
+    background: #FDF2E9; /* Warm cream/beige background */
+    border: 1px solid transparent;
+    color: #5C3D2E;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    white-space: nowrap;
+    outline: none;
+  }
+
+  .cat-pill-btn:hover {
+    background: #F5E6D8;
+    color: #8B4557;
+  }
+
+  .cat-pill-btn.active {
+    background: #8B4557; /* Rose background */
+    color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(139, 69, 87, 0.2);
+  }
+
+  .category-bar-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-shrink: 0;
+  }
+
+  .sort-dropdown-wrap {
+    display: flex;
+    align-items: center;
+    background: #FFFFFF;
+    border: 1px solid #E8D5C4;
+    border-radius: 9999px;
+    padding: 0.6rem 2.2rem 0.6rem 1.2rem;
+    position: relative;
+    cursor: pointer;
+    transition: border-color 0.3s;
+  }
+
+  .sort-dropdown-wrap:hover {
+    border-color: #8B4557;
+  }
+
+  .sort-dropdown-label {
+    font-size: 0.75rem;
+    color: #9C8B7E;
+    margin-right: 0.35rem;
+    pointer-events: none;
+  }
+
+  .sort-dropdown-select {
+    appearance: none;
+    border: none;
+    background: transparent;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #5C3D2E;
+    outline: none;
+    cursor: pointer;
+    padding-right: 0.5rem;
+  }
+
+  .sort-select-arrow {
+    position: absolute;
+    right: 1.1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #5C3D2E;
+  }
+
+  .flower-ornament-deco {
+    color: #E8A0B0;
+    font-size: 1.1rem;
+    pointer-events: none;
+  }
+
+  @media (max-width: 900px) {
+    .category-bar-container {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    .category-pills-list {
+      width: 100%;
+    }
+    .category-bar-right {
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+</style>

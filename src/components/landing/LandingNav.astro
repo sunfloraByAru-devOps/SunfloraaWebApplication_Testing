@@ -1,0 +1,493 @@
+---
+import Logo from "../../assets/logo.png";
+const links = [
+  { label: "Home", href: "/" },
+  { label: "Shop", href: "/productlist", hasDropdown: true },
+  { label: "Custom Orders", href: "/#custom-orders" },
+  { label: "About Us", href: "/#about" },
+  { label: "Our Story", href: "/#story" },
+  { label: "Contact", href: "/#contact" },
+];
+
+const pathname = Astro.url.pathname;
+const cleanPathname = pathname.replace(/\/$/, "");
+---
+
+<header id="kn-header" class="kn-header">
+  <div class="kn-nav-container">
+    <!-- Logo -->
+    <a href="/" class="kn-logo">
+      <img
+        src={Logo.src}
+        alt="Sunflora"
+        class="logo-img"
+        style="mix-blend-mode: multiply;"
+      />
+    </a>
+
+    <!-- Desktop Nav -->
+    <nav class="kn-desktop-nav">
+      {
+        links.map((l) => {
+          const isShop = cleanPathname === "/productlist" && l.label === "Shop";
+          const isHome =
+            (cleanPathname === "" || cleanPathname === "/") &&
+            l.label === "Home";
+          const isActive = isShop || isHome;
+          return (
+            <a
+              href={l.href}
+              class={`kn-nav-link ${isActive ? "active" : ""}`}
+              data-label={l.label}
+            >
+              {l.label}
+              {l.hasDropdown && (
+                <svg
+                  width="10"
+                  height="6"
+                  viewBox="0 0 10 6"
+                  fill="none"
+                  class="dropdown-arrow"
+                >
+                  <path
+                    d="M1 1L5 5L9 1"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              )}
+            </a>
+          );
+        })
+      }
+    </nav>
+
+    <!-- Icons -->
+    <div class="kn-nav-icons">
+      <button class="nav-icon-btn" aria-label="Search">
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <circle cx="11" cy="11" r="8"></circle><path d="M21 21L16.65 16.65"
+          ></path>
+        </svg>
+      </button>
+      <button class="nav-icon-btn" aria-label="Account">
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle
+            cx="12"
+            cy="7"
+            r="4"></circle>
+        </svg>
+      </button>
+      <button class="nav-icon-btn cart-btn" aria-label="Cart">
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"
+          ></path><line x1="3" y1="6" x2="21" y2="6"></line><path
+            d="M16 10a4 4 0 0 1-8 0"></path>
+        </svg>
+        <span class="cart-badge">0</span>
+      </button>
+    </div>
+
+    <!-- Mobile Toggle -->
+    <button
+      id="kn-mobile-toggle"
+      class="kn-mobile-toggle"
+      aria-label="Toggle menu"
+    >
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div id="kn-mobile-menu" class="kn-mobile-menu">
+    <div class="mobile-menu-inner">
+      {
+        links.map((l) => (
+          <a href={l.href} class="kn-mobile-link" data-label={l.label}>
+            {l.label}
+          </a>
+        ))
+      }
+    </div>
+  </div>
+</header>
+
+<style>
+  .kn-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: transparent;
+    border-bottom: 1px solid transparent;
+    transition: all 0.4s ease;
+  }
+
+  .kn-header.scrolled {
+    background: rgba(255, 248, 240, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(232, 213, 196, 0.5);
+    box-shadow: 0 2px 20px rgba(92, 61, 46, 0.08);
+  }
+
+  .kn-nav-container {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 0 40px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .kn-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+
+  .logo-img {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
+  }
+
+  .logo-text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .logo-name {
+    font-family: var(--kn-font-heading);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--kn-brown);
+    line-height: 1.1;
+  }
+
+  .logo-tagline {
+    font-family: var(--kn-font-body);
+    font-size: 10px;
+    color: var(--kn-brown-muted);
+    letter-spacing: 0.02em;
+  }
+
+  .kn-desktop-nav {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+
+  .kn-nav-link {
+    font-family: var(--kn-font-body);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--kn-brown-light);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.3s ease;
+    position: relative;
+  }
+
+  .kn-nav-link:hover,
+  .kn-nav-link.active {
+    color: var(--kn-brown);
+  }
+
+  .kn-nav-link.active::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--kn-rose);
+    border-radius: 1px;
+  }
+
+  .dropdown-arrow {
+    transition: transform 0.3s ease;
+  }
+
+  .kn-nav-icons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .nav-icon-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: transparent;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--kn-brown-light);
+    transition: all 0.3s ease;
+  }
+
+  .nav-icon-btn:hover {
+    background: rgba(232, 213, 196, 0.4);
+    color: var(--kn-brown);
+  }
+
+  .cart-btn {
+    position: relative;
+  }
+
+  .cart-badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 16px;
+    height: 16px;
+    background: var(--kn-rose);
+    color: white;
+    font-size: 9px;
+    font-weight: 700;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .kn-mobile-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+  }
+
+  .kn-mobile-toggle span {
+    width: 22px;
+    height: 2px;
+    background: var(--kn-brown);
+    border-radius: 2px;
+    transition: all 0.3s ease;
+  }
+
+  .kn-mobile-menu {
+    display: none;
+    background: var(--kn-cream);
+    border-top: 1px solid var(--kn-taupe);
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.4s ease;
+  }
+
+  .kn-mobile-menu.open {
+    max-height: 400px;
+  }
+
+  .mobile-menu-inner {
+    padding: 16px 40px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .kn-mobile-link {
+    font-family: var(--kn-font-heading);
+    font-size: 20px;
+    color: var(--kn-brown);
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  .kn-mobile-link:hover {
+    color: var(--kn-rose);
+  }
+
+  @media (max-width: 1024px) {
+    .kn-desktop-nav {
+      display: none;
+    }
+    .kn-mobile-toggle {
+      display: flex;
+    }
+    .kn-mobile-menu {
+      display: block;
+    }
+    .kn-nav-container {
+      padding: 0 20px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .kn-nav-icons {
+      gap: 2px;
+    }
+    .nav-icon-btn {
+      width: 36px;
+      height: 36px;
+    }
+    .mobile-menu-inner {
+      padding: 16px 20px 24px;
+    }
+  }
+</style>
+
+<script>
+  const header = document.getElementById("kn-header")!;
+  const toggle = document.getElementById("kn-mobile-toggle")!;
+  const menu = document.getElementById("kn-mobile-menu")!;
+
+  window.addEventListener("scroll", () => {
+    header.classList.toggle("scrolled", window.scrollY > 20);
+  });
+
+  toggle.addEventListener("click", () => {
+    menu.classList.toggle("open");
+    toggle.classList.toggle("active");
+  });
+
+  document.querySelectorAll(".kn-mobile-link").forEach((link) => {
+    link.addEventListener("click", () => {
+      menu.classList.remove("open");
+      toggle.classList.remove("active");
+    });
+  });
+
+  // Dynamic Navigation Highlight Logic
+  const desktopLinks = document.querySelectorAll(
+    ".kn-desktop-nav .kn-nav-link",
+  );
+  const pathname = window.location.pathname;
+  const isHomePage = pathname === "/" || pathname === "";
+
+  // Map section IDs to label names
+  const sectionMap: Record<string, string> = {
+    hero: "Home",
+    "custom-orders": "Custom Orders",
+    about: "About Us",
+    story: "Our Story",
+    contact: "Contact",
+  };
+
+  if (isHomePage) {
+    const sections = Object.keys(sectionMap)
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => el !== null);
+
+    const observerOptions = {
+      root: null,
+      rootMargin: "-20% 0px -60% 0px", // Trigger when section occupies the active view area
+      threshold: 0,
+    };
+
+    let isScrollingToHash = false;
+    let scrollTimeout: number;
+
+    const observer = new IntersectionObserver((entries) => {
+      if (isScrollingToHash) return; // skip updating while clicking same-page nav links
+
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const id = entry.target.id;
+          const label = sectionMap[id];
+          if (label) {
+            desktopLinks.forEach((link) => {
+              if (link.getAttribute("data-label") === label) {
+                link.classList.add("active");
+              } else {
+                link.classList.remove("active");
+              }
+            });
+          }
+        }
+      });
+    }, observerOptions);
+
+    sections.forEach((section) => observer.observe(section));
+
+    // Handle hash on page load (if page loads with a hash e.g., /#about)
+    const hash = window.location.hash;
+    if (hash) {
+      const targetLabel = sectionMap[hash.replace("#", "")];
+      if (targetLabel) {
+        desktopLinks.forEach((link) => {
+          if (link.getAttribute("data-label") === targetLabel) {
+            link.classList.add("active");
+          } else {
+            link.classList.remove("active");
+          }
+        });
+      }
+    }
+
+    // Add click listeners to immediately update active class
+    desktopLinks.forEach((link) => {
+      link.addEventListener("click", () => {
+        const label = link.getAttribute("data-label");
+        if (label && label !== "Shop") {
+          isScrollingToHash = true;
+          clearTimeout(scrollTimeout);
+
+          desktopLinks.forEach((l) => {
+            if (l.getAttribute("data-label") === label) {
+              l.classList.add("active");
+            } else {
+              l.classList.remove("active");
+            }
+          });
+
+          // Resume observation after scroll finishes (rough estimate of 1000ms for smooth scroll)
+          scrollTimeout = window.setTimeout(() => {
+            isScrollingToHash = false;
+          }, 1000);
+        }
+      });
+    });
+  } else {
+    // If not home page, check if we are on /productlist
+    if (pathname.includes("/productlist")) {
+      desktopLinks.forEach((link) => {
+        if (link.getAttribute("data-label") === "Shop") {
+          link.classList.add("active");
+        } else {
+          link.classList.remove("active");
+        }
+      });
+    }
+  }
+</script>

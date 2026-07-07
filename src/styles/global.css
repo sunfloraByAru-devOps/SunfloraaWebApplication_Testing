@@ -1,10 +1,11 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,500&family=Playfair+Display:ital,wght@0,700;0,900;1,400;1,700&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Inter:wght@300;400;500;600;700&family=Dancing+Script:wght@400;500;600;700&display=swap');
 
 @import "tailwindcss";
+@import "./landing.css";
 
 html, body {
-  background-color: #FFFFFF;
-  color: #000000;
+  background-color: #FFF8F0;
+  color: #5C3D2E;
   font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -14,13 +15,13 @@ html, body {
 .font-serif-display,
 .font-hero-heading,
 h1 {
-  font-family: 'Cormorant Garamond', serif;
-  font-weight: 500;
+  font-family: 'Playfair Display', serif;
+  font-weight: 600;
 }
 
 h1 {
-  line-height: 0.95;
-  letter-spacing: -0.05em;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
 }
 
 h1 em,
@@ -30,12 +31,12 @@ h1 em,
 }
 
 .squiggle {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 8'><path d='M0 4 Q 10 0, 20 4 T 40 4 T 60 4 T 80 4' fill='none' stroke='%23C8862C' stroke-width='1.2'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 8'><path d='M0 4 Q 10 0, 20 4 T 40 4 T 60 4 T 80 4' fill='none' stroke='%23D4708F' stroke-width='1.2'/></svg>");
   background-repeat: repeat-x;
   background-position: 0 100%;
   background-size: 80px 8px;
   padding-bottom: 8px;
-} 
+}
 
 .paper-grain::before {
   content: "";
@@ -46,4 +47,28 @@ h1 em,
   opacity: 0;
   mix-blend-mode: multiply;
   background-image: none;
+}
+
+/* Selection color */
+::selection {
+  background: rgba(212, 112, 143, 0.2);
+  color: #5C3D2E;
+}
+
+/* Smooth scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FFF8F0;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #E8D5C4;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #D4708F;
 }

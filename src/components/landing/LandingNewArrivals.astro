@@ -1,0 +1,168 @@
+---
+/* New Arrivals section — product grid */
+const products = [
+  {
+    name: "Sunflower Tote Bag",
+    img: "/images/landing/prod-bag.png",
+    price: "₹1,499",
+  },
+  {
+    name: "Rose Bouquet",
+    img: "/images/landing/cat-bouquet.png",
+    price: "₹699",
+  },
+  {
+    name: "Flower Hair Clips Set",
+    img: "/images/landing/prod-hairclips.png",
+    price: "₹349",
+  },
+  {
+    name: "Pink Yarn Ball",
+    img: "/images/landing/prod-yarn.png",
+    price: "₹199",
+  },
+  {
+    name: "Home Decor Set",
+    img: "/images/landing/cat-home-decor.png",
+    price: "₹1,299",
+  },
+];
+---
+
+<section
+  id="new-arrivals"
+  class="kn-section"
+  style="background: var(--kn-cream);"
+>
+  <div class="kn-container">
+    <!-- Header row -->
+    <div class="arrivals-header kn-fade-up">
+      <div>
+        <h2 class="kn-section-title" style="text-align:left; margin-bottom:0;">
+          New Arrivals 🌷
+        </h2>
+      </div>
+      <a href="/productlist" class="kn-view-all">View All →</a>
+    </div>
+
+    <!-- Product row -->
+    <div class="arrivals-grid">
+      {
+        products.map((p, i) => (
+          <div
+            class={`kn-product-card kn-fade-up`}
+            style={`transition-delay: ${i * 0.08}s`}
+          >
+            <div class="arrivals-img-wrap">
+              <img src={p.img} alt={p.name} loading="lazy" class="card-img" />
+              <span class="new-badge">NEW</span>
+              <button
+                class="arrivals-wishlist"
+                aria-label={`Add ${p.name} to wishlist`}
+              >
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                </svg>
+              </button>
+            </div>
+            <div class="card-body">
+              <p class="card-title">{p.name}</p>
+              <p class="card-price">{p.price}</p>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .arrivals-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 32px;
+  }
+
+  .arrivals-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+  }
+
+  .arrivals-img-wrap {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--kn-radius-md) var(--kn-radius-md) 0 0;
+  }
+
+  .new-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: var(--kn-rose);
+    color: white;
+    font-family: var(--kn-font-body);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    border-radius: var(--kn-radius-full);
+  }
+
+  .arrivals-wishlist {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.85);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--kn-brown-muted);
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  .kn-product-card:hover .arrivals-wishlist {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .arrivals-wishlist:hover {
+    color: var(--kn-rose);
+    background: white;
+  }
+
+  @media (max-width: 1024px) {
+    .arrivals-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .arrivals-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+    .arrivals-header {
+      flex-direction: column;
+      gap: 12px;
+      align-items: flex-start;
+    }
+  }
+</style>

@@ -4,22 +4,57 @@ interface Props {
 }
 const { productCount } = Astro.props;
 ---
-<div class="controls-row">
-    <p class="results-label">
-        Showing <strong id="result-count">{productCount}</strong> pieces
-    </p>
-    <div class="sort-wrap">
-        <span class="sort-label">Sort</span>
-        <select
-            class="sort-select"
-            id="sort-select"
-            aria-label="Sort products"
-        >
-            <option value="default">Featured</option>
-            <option value="price-asc">Price: Low → High</option>
-            <option value="price-desc">Price: High → Low</option>
-            <option value="rating">Top Rated</option>
-            <option value="new">Newest First</option>
-        </select>
-    </div>
+<div class="category-heading-section">
+  <!-- Dynamic Category Title with ornaments -->
+  <div class="heading-ornament-wrap">
+    <span class="heading-leaf-left">❀</span>
+    <h2 class="category-heading-title" id="category-heading-title">All Products</h2>
+    <span class="heading-leaf-right">❀</span>
+  </div>
+  <p class="category-heading-subtitle">Lovingly handmade for you and your little moments. ♡</p>
+  
+  <!-- Hidden results count element for script selector compatibility -->
+  <span id="result-count" style="display: none;">{productCount}</span>
 </div>
+
+<style>
+  .category-heading-section {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 3rem clamp(1.25rem, 5vw, 5rem) 1.5rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .heading-ornament-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
+  .category-heading-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    font-weight: 600;
+    color: #5C3D2E;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+  }
+
+  .heading-leaf-left,
+  .heading-leaf-right {
+    font-size: 1.5rem;
+    color: #9C8B7E;
+    opacity: 0.65;
+  }
+
+  .category-heading-subtitle {
+    font-size: 0.92rem;
+    color: #6B5B4E;
+    letter-spacing: 0.02em;
+  }
+</style>
