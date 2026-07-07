@@ -27,7 +27,7 @@
   --kn-font-script: 'Dancing Script', cursive;
 
   /* Spacing */
-  --kn-section-py: 80px;
+  --kn-section-py: 96px;
   --kn-container-max: 1320px;
   --kn-container-px: 40px;
 
@@ -192,7 +192,7 @@
 /* ── Responsive ── */
 @media (max-width: 768px) {
   :root {
-    --kn-section-py: 56px;
+    --kn-section-py: 64px;
     --kn-container-px: 20px;
   }
 }

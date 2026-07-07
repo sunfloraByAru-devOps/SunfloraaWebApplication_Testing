@@ -1,162 +1,741 @@
 ---
-/* Loved by Many + A Note from Our Founder — side by side layout */
-const favorites = [
-  "/images/landing/prod-teddy.png",
-  "/images/landing/cat-bouquet.png",
-  "/images/landing/prod-bag.png",
-  "/images/landing/prod-bunny.png",
+/* ============================================================
+   Community Wall + Founder's Note
+   Real customer/maker photos from src/assets, copied into
+   public/images/community/ so they can be referenced the same
+   way every other landing section references images.
+   ============================================================ */
+
+const galleryItems = [
+  {
+    img: "/images/community/yellow_rose_bouquet.jpg",
+    caption: "Wrapped this one at midnight \ud83c\udf37",
+    rotate: -3,
+    tall: true,
+  },
+  {
+    img: "/images/community/crochet_hair_clips.png",
+    caption: null,
+    rotate: 2,
+  },
+  {
+    img: "/images/community/sun_and_moon.jpg",
+    caption: "My Sunny came home today!",
+    rotate: -2,
+  },
+  { img: "/images/community/Sunflower_Pot_1.png", caption: null, rotate: 3 },
+  {
+    img: "/images/community/Yello_orchid_(1).jpg",
+    caption: "Best unboxing moment \ud83d\udc9b",
+    rotate: -2,
+    tall: true,
+  },
+  {
+    img: "/images/community/sun_on_desk.png",
+    caption: "Found the perfect little spot",
+    rotate: -2,
+  },
+  {
+    img: "/images/community/sunflower_rosebig_.jpg",
+    caption: null,
+    rotate: 2,
+  },
+  {
+    img: "/images/community/sun_on_couch.jpg",
+    caption: "Settling into his new home",
+    rotate: -3,
+    framed: true,
+  },
+];
+
+const founderPromises = [
+  { label: "Made with", accent: "Love & Care" },
+  { label: "Thoughtful &", accent: "Meaningful" },
+  { label: "Packed with", accent: "Happiness" },
+  { label: "Small Batches,", accent: "Big Heart" },
 ];
 ---
 
-<section id="about" class="kn-section founder-section">
-  <div class="kn-container">
-    <div class="founder-grid">
-      <!-- Loved by Many -->
-      <div class="loved-wrap kn-fade-up">
-        <h3 class="loved-title">Loved by Many 🧡</h3>
-        <div class="loved-gallery">
-          {
-            favorites.map((img, i) => (
-              <div class="loved-item" style={`animation-delay: ${i * 0.15}s`}>
+<!-- ============================================================
+     COMMUNITY WALL
+     ============================================================ -->
+<section id="about" class="kn-section wall-section">
+  <div class="thread-decor thread-top" aria-hidden="true">
+    <svg viewBox="0 0 260 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M8 150C40 120 70 170 60 130C50 90 20 80 40 55C60 30 90 40 85 65"
+        stroke="var(--kn-rose)"
+        stroke-width="2"
+        stroke-linecap="round"></path>
+      <path
+        d="M85 65C95 30 130 20 150 45"
+        stroke="var(--kn-rose)"
+        stroke-width="2"
+        stroke-linecap="round"
+        fill="none"></path>
+    </svg>
+  </div>
+
+  <div class="kn-container wall-inner">
+    <header class="wall-header kn-fade-up">
+      <p class="wall-eyebrow">
+        <span>Our Community</span>
+        <svg width="14" height="13" viewBox="0 0 14 13" fill="none"
+          ><path
+            d="M7 12.3S1 8.4 1 4.4C1 2.2 2.6 1 4.3 1c1.1 0 2.1.6 2.7 1.6C7.6 1.6 8.6 1 9.7 1 11.4 1 13 2.2 13 4.4c0 4-6 7.9-6 7.9z"
+            stroke="var(--kn-rose)"
+            stroke-width="1.1"></path></svg
+        >
+      </p>
+      <h2 class="wall-heading">
+        In Your Hands, In Your <em>Hearts</em>
+        <svg
+          class="heading-heart"
+          width="30"
+          height="27"
+          viewBox="0 0 30 27"
+          fill="none"
+          ><path
+            d="M15 26S2 18 2 9.5C2 4.8 5.4 2 9.2 2c2.4 0 4.6 1.3 5.8 3.4C16.2 3.3 18.4 2 20.8 2 24.6 2 28 4.8 28 9.5 28 18 15 26 15 26z"
+            stroke="var(--kn-rose)"
+            stroke-width="1.4"></path></svg
+        >
+      </h2>
+      <p class="wall-sub">Real people. Real moments. Real love for handmade.</p>
+    </header>
+
+    <div class="wall-gallery">
+      {
+        galleryItems.map((item, i) => (
+          <figure
+            class:list={[
+              "wall-item",
+              "kn-fade-up",
+              { "wall-item--tall": item.tall },
+            ]}
+            style={`--rot:${item.rotate}deg; transition-delay:${i * 70}ms`}
+          >
+            {item.framed ? (
+              <img
+                class="wall-img wall-img--framed"
+                src={item.img}
+                alt="Sunflora customer moment"
+                loading="lazy"
+              />
+            ) : (
+              <div class="polaroid">
+                <span class="tape" aria-hidden="true" />
                 <img
-                  src={img}
-                  alt="Customer favorite crochet product"
+                  src={item.img}
+                  alt="Sunflora customer moment"
                   loading="lazy"
-                  class="loved-img"
                 />
               </div>
-            ))
-          }
-        </div>
-      </div>
+            )}
+            {item.caption && (
+              <figcaption class="note-card">
+                {item.caption}
+                <svg
+                  width="11"
+                  height="10"
+                  viewBox="0 0 11 10"
+                  fill="none"
+                  class="note-heart"
+                >
+                  <path
+                    d="M5.5 9.3S1 6.5 1 3.6C1 2 2.1 1 3.4 1c.8 0 1.6.4 2.1 1.1C6 1.4 6.8 1 7.6 1 8.9 1 10 2 10 3.6c0 2.9-4.5 5.7-4.5 5.7z"
+                    stroke="var(--kn-brown-muted)"
+                    stroke-width="0.9"
+                  />
+                </svg>
+              </figcaption>
+            )}
+          </figure>
+        ))
+      }
+    </div>
 
-      <!-- Founder Note -->
-      <div class="founder-note kn-fade-up">
-        <h3 class="founder-heading">A Note from Our Founder ✿</h3>
-        <p class="founder-text">
-          At Sunflora, every piece is more than just a product — it's a piece of
-          our heart, our time, and our passion.
-        </p>
-        <p class="founder-text">
-          Thank you for supporting handmade and being a part of our journey.
-        </p>
-        <div class="founder-sig">
-          <p class="sig-text">With love,</p>
-          <p class="sig-name">Ananya</p>
-        </div>
+    <div class="wall-cta">
+      <p class="ig-note">
+        <svg class="ig-icon" width="13" height="13" viewBox="0 0 24 24" fill="none"
+          ><rect
+            x="3"
+            y="3"
+            width="18"
+            height="18"
+            rx="5"
+            stroke="var(--kn-rose)"
+            stroke-width="1.6"></rect><circle
+            cx="12"
+            cy="12"
+            r="4.2"
+            stroke="var(--kn-rose)"
+            stroke-width="1.6"></circle><circle
+            cx="17.3"
+            cy="6.7"
+            r="1.1"
+            fill="var(--kn-rose)"></circle></svg
+        >
+        <span>Tag <strong>@sunflorabyaru</strong> on Instagram — our favourites get shared
+        every Friday</span>
+      </p>
+      <button type="button" class="share-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+          ><path
+            d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"
+            stroke="#fff"
+            stroke-width="1.6"></path><circle
+            cx="12"
+            cy="13"
+            r="3.2"
+            stroke="#fff"
+            stroke-width="1.6"></circle></svg
+        >
+        Share Your Moment
+      </button>
+    </div>
+  </div>
+
+  <div class="yarn-ball" aria-hidden="true">
+    <svg width="70" height="70" viewBox="0 0 70 70" fill="none">
+      <circle cx="35" cy="35" r="30" fill="var(--kn-rose)"></circle>
+      <path
+        d="M10 30c15 5 25 15 30 30M8 45c18-2 32 5 40 18M14 18c10 12 30 18 40 34"
+        stroke="#fff"
+        stroke-width="1.3"
+        opacity="0.55"
+        fill="none"></path>
+    </svg>
+  </div>
+</section>
+
+<!-- ============================================================
+     FOUNDER'S NOTE
+     ============================================================ -->
+<section class="kn-section founder-section">
+  <div class="kn-container founder-layout">
+    <div class="founder-copy kn-fade-up">
+      <p class="founder-eyebrow">
+        A Note From Our Founder
+        <svg width="12" height="11" viewBox="0 0 12 11" fill="none"
+          ><path
+            d="M6 10.3S1 6.9 1 3.7C1 1.9 2.3 1 3.6 1c.9 0 1.8.5 2.4 1.3C6.6 1.5 7.5 1 8.4 1 9.7 1 11 1.9 11 3.7c0 3.2-5 6.6-5 6.6z"
+            stroke="var(--kn-rose)"
+            stroke-width="1"></path></svg
+        >
+      </p>
+      <h2 class="founder-title">
+        Every Stitch<br />Tells a <em>Story</em>
+        <svg width="18" height="16" viewBox="0 0 18 16" fill="none"
+          ><path
+            d="M9 15.4S2 11 2 5.9C2 3.4 4 1.6 6.4 1.6c1.5 0 2.9.8 3.6 2C10.7 2.4 12.1 1.6 13.6 1.6 16 1.6 18 3.4 18 5.9c0 5.1-9 9.5-9 9.5z"
+            stroke="var(--kn-rose)"
+            stroke-width="1.2"></path></svg
+        >
+      </h2>
+      <p class="founder-text">
+        When I picked up my first crochet hook, I never knew it would become my
+        life's purpose. Sunflora is more than a brand — it's a piece of my
+        heart, my time, and my belief in the beauty of handmade.
+      </p>
+      <p class="founder-text">
+        Thank you for supporting handmade and being a part of this beautiful
+        journey.
+      </p>
+      <p class="founder-sig">
+        <svg width="14" height="13" viewBox="0 0 14 13" fill="none"
+          ><path
+            d="M7 12.3S1 8.4 1 4.4C1 2.2 2.6 1 4.3 1c1.1 0 2.1.6 2.7 1.6C7.6 1.6 8.6 1 9.7 1 11.4 1 13 2.2 13 4.4c0 4-6 7.9-6 7.9z"
+            stroke="var(--kn-rose)"
+            stroke-width="1.1"></path></svg
+        >
+        <span class="sig-name">Aru Jaiswal</span>
+      </p>
+      <p class="sig-role">Founder, Sunflora</p>
+    </div>
+
+    <div class="founder-visual kn-fade-up">
+      <div class="polaroid founder-polaroid">
+        <span class="tape" aria-hidden="true"></span>
+        <img
+          src="https://media-bom2-3.cdn.whatsapp.net/v/t61.24694-24/534427929_1711673370153043_7618938782520873671_n.jpg?ccb=11-4&oh=01_Q5Aa5AGtTgX6sU02LCeI4dU91viSTqL8RYrKJsqrDrdgP4BQ9g&oe=6A5A85D3&_nc_sid=5e03e0&_nc_cat=111"
+          alt="Founder of Sunflora"
+          loading="lazy"
+        />
       </div>
+      <div class="hang-tag">
+        <span class="tag-heart">♥</span>
+        Thank you for believing in handmade and in me.
+      </div>
+    </div>
+
+    <div class="founder-promises kn-fade-up">
+      {
+        founderPromises.map((p, i) => (
+          <div class="promise-cell">
+            <span class="promise-icon" aria-hidden="true">
+              {i === 0 && (
+                <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+                  <circle
+                    cx="13"
+                    cy="13"
+                    r="11"
+                    stroke="var(--kn-brown)"
+                    stroke-width="1.3"
+                  />
+                  <path
+                    d="M4 13c6 2 10 6 12 12M3 8c8-1 14 2 18 8M6 5c7 5 13 8 17 15"
+                    stroke="var(--kn-brown)"
+                    stroke-width="1"
+                  />
+                </svg>
+              )}
+              {i === 1 && (
+                <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+                  <path
+                    d="M13 22s-8-5-8-11.5C5 6.9 7.5 4.5 10.6 4.5c1.5 0 2.9.8 3.4 2 .5-1.2 1.9-2 3.4-2C20.5 4.5 23 6.9 23 10.5 23 17 15 22 13 22z"
+                    stroke="var(--kn-brown)"
+                    stroke-width="1.3"
+                  />
+                  <path
+                    d="M4 19c1.5-1 3-1 4 .3M22 19c-1.5-1-3-1-4 .3"
+                    stroke="var(--kn-brown)"
+                    stroke-width="1.3"
+                    stroke-linecap="round"
+                  />
+                </svg>
+              )}
+              {i === 2 && (
+                <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+                  <rect
+                    x="4"
+                    y="10"
+                    width="18"
+                    height="12"
+                    rx="1.5"
+                    stroke="var(--kn-brown)"
+                    stroke-width="1.3"
+                  />
+                  <path
+                    d="M4 10h18M13 10v12"
+                    stroke="var(--kn-brown)"
+                    stroke-width="1.3"
+                  />
+                  <path
+                    d="M8 10c0-2.5 2-4.5 4.5-4.5S17 7.5 17 10"
+                    stroke="var(--kn-brown)"
+                    stroke-width="1.3"
+                  />
+                </svg>
+              )}
+              {i === 3 && (
+                <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+                  <path
+                    d="M13 3v9"
+                    stroke="var(--kn-brown)"
+                    stroke-width="1.3"
+                  />
+                  <path
+                    d="M13 8c-3-3-8-2-8 1s5 3 8 1M13 8c3-3 8-2 8 1s-5 3-8 1"
+                    stroke="var(--kn-brown)"
+                    stroke-width="1.1"
+                  />
+                  <path
+                    d="M13 12c-4 1-6 5-6 10M13 12c4 1 6 5 6 10"
+                    stroke="var(--kn-brown)"
+                    stroke-width="1.1"
+                  />
+                </svg>
+              )}
+            </span>
+            <p class="promise-label">
+              {p.label}
+              <br />
+              {p.accent}
+            </p>
+          </div>
+        ))
+      }
     </div>
   </div>
 </section>
 
 <style>
-  .founder-section {
-    background: var(--kn-cream-alt);
-  }
-
-  .founder-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 48px;
-    align-items: start;
-  }
-
-  /* Loved by Many */
-  .loved-wrap {
+  /* ---------- shared polaroid ---------- */
+  .polaroid {
+    position: relative;
     background: var(--kn-white);
-    border-radius: var(--kn-radius-lg);
-    padding: 28px;
-    box-shadow: 0 4px 20px rgba(92, 61, 46, 0.06);
+    padding: 10px 10px 0;
+    border-radius: 2px;
+    box-shadow: 0 10px 24px rgba(92, 61, 46, 0.14);
   }
-
-  .loved-title {
-    font-family: var(--kn-font-heading);
-    font-size: 22px;
-    font-weight: 600;
-    color: var(--kn-brown);
-    margin-bottom: 20px;
-  }
-
-  .loved-gallery {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-  }
-
-  .loved-item {
-    border-radius: var(--kn-radius-sm);
-    overflow: hidden;
-    aspect-ratio: 1;
-  }
-
-  .loved-img {
+  .polaroid img {
+    display: block;
     width: 100%;
-    height: 100%;
+    aspect-ratio: 1;
     object-fit: cover;
-    transition: transform 0.4s ease;
+    border-radius: 1px;
+  }
+  .tape {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%) rotate(-2deg);
+    width: 56px;
+    height: 20px;
+    background: rgba(230, 210, 190, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.4);
   }
 
-  .loved-item:hover .loved-img {
-    transform: scale(1.08);
+  /* image that already has its own physical frame (instax-style) */
+  .wall-img--framed {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    box-shadow: 0 10px 24px rgba(92, 61, 46, 0.14);
   }
 
-  /* Founder Note */
-  .founder-note {
-    background: var(--kn-white);
-    border-radius: var(--kn-radius-lg);
-    padding: 36px;
-    box-shadow: 0 4px 20px rgba(92, 61, 46, 0.06);
+  /* ---------- community wall ---------- */
+  .wall-section {
+    position: relative;
+    background: var(--kn-cream);
+    overflow: hidden;
+  }
+  .thread-decor {
+    position: absolute;
+    opacity: 0.9;
+  }
+  .thread-top {
+    top: 10px;
+    left: 4%;
+    width: 130px;
   }
 
-  .founder-heading {
-    font-family: var(--kn-font-heading);
-    font-size: 22px;
-    font-weight: 600;
-    color: var(--kn-brown);
-    margin-bottom: 20px;
+  .wall-header {
+    text-align: center;
+    max-width: 640px;
+    margin: 0 auto 56px;
   }
-
-  .founder-text {
+  .wall-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     font-family: var(--kn-font-body);
-    font-size: 14px;
-    line-height: 1.8;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--kn-rose);
+    font-weight: 600;
+    margin-bottom: 14px;
+  }
+  .wall-heading {
+    font-family: var(--kn-font-heading);
+    font-size: clamp(32px, 4.4vw, 48px);
+    color: var(--kn-brown);
+    font-weight: 500;
+    line-height: 1.15;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .wall-heading em {
+    font-style: normal;
+    color: var(--kn-rose);
+  }
+  .heading-heart {
+    flex-shrink: 0;
+  }
+  .wall-sub {
+    margin-top: 16px;
+    font-family: var(--kn-font-body);
+    font-size: 16px;
     color: var(--kn-brown-light);
-    margin-bottom: 12px;
   }
 
-  .founder-sig {
-    margin-top: 24px;
-    padding-top: 16px;
-    border-top: 1px solid var(--kn-taupe-light);
+  .wall-gallery {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-auto-flow: dense;
+    grid-auto-rows: minmax(150px, auto);
+    gap: 20px 24px;
+    position: relative;
+    z-index: 1;
+  }
+  .wall-item {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    /* override the generic .kn-fade-up transform so rotation survives the reveal */
+    transform: rotate(var(--rot)) translateY(20px);
+  }
+  .wall-item.in-view {
+    transform: rotate(var(--rot)) translateY(0);
+  }
+  .wall-item--tall {
+    grid-row: span 2;
+  }
+  .wall-item--tall .polaroid img,
+  .wall-item--tall .wall-img--framed {
+    aspect-ratio: 3/4;
+    height: 100%;
+  }
+  .wall-item:hover {
+    transform: rotate(0deg) scale(1.03);
+    transition: transform 0.35s ease;
   }
 
-  .sig-text {
+  .note-card {
+    align-self: center;
+    transform: rotate(calc(var(--rot) * -0.6));
+    background: var(--kn-white);
+    border: 1px solid rgba(92, 61, 46, 0.08);
+    box-shadow: 0 6px 14px rgba(92, 61, 46, 0.1);
+    padding: 10px 14px;
+    font-family: var(--kn-font-body);
+    font-size: 13px;
+    color: var(--kn-brown);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: center;
+    text-align: center;
+  }
+  .note-heart {
+    flex-shrink: 0;
+  }
+
+  .wall-cta {
+    margin-top: 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    background: var(--kn-rose);
+    color: #fff;
+    font-family: var(--kn-font-body);
+    font-size: 15px;
+    font-weight: 600;
+    padding: 14px 30px;
+    border-radius: var(--kn-radius-full);
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(139, 69, 87, 0.28);
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+  .share-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 26px rgba(139, 69, 87, 0.34);
+  }
+
+  .ig-note {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     font-family: var(--kn-font-body);
     font-size: 13px;
     color: var(--kn-brown-muted);
+    text-align: center;
+    line-height: 1.5;
+    max-width: 90%;
+  }
+  .ig-icon {
+    flex-shrink: 0;
+  }
+  .ig-note strong {
+    color: var(--kn-brown);
+    font-weight: 600;
+  }
+
+  .yarn-ball {
+    position: absolute;
+    right: 4%;
+    bottom: 6%;
+    opacity: 0.9;
+  }
+
+  /* ---------- founder section ---------- */
+  .founder-section {
+    background: var(--kn-cream-alt);
+  }
+  .founder-layout {
+    display: grid;
+    grid-template-columns: 1.05fr 0.85fr 1fr;
+    gap: 48px;
+    align-items: center;
+  }
+  .founder-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--kn-font-body);
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--kn-rose);
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+  .founder-title {
+    font-family: var(--kn-font-heading);
+    font-size: clamp(30px, 3.6vw, 42px);
+    line-height: 1.2;
+    color: var(--kn-brown);
+    font-weight: 500;
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .founder-title em {
+    font-style: normal;
+    color: var(--kn-rose);
+  }
+  .founder-text {
+    font-family: var(--kn-font-body);
+    font-size: 15px;
+    line-height: 1.8;
+    color: var(--kn-brown-light);
+    margin-bottom: 14px;
+    max-width: 42ch;
+  }
+  .founder-sig {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 18px;
+  }
+  .sig-name {
+    font-family: var(--kn-font-script);
+    font-size: 26px;
+    color: var(--kn-rose);
+  }
+  .sig-role {
+    font-family: var(--kn-font-body);
+    font-size: 13px;
+    color: var(--kn-brown-muted);
+    margin-left: 22px;
+  }
+
+  .founder-visual {
+    position: relative;
+    justify-self: center;
+  }
+  .founder-polaroid {
+    width: 240px;
+    transform: rotate(-3deg);
+  }
+  .founder-polaroid img {
+    aspect-ratio: 4/5;
+  }
+  .hang-tag {
+    position: absolute;
+    right: -70px;
+    bottom: 30px;
+    width: 130px;
+    background: var(--kn-white);
+    border: 1px solid rgba(92, 61, 46, 0.08);
+    box-shadow: 0 8px 18px rgba(92, 61, 46, 0.12);
+    padding: 14px 12px;
+    font-family: var(--kn-font-body);
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--kn-brown);
+    transform: rotate(4deg);
+  }
+  .tag-heart {
+    color: var(--kn-rose);
+    display: block;
     margin-bottom: 4px;
   }
 
-  .sig-name {
-    font-family: var(--kn-font-script);
-    font-size: 28px;
-    color: var(--kn-rose);
+  .founder-promises {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+  .promise-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+    padding: 20px 16px;
+    border-right: 1px solid rgba(92, 61, 46, 0.1);
+    border-bottom: 1px solid rgba(92, 61, 46, 0.1);
+  }
+  .promise-cell:nth-child(2n) {
+    border-right: none;
+  }
+  .promise-cell:nth-child(n + 3) {
+    border-bottom: none;
+  }
+  .promise-label {
+    font-family: var(--kn-font-body);
+    font-size: 13px;
+    color: var(--kn-brown);
+    line-height: 1.5;
   }
 
+  /* ---------- responsive ---------- */
   @media (max-width: 1024px) {
-    .founder-grid {
+    .wall-gallery {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .founder-layout {
       grid-template-columns: 1fr;
-      gap: 24px;
+    }
+    .founder-visual {
+      margin: 24px 0;
+    }
+    .hang-tag {
+      right: 10px;
+    }
+  }
+  @media (max-width: 640px) {
+    .wall-gallery {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    .wall-item--tall {
+      grid-row: span 1;
+    }
+    .wall-item--tall .polaroid img,
+    .wall-item--tall .wall-img--framed {
+      aspect-ratio: 1;
+      height: auto;
+    }
+    .wall-heading {
+      font-size: 30px;
+    }
+    .founder-polaroid {
+      width: 200px;
+    }
+    .hang-tag {
+      position: static;
+      margin-top: 16px;
+      transform: rotate(0);
+      width: auto;
     }
   }
 
-  @media (max-width: 640px) {
-    .loved-gallery {
-      grid-template-columns: repeat(2, 1fr);
+  @media (prefers-reduced-motion: reduce) {
+    .wall-item {
+      transition: none;
     }
-    .loved-wrap,
-    .founder-note {
-      padding: 20px;
+    .share-btn:hover {
+      transform: none;
     }
   }
 </style>

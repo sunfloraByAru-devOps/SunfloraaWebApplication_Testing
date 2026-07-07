@@ -6,6 +6,7 @@ interface Props {
 }
 const { productCount } = Astro.props;
 ---
+
 <div class="shop-hero-section">
   <!-- Left Side content -->
   <div class="shop-hero-inner">
@@ -14,21 +15,36 @@ const { productCount } = Astro.props;
         Handmade<br />Collections <span class="heart-symbol">♡</span>
       </h1>
       <p class="shop-hero-text">
-        Every stitch tells a story. Browse our handcrafted crochet creations, made with patience and love.
+        Every stitch tells a story. Browse our handcrafted crochet creations,
+        made with patience and love.
       </p>
-      
+
       <div class="shop-hero-actions">
         <a href="#category-bar" class="btn-all-products">
-          Latest Products 
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          Latest Products
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
             <line x1="5" y1="12" x2="19" y2="12"></line>
             <polyline points="12 5 19 12 12 19"></polyline>
           </svg>
         </a>
-        <button class="btn-watch-process" onclick="alert('Opening process walkthrough video...');">
+        <button
+          class="btn-watch-process"
+          onclick="alert('Opening process walkthrough video...');"
+        >
           <span class="play-icon-wrap">
             <svg width="10" height="12" viewBox="0 0 24 28" fill="currentColor">
-              <path d="M4 2.6v22.8c0 .8.9 1.3 1.6.8l17-11.4c.5-.4.5-1.2 0-1.6L5.6 1.8c-.7-.5-1.6 0-1.6.8z" />
+              <path
+                d="M4 2.6v22.8c0 .8.9 1.3 1.6.8l17-11.4c.5-.4.5-1.2 0-1.6L5.6 1.8c-.7-.5-1.6 0-1.6.8z"
+              ></path>
             </svg>
           </span>
           Watch Our Process
@@ -41,11 +57,11 @@ const { productCount } = Astro.props;
       <!-- Wavy yarn loops in background -->
       <div class="yarn-loop-bg-left"></div>
       <div class="yarn-loop-bg-right"></div>
-      
+
       <!-- Speech bubble badge -->
       <div class="speech-bubble-badge">
         <div class="bubble-content">
-          <span class="bubble-text">Made for you with love</span>
+          <span class="bubble-text">This one being made</span>
           <span class="bubble-heart">♡</span>
         </div>
         <div class="bubble-tail"></div>
@@ -60,17 +76,27 @@ const { productCount } = Astro.props;
 
   <!-- Decorative Wavy Yarn Divider at bottom -->
   <div class="shop-yarn-divider">
-    <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" class="yarn-divider-svg">
-      <path d="M-10,40 C120,20 280,60 420,50 C560,40 600,20 720,60 C735,66 750,75 758,66 C766,57 760,42 748,45 C735,48 722,65 738,78 C752,90 772,70 790,55 C920,15 1080,70 1220,50 C1360,30 1420,40 1460,40" stroke="#8B4557" stroke-width="2" stroke-linecap="round" fill="none" />
+    <svg
+      viewBox="0 0 1440 120"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      class="yarn-divider-svg"
+    >
+      <path
+        d="M-10,40 C120,20 280,60 420,50 C560,40 600,20 720,60 C735,66 750,75 758,66 C766,57 760,42 748,45 C735,48 722,65 738,78 C752,90 772,70 790,55 C920,15 1080,70 1220,50 C1360,30 1420,40 1460,40"
+        stroke="#8B4557"
+        stroke-width="2"
+        stroke-linecap="round"
+        fill="none"></path>
       <!-- Small yarn ball decoration -->
-      <circle cx="743" cy="56" r="3" fill="#8B4557" />
+      <circle cx="743" cy="56" r="3" fill="#8B4557"></circle>
     </svg>
   </div>
 </div>
 
 <style>
   .shop-hero-section {
-    background: #FFF8F0; /* Soft warm cream */
+    background: #fff8f0; /* Soft warm cream */
     padding: 7rem clamp(1.25rem, 5vw, 5rem) 1.5rem;
     position: relative;
     overflow: hidden;
@@ -91,24 +117,24 @@ const { productCount } = Astro.props;
   }
 
   .shop-hero-title {
-    font-family: 'Playfair Display', serif;
+    font-family: "Playfair Display", serif;
     font-size: clamp(1.8rem, 3.5vw, 2.8rem);
     line-height: 1.08;
     font-weight: 600;
-    color: #5C3D2E;
+    color: #5c3d2e;
     margin-bottom: 0.5rem;
     letter-spacing: -0.01em;
   }
 
   .heart-symbol {
-    color: #8B4557;
+    color: #8b4557;
     font-weight: 400;
   }
 
   .shop-hero-text {
     font-size: clamp(0.95rem, 1.2vw, 1.15rem);
     line-height: 1.6;
-    color: #6B5B4E;
+    color: #6b5b4e;
     margin-bottom: 1.2rem;
   }
 
@@ -123,8 +149,8 @@ const { productCount } = Astro.props;
     display: inline-flex;
     align-items: center;
     gap: 0.6rem;
-    background: #8B4557;
-    color: #FFFFFF;
+    background: #8b4557;
+    color: #ffffff;
     font-size: 0.82rem;
     font-weight: 600;
     text-transform: uppercase;
@@ -137,7 +163,7 @@ const { productCount } = Astro.props;
   }
 
   .btn-all-products:hover {
-    background: #73384A;
+    background: #73384a;
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(139, 69, 87, 0.3);
   }
@@ -148,7 +174,7 @@ const { productCount } = Astro.props;
     gap: 0.75rem;
     background: transparent;
     border: none;
-    color: #5C3D2E;
+    color: #5c3d2e;
     font-size: 0.82rem;
     font-weight: 600;
     cursor: pointer;
@@ -157,11 +183,11 @@ const { productCount } = Astro.props;
   }
 
   .btn-watch-process:hover {
-    color: #8B4557;
+    color: #8b4557;
   }
 
   .btn-watch-process:hover .play-icon-wrap {
-    background: #FFF0F2;
+    background: #fff0f2;
     transform: scale(1.08);
   }
 
@@ -173,7 +199,7 @@ const { productCount } = Astro.props;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #8B4557;
+    color: #8b4557;
     transition: all 0.3s ease;
   }
 
@@ -189,19 +215,25 @@ const { productCount } = Astro.props;
     width: 100%;
     aspect-ratio: 1;
     border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%; /* organic soft shape */
-    background: #F5E6D8;
+    background: #f5e6d8;
     overflow: hidden;
     position: relative;
-    border: 8px solid #FFFFFF;
+    border: 8px solid #ffffff;
     box-shadow: 0 15px 45px rgba(92, 61, 46, 0.08);
     animation: waveBlob 15s ease-in-out infinite;
     z-index: 2;
   }
 
   @keyframes waveBlob {
-    0% { border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%; }
-    50% { border-radius: 70% 30% 52% 48% / 60% 40% 60% 40%; }
-    100% { border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%; }
+    0% {
+      border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
+    }
+    50% {
+      border-radius: 70% 30% 52% 48% / 60% 40% 60% 40%;
+    }
+    100% {
+      border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
+    }
   }
 
   .mascot-img {
@@ -216,7 +248,7 @@ const { productCount } = Astro.props;
     position: absolute;
     top: -20px;
     right: -20px;
-    background: #FFFFFF;
+    background: #ffffff;
     border-radius: 20px;
     padding: 10px 18px;
     box-shadow: 0 8px 24px rgba(92, 61, 46, 0.1);
@@ -225,9 +257,15 @@ const { productCount } = Astro.props;
   }
 
   @keyframes floatBadge {
-    0% { transform: translateY(0); }
-    50% { transform: translateY(-6px); }
-    100% { transform: translateY(0); }
+    0% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-6px);
+    }
+    100% {
+      transform: translateY(0);
+    }
   }
 
   .bubble-content {
@@ -240,13 +278,13 @@ const { productCount } = Astro.props;
   .bubble-text {
     font-size: 0.72rem;
     font-weight: 600;
-    color: #6B5B4E;
+    color: #6b5b4e;
     text-transform: uppercase;
     letter-spacing: 0.04em;
   }
 
   .bubble-heart {
-    color: #8B4557;
+    color: #8b4557;
     font-weight: bold;
     font-size: 0.9rem;
   }
@@ -259,7 +297,7 @@ const { productCount } = Astro.props;
     height: 0;
     border-left: 8px solid transparent;
     border-right: 8px solid transparent;
-    border-top: 8px solid #FFFFFF;
+    border-top: 8px solid #ffffff;
   }
 
   /* Yarn deco strings */

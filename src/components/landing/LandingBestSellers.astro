@@ -1,5 +1,5 @@
 ---
-/* Best Sellers section — product grid with prices */
+/* Best Sellers section — horizontal carousel, left-aligned with veil on right */
 const products = [
   {
     name: "Cozy Teddy Bear",
@@ -31,51 +31,59 @@ const products = [
 
 <section id="best-sellers" class="kn-section">
   <div class="kn-container">
-    <!-- Header row -->
+    <!-- Header row — left aligned -->
     <div class="sellers-header kn-fade-up">
       <div class="sellers-title-wrap">
         <h2 class="kn-section-title" style="text-align:left; margin-bottom:0;">
-          Best Sellers 🔥
+          Most Loved
         </h2>
       </div>
       <a href="/productlist" class="kn-view-all">View All →</a>
     </div>
 
-    <!-- Product row -->
-    <div class="sellers-grid">
-      {
-        products.map((p, i) => (
-          <div
-            class={`kn-product-card kn-fade-up`}
-            style={`transition-delay: ${i * 0.08}s`}
-          >
-            <div class="card-img-wrap">
-              <img src={p.img} alt={p.name} loading="lazy" class="card-img" />
-              <button
-                class="wishlist-btn"
-                aria-label={`Add ${p.name} to wishlist`}
-              >
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+    <!-- Carousel with veil on right -->
+    <div class="sellers-carousel-wrap">
+      <div class="sellers-carousel" id="sellers-carousel">
+        {
+          products.map((p, i) => (
+            <div
+              class="kn-product-card carousel-card kn-fade-up"
+              style={`transition-delay: ${i * 0.08}s`}
+            >
+              <div class="card-img-wrap">
+                <img src={p.img} alt={p.name} loading="lazy" class="card-img" />
+                <button
+                  class="wishlist-btn"
+                  aria-label={`Add ${p.name} to wishlist`}
                 >
-                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                </svg>
-              </button>
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                  </svg>
+                </button>
+              </div>
+              <div class="card-body">
+                <p class="card-title">{p.name}</p>
+                <p class="card-price">{p.price}</p>
+              </div>
             </div>
-            <div class="card-body">
-              <p class="card-title">{p.name}</p>
-              <p class="card-price">{p.price}</p>
-            </div>
-          </div>
-        ))
-      }
+          ))
+        }
+      </div>
+      <!-- Gradient veil on right edge with arrow -->
+      <div class="sellers-veil" aria-hidden="true">
+        <svg class="veil-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--kn-rose, #D4708F)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 18l6-6-6-6" />
+        </svg>
+      </div>
     </div>
   </div>
 </section>
@@ -85,13 +93,61 @@ const products = [
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 32px;
+    margin-bottom: 40px;
   }
 
-  .sellers-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
+  /* ── Carousel wrapper — left-aligned, ~80% width ── */
+  .sellers-carousel-wrap {
+    position: relative;
+    width: 82%;
+    /* left-aligned by default (no margin-left) */
+  }
+
+  /* Gradient veil on right edge */
+  .sellers-veil {
+    position: absolute;
+    top: 0;
+    right: -1px;
+    width: 80px;
+    height: 100%;
+    background: linear-gradient(to right, transparent, #ffffff);
+    pointer-events: none;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sellers-veil .veil-arrow {
+    opacity: 0.7;
+    animation: arrowPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes arrowPulse {
+    0%, 100% { transform: translateX(0); opacity: 0.7; }
+    50% { transform: translateX(4px); opacity: 1; }
+  }
+
+  /* ── Carousel track ── */
+  .sellers-carousel {
+    display: flex;
     gap: 20px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 8px;
+  }
+
+  .sellers-carousel::-webkit-scrollbar {
+    display: none;
+  }
+
+  .sellers-carousel .carousel-card {
+    flex: 0 0 calc((100% - 40px) / 3); /* 3 cards fill the narrower track */
+    scroll-snap-align: start;
+    min-width: 0;
   }
 
   .card-img-wrap {
@@ -130,15 +186,14 @@ const products = [
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
-  @media (max-width: 1024px) {
-    .sellers-grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
-  }
-
   @media (max-width: 640px) {
-    .sellers-grid {
-      grid-template-columns: repeat(2, 1fr);
+    .sellers-carousel-wrap {
+      width: 90%;
+    }
+    .sellers-carousel .carousel-card {
+      flex: 0 0 calc((100% - 14px) / 2); /* 2 cards on mobile */
+    }
+    .sellers-carousel {
       gap: 14px;
     }
     .sellers-header {
@@ -146,5 +201,61 @@ const products = [
       gap: 12px;
       align-items: flex-start;
     }
+    .sellers-veil {
+      width: 50px;
+    }
   }
 </style>
+
+<script>
+  // Auto-scroll Best Sellers carousel to the LEFT periodically
+  (() => {
+    const carousel = document.getElementById("sellers-carousel");
+    if (!carousel) return;
+
+    const INTERVAL_MS = 3000;
+    let timer: ReturnType<typeof setInterval>;
+
+    function getCardWidth(): number {
+      const card = carousel!.querySelector(".carousel-card") as HTMLElement | null;
+      if (!card) return 0;
+      const style = getComputedStyle(carousel!);
+      const gap = parseFloat(style.gap) || 20;
+      return card.offsetWidth + gap;
+    }
+
+    function scrollOneLeft() {
+      const cardW = getCardWidth();
+      if (cardW === 0) return;
+      const maxScroll = carousel!.scrollWidth - carousel!.clientWidth;
+
+      if (carousel!.scrollLeft >= maxScroll - 2) {
+        carousel!.scrollTo({ left: 0, behavior: "smooth" });
+      } else {
+        carousel!.scrollBy({ left: cardW, behavior: "smooth" });
+      }
+    }
+
+    function startAutoScroll() {
+      stopAutoScroll();
+      timer = setInterval(scrollOneLeft, INTERVAL_MS);
+    }
+
+    function stopAutoScroll() {
+      clearInterval(timer);
+    }
+
+    carousel.addEventListener("mouseenter", stopAutoScroll);
+    carousel.addEventListener("mouseleave", startAutoScroll);
+    carousel.addEventListener("touchstart", stopAutoScroll, { passive: true });
+    carousel.addEventListener("touchend", () => setTimeout(startAutoScroll, 2000));
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        entry.isIntersecting ? startAutoScroll() : stopAutoScroll();
+      },
+      { threshold: 0.3 }
+    );
+    io.observe(carousel);
+  })();
+</script>
