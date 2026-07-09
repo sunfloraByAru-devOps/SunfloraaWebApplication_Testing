@@ -1,0 +1,2341 @@
+---
+import Layout from "../layouts/Layout.astro";
+import LandingNav from "../components/landing/LandingNav.astro";
+import LandingFooter from "../components/landing/LandingFooter.astro";
+
+/* ── Topic definitions: each drives the card, the note panel, the
+     auto-filled subject, and which extra fields appear in the form ── */
+const topics = [
+    {
+        id: "custom",
+        title: "Custom Order",
+        cardDesc: "I have an idea I'd love to bring to life.",
+        subject: "Custom Order Inquiry",
+        noteTitle: "Custom Order",
+        noteDesc:
+            "Have an idea you're dying to bring to life? A photo, a memory, a doodle — tell us everything and we'll make it real.",
+        icon: "sparkle",
+    },
+    {
+        id: "partner",
+        title: "Partner With Us",
+        cardDesc: "Let's collaborate and create something amazing.",
+        subject: "Partnership Inquiry",
+        noteTitle: "Partner With Us",
+        noteDesc:
+            "We love collaborating with brands, boutiques, creators and businesses who value handmade goodness. Let's build something beautiful together.",
+        icon: "handshake",
+    },
+    {
+        id: "journey",
+        title: "Join Our Journey",
+        cardDesc: "I want to work or create with you.",
+        subject: "Join Our Journey",
+        noteTitle: "Join Our Journey",
+        noteDesc:
+            "Whether you'd like to collaborate, intern, or just be part of our little world — we'd love to hear from you.",
+        icon: "compass",
+    },
+    {
+        id: "support",
+        title: "Order Support",
+        cardDesc: "I need help with my existing order.",
+        subject: "Order Support",
+        noteTitle: "Order Support",
+        noteDesc:
+            "Need help with an order that's already on its way to you? We've got you covered — just tell us the details.",
+        icon: "box",
+    },
+    {
+        id: "feedback",
+        title: "Feedback & Ideas",
+        cardDesc: "I have an idea or feedback to share.",
+        subject: "Feedback & Ideas",
+        noteTitle: "Feedback & Ideas",
+        noteDesc:
+            "Your thoughts help us grow. Good, bad, or somewhere in between — we're genuinely listening.",
+        icon: "bulb",
+    },
+    {
+        id: "wrong",
+        title: "Something Went Wrong",
+        cardDesc: "I'm facing an issue and need help.",
+        subject: "Something Went Wrong",
+        noteTitle: "Something Went Wrong",
+        noteDesc:
+            "We're sorry to hear that. Tell us what happened and we'll do everything we can to make it right.",
+        icon: "heart-alert",
+    },
+];
+
+/* Server-rendered icon markup — mirrors ICONS_MAP in the client script below,
+   so cards render correctly before JS hydrates. */
+const ICONS: Record<string, string> = {
+    sparkle: `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M5 5l2.8 2.8M16.2 16.2L19 19M3 12h4M17 12h4M5 19l2.8-2.8M16.2 7.8L19 5"/><circle cx="12" cy="12" r="2.4"/></svg>`,
+    handshake: `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 12l2.5 2.5a1.8 1.8 0 0 0 2.5 0l.3-.3a1.8 1.8 0 0 0 0-2.5L11 9.4"/><path d="M2 11l4-4 4.3 4.3a1.6 1.6 0 0 1 0 2.3l-.2.2a1.6 1.6 0 0 1-2.3 0"/><path d="M22 11l-4-4-5.5 5.5"/><path d="M14 15l1.5 1.5a1.6 1.6 0 0 0 2.3 0l3.2-3.2"/></svg>`,
+    compass: `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polygon points="14.5 9.5 12.8 12.8 9.5 14.5 11.2 11.2 14.5 9.5"/></svg>`,
+    box: `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg>`,
+    bulb: `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.6.5 1.1 1.4 1.1 2.2h5c0-.8.5-1.7 1.1-2.2A6 6 0 0 0 12 3z"/></svg>`,
+    "heart-alert": `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 8.6c0 5.6-8.8 10.9-8.8 10.9S3.2 14.2 3.2 8.6a4.8 4.8 0 0 1 8.8-2.7 4.8 4.8 0 0 1 8.8 2.7z"/><line x1="12" y1="7" x2="12" y2="11"/><circle cx="12" cy="13.6" r="0.6" fill="currentColor"/></svg>`,
+};
+---
+
+<Layout
+    title="Contact Us — Sunflora | Handmade Crochet"
+    description="We'd love to hear from you. Whatever brings you here, choose a topic and let's connect — custom orders, partnerships, feedback, or support."
+>
+    <div class="desktop-chrome">
+        <LandingNav />
+    </div>
+
+    <main class="contact-page desktop-flow">
+        <!-- ── HERO ── -->
+        <section class="contact-hero kn-fade-up">
+            <div class="kn-container contact-hero-inner">
+                <div class="contact-hero-text">
+                    <span class="contact-eyebrow">Let's Connect ♡</span>
+                    <h1 class="contact-heading">
+                        We'd love to<br />
+                        hear from you <span class="heart-icon">♡</span>
+                    </h1>
+                    <p class="contact-sub">
+                        Whatever brings you here, we're happy you found us.
+                        Choose a topic and we'll take it from there.
+                    </p>
+                </div>
+
+                <div class="contact-hero-visual" aria-hidden="true">
+                    <span class="hero-visual-label"
+                        >What brings you here today?</span
+                    >
+                    <img
+                        src="/images/landing/yarn-ball.png"
+                        alt=""
+                        class="deco deco-yarn"
+                        loading="lazy"
+                    />
+                    <img
+                        src="/images/landing/prod-teddy.png"
+                        alt=""
+                        class="deco deco-teddy"
+                        loading="lazy"
+                    />
+                    <div class="deco deco-tag">
+                        <p>Handmade with love,<br />just for you.</p>
+                        <span class="heart-icon">♡</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── TOPIC SELECTOR ── -->
+        <section class="topic-section kn-fade-up">
+            <div class="kn-container">
+                <div class="topic-grid" id="topic-grid">
+                    {
+                        topics.map((t, i) => (
+                            <button
+                                type="button"
+                                class={`topic-card ${i === 1 ? "active" : ""}`}
+                                data-topic={t.id}
+                                aria-pressed={i === 1 ? "true" : "false"}
+                            >
+                                <span class="topic-check" aria-hidden="true">
+                                    <svg
+                                        width="12"
+                                        height="12"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="3"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    >
+                                        <polyline points="20 6 9 17 4 12" />
+                                    </svg>
+                                </span>
+                                <span
+                                    class="topic-icon"
+                                    set:html={ICONS[t.icon]}
+                                />
+                                <span class="topic-title">{t.title}</span>
+                                <span class="topic-desc">{t.cardDesc}</span>
+                            </button>
+                        ))
+                    }
+                </div>
+                <p class="topic-hint">
+                    Tell us more so we can help better <span class="heart-icon"
+                        >♡</span>
+                </p>
+            </div>
+        </section>
+
+        <!-- ── FORM SECTION ── -->
+        <section class="form-section kn-fade-up">
+            <div class="kn-container">
+                <div class="form-grid">
+                    <!-- Left: sticky note -->
+                    <div class="note-wrap">
+                        <div class="note-card" id="note-card">
+                            <span class="note-tape" aria-hidden="true"></span>
+                            <span
+                                class="note-icon"
+                                id="note-icon"
+                                set:html={ICONS.handshake}
+                            />
+                            <h3 class="note-title" id="note-title">
+                                Partner With Us
+                            </h3>
+                            <p class="note-desc" id="note-desc">
+                                We love collaborating with brands, boutiques,
+                                creators and businesses who value handmade
+                                goodness.
+                                <br /><br />
+                                Let's build something beautiful together.
+                            </p>
+                            <span class="heart-icon note-heart">♡</span>
+                        </div>
+                        <img
+                            src="/images/landing/yarn-strand.png"
+                            alt=""
+                            class="note-yarn-deco"
+                            aria-hidden="true"
+                            loading="lazy"
+                        />
+                    </div>
+
+                    <!-- Right: form -->
+                    <form class="contact-form" id="contact-form">
+                        <label class="field field-subject">
+                            <span class="field-label">Subject (automatic)</span>
+                            <span class="subject-display" id="subject-display">
+                                <span
+                                    id="subject-icon"
+                                    set:html={ICONS.handshake}
+                                />
+                                <span id="subject-text"
+                                    >Partnership Inquiry</span
+                                >
+                                <svg
+                                    width="14"
+                                    height="14"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    class="lock-icon"
+                                    ><rect
+                                        x="3"
+                                        y="11"
+                                        width="18"
+                                        height="11"
+                                        rx="2"></rect><path
+                                        d="M7 11V7a5 5 0 0 1 10 0v4"
+                                    ></path></svg
+                                >
+                            </span>
+                        </label>
+
+                        <div class="field-row">
+                            <label class="field">
+                                <span class="field-label">Your Name</span>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    id="f-name"
+                                    placeholder="Enter your full name"
+                                    required
+                                />
+                            </label>
+                            <label class="field">
+                                <span class="field-label">Email Address</span>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    id="f-email"
+                                    placeholder="Enter your email"
+                                    required
+                                />
+                            </label>
+                        </div>
+
+                        <!-- Dynamic topic-specific fields render here -->
+                        <div id="dynamic-fields"></div>
+
+                        <label class="field field-full">
+                            <span class="field-label">Additional Message</span>
+                            <textarea
+                                name="message"
+                                id="f-message"
+                                rows="4"
+                                placeholder="Anything else you'd like to share with us..."
+                            ></textarea>
+                        </label>
+
+                        <div class="form-footer">
+                            <p class="form-note">
+                                <span class="heart-icon">♡</span> We read every message
+                                and value every connection.
+                            </p>
+                            <button
+                                type="submit"
+                                class="kn-btn-primary"
+                                id="submit-btn"
+                            >
+                                <span id="submit-label">Send Message</span>
+                                <svg
+                                    width="16"
+                                    height="16"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                                    <polygon points="22 2 15 22 11 13 2 9 22 2"
+                                    ></polygon>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <p class="form-success" id="form-success" hidden>
+                            Your message has been received and means a lot to
+                            us. We'll be in touch soon <span class="heart-icon"
+                                >♡</span
+                            >
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── WHAT HAPPENS NEXT STRIP ── -->
+        <section class="next-strip kn-fade-up">
+            <div class="kn-container next-strip-inner">
+                <div class="polaroid-wrap">
+                    <div class="polaroid">
+                        <img
+                            src="/images/landing/prod-yarn.png"
+                            alt="Basket of hand-dyed yarn"
+                            loading="lazy"
+                        />
+                    </div>
+                    <div class="sticky-note">
+                        <p class="sticky-title">Thank you!</p>
+                        <p class="sticky-body">
+                            Your message has been received and means a lot to
+                            us.
+                        </p>
+                        <span class="heart-icon">♡</span>
+                    </div>
+                </div>
+
+                <div class="envelope-deco" aria-hidden="true">
+                    <svg width="70" height="70" viewBox="0 0 70 70" fill="none">
+                        <rect
+                            x="8"
+                            y="20"
+                            width="54"
+                            height="38"
+                            rx="4"
+                            stroke="#C8862C"
+                            stroke-width="1.5"></rect>
+                        <path
+                            d="M8 22L35 44L62 22"
+                            stroke="#C8862C"
+                            stroke-width="1.5"
+                            fill="none"></path>
+                    </svg>
+                </div>
+
+                <div class="next-text">
+                    <p class="next-title">
+                        We'll get back to you within 1-2 business days.
+                    </p>
+                    <p class="next-body">
+                        Until then, feel free to explore our creations and stay
+                        connected with us. <span class="heart-icon">♡</span>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <p class="made-with-love">
+            <span aria-hidden="true">✦</span> Made with love, just for you <span
+                class="heart-icon">♡</span
+            >
+            <span aria-hidden="true">✦</span>
+        </p>
+    </main>
+
+    <!-- ══════════════════════════════════════════════
+       MOBILE STEP-FLOW (screens < 768px)
+       Screen 1: browse topics · Screen 2: form · Screen 3: thank you
+  ══════════════════════════════════════════════ -->
+    <div class="mobile-flow" id="mobile-flow">
+        <!-- App bar -->
+        <header class="mobile-appbar">
+            <button
+                type="button"
+                class="mobile-back-btn"
+                id="mobile-back-btn"
+                hidden
+            >
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    ><polyline points="15 18 9 12 15 6"></polyline></svg
+                >
+                Back
+            </button>
+            <a href="/" class="mobile-logo"
+                >Knotique<span class="heart-icon">♡</span></a
+            >
+            <button
+                type="button"
+                class="mobile-hamburger"
+                id="mobile-hamburger-btn"
+                aria-label="Menu"
+            >
+                <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    ><line x1="3" y1="6" x2="21" y2="6"></line><line
+                        x1="3"
+                        y1="12"
+                        x2="21"
+                        y2="12"></line><line x1="3" y1="18" x2="21" y2="18"
+                    ></line></svg
+                >
+            </button>
+        </header>
+
+        <!-- Slide-out drawer -->
+        <div class="mobile-drawer" id="mobile-drawer">
+            <a href="/">Home</a>
+            <a href="/productlist">Shop</a>
+            <a href="/custom">Custom Orders</a>
+            <a href="/#about">About Us</a>
+            <a href="/#story">Our Story</a>
+            <a href="/contact" class="active">Contact</a>
+        </div>
+
+        <!-- ── SCREEN 1: Browse topics ── -->
+        <section class="mobile-screen active" data-screen="1">
+            <div class="mobile-hero-photo">
+                <img
+                    src="/images/landing/prod-teddy.png"
+                    alt=""
+                    loading="lazy"
+                />
+                <img
+                    src="/images/landing/yarn-ball.png"
+                    alt=""
+                    class="mobile-hero-yarn"
+                    loading="lazy"
+                />
+                <div class="mobile-hero-tag">
+                    <p>Handmade<br />with love,<br />just for you.</p>
+                    <span class="heart-icon">♡</span>
+                </div>
+            </div>
+
+            <div class="mobile-content">
+                <span class="contact-eyebrow">Let's Connect ♡</span>
+                <h1 class="contact-heading">
+                    We'd love to<br />hear from you <span class="heart-icon"
+                        >♡</span
+                    >
+                </h1>
+                <p class="contact-sub">
+                    Whatever brings you here, we're happy you found us. Choose a
+                    topic and we'll take it from there.
+                </p>
+
+                <p class="mobile-hint">What brings you here today?</p>
+
+                <div class="mobile-topic-list" id="mobile-topic-list">
+                    {
+                        topics.map((t) => (
+                            <button
+                                type="button"
+                                class="mobile-topic-row"
+                                data-topic={t.id}
+                            >
+                                <span
+                                    class="mtr-icon"
+                                    set:html={ICONS[t.icon]}
+                                />
+                                <span class="mtr-text">
+                                    <span class="mtr-title">{t.title}</span>
+                                    <span class="mtr-desc">{t.cardDesc}</span>
+                                </span>
+                                <svg
+                                    width="18"
+                                    height="18"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    class="mtr-chevron"
+                                >
+                                    <polyline points="9 18 15 12 9 6" />
+                                </svg>
+                            </button>
+                        ))
+                    }
+                </div>
+
+                <p class="mobile-footnote">
+                    <span class="heart-icon">♡</span> We read every message and value
+                    every connection.
+                </p>
+            </div>
+        </section>
+
+        <!-- ── SCREEN 2: Form ── -->
+        <section class="mobile-screen" data-screen="2">
+            <div class="mobile-hero-photo mobile-form-photo">
+                <img
+                    src="/images/landing/prod-bag.png"
+                    alt=""
+                    id="mobile-form-photo-img"
+                    loading="lazy"
+                />
+                <img
+                    src="/images/landing/prod-tulips.png"
+                    alt=""
+                    class="mobile-hero-flower"
+                    loading="lazy"
+                />
+            </div>
+
+            <div class="mobile-content">
+                <h2 class="mobile-form-title" id="mobile-form-title">
+                    Partner With Us <span class="heart-icon">♡</span>
+                </h2>
+                <p class="mobile-form-desc" id="mobile-form-desc">
+                    We love collaborating with brands, boutiques, creators and
+                    businesses who value handmade goodness. Let's build
+                    something beautiful together.
+                </p>
+
+                <form class="mobile-contact-form" id="mobile-contact-form">
+                    <label class="field field-subject">
+                        <span class="field-label">Subject (automatic)</span>
+                        <span class="subject-display">
+                            <span
+                                id="mobile-subject-icon"
+                                set:html={ICONS.handshake}
+                            />
+                            <span id="mobile-subject-text"
+                                >Partnership Inquiry</span
+                            >
+                            <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                class="lock-icon"
+                                ><rect
+                                    x="3"
+                                    y="11"
+                                    width="18"
+                                    height="11"
+                                    rx="2"></rect><path
+                                    d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg
+                            >
+                        </span>
+                    </label>
+
+                    <label class="field">
+                        <span class="field-label">Your Name</span>
+                        <input
+                            type="text"
+                            name="name"
+                            id="mf-name"
+                            placeholder="Enter your full name"
+                            required
+                        />
+                    </label>
+
+                    <label class="field">
+                        <span class="field-label">Email Address</span>
+                        <input
+                            type="email"
+                            name="email"
+                            id="mf-email"
+                            placeholder="Enter your email"
+                            required
+                        />
+                    </label>
+
+                    <!-- Dynamic topic-specific fields render here -->
+                    <div id="mobile-dynamic-fields"></div>
+
+                    <label class="field field-full">
+                        <span class="field-label">Additional Message</span>
+                        <textarea
+                            name="message"
+                            id="mf-message"
+                            rows="4"
+                            placeholder="Anything else you'd like to share..."
+                        ></textarea>
+                    </label>
+
+                    <p class="form-note mobile-form-note">
+                        <span class="heart-icon">♡</span> We read every message and
+                        value every connection.
+                    </p>
+
+                    <button
+                        type="submit"
+                        class="kn-btn-primary mobile-submit-btn"
+                        id="mobile-submit-btn"
+                    >
+                        <span id="mobile-submit-label">Send Message</span>
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            ><line x1="22" y1="2" x2="11" y2="13"
+                            ></line><polygon points="22 2 15 22 11 13 2 9 22 2"
+                            ></polygon></svg
+                        >
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- ── SCREEN 3: Thank you ── -->
+        <section class="mobile-screen" data-screen="3">
+            <div class="mobile-content thankyou-content">
+                <div class="thankyou-icon-wrap">
+                    <span class="thankyou-heart-mini thankyou-heart-1">♡</span>
+                    <span class="thankyou-heart-mini thankyou-heart-2">♡</span>
+                    <svg
+                        width="46"
+                        height="46"
+                        viewBox="0 0 24 24"
+                        fill="var(--kn-rose)"
+                        stroke="none"
+                        ><path
+                            d="M12 21s-7.5-4.9-10-9.6C.5 7.8 2.4 4 6 4c2 0 3.6 1.1 4.5 2.7C11.4 5.1 13 4 15 4c3.6 0 5.5 3.8 4 7.4C19.5 16.1 12 21 12 21z"
+                        ></path></svg
+                    >
+                </div>
+
+                <h1 class="thankyou-title">
+                    Thank you! <span class="heart-icon">♡</span>
+                </h1>
+                <p class="thankyou-sub">
+                    Your message has been received and means a lot to us.
+                </p>
+                <p class="thankyou-sub">
+                    We'll get back to you within 1–2 business days.
+                </p>
+
+                <div class="thankyou-basket-wrap">
+                    <img
+                        src="/images/landing/prod-yarn.png"
+                        alt="Basket of hand-dyed yarn"
+                        loading="lazy"
+                    />
+                    <div class="basket-tag">
+                        <p>Made<br />with love.</p>
+                        <span class="heart-icon">♡</span>
+                    </div>
+                </div>
+
+                <div class="next-steps-card">
+                    <p class="next-steps-heading">What happens next?</p>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <span class="timeline-icon">
+                                <svg
+                                    width="18"
+                                    height="18"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.8"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    ><rect
+                                        x="2"
+                                        y="5"
+                                        width="20"
+                                        height="14"
+                                        rx="2"></rect><path d="M2 7l10 6 10-6"
+                                    ></path></svg
+                                >
+                            </span>
+                            <span>
+                                <span class="timeline-title"
+                                    >We've received your message</span
+                                >
+                                <span class="timeline-desc"
+                                    >You'll get a confirmation email shortly.</span
+                                >
+                            </span>
+                        </div>
+                        <div class="timeline-item">
+                            <span class="timeline-icon">
+                                <svg
+                                    width="18"
+                                    height="18"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.8"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    ><circle cx="12" cy="12" r="9"
+                                    ></circle><path d="M8 12l2.5 2.5L16 9"
+                                    ></path></svg
+                                >
+                            </span>
+                            <span>
+                                <span class="timeline-title"
+                                    >Our team will review it</span
+                                >
+                                <span class="timeline-desc"
+                                    >We read every message personally.</span
+                                >
+                            </span>
+                        </div>
+                        <div class="timeline-item">
+                            <span class="timeline-icon">
+                                <svg
+                                    width="18"
+                                    height="18"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.8"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    ><path
+                                        d="M20.8 8.6c0 5.6-8.8 10.9-8.8 10.9S3.2 14.2 3.2 8.6a4.8 4.8 0 0 1 8.8-2.7 4.8 4.8 0 0 1 8.8 2.7z"
+                                    ></path></svg
+                                >
+                            </span>
+                            <span>
+                                <span class="timeline-title"
+                                    >We'll get back to you</span
+                                >
+                                <span class="timeline-desc"
+                                    >Within 1–2 business days on your preferred
+                                    method.</span
+                                >
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <a href="/" class="kn-btn-primary thankyou-home-btn">
+                    <svg
+                        width="15"
+                        height="15"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        ><path d="M3 9l9-7 9 7"></path><path d="M5 10v10h14V10"
+                        ></path></svg
+                    >
+                    Back to Home
+                </a>
+
+                <p class="thankyou-follow">
+                    Follow our journey <span class="heart-icon">♡</span>
+                </p>
+                <div class="thankyou-socials">
+                    <a
+                        href="https://www.instagram.com/sunfloraa.a/"
+                        aria-label="Instagram"
+                        ><svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            ><rect x="2" y="2" width="20" height="20" rx="5"
+                            ></rect><path
+                                d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"
+                            ></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"
+                            ></line></svg
+                        ></a
+                    >
+                    <a href="https://pin.it/6o5n03e3y" aria-label="Pinterest"
+                        ><svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                            ><path
+                                d="M12 0a12 12 0 0 0-4.37 23.17c-.1-.94-.2-2.37.04-3.4l1.39-5.9s-.36-.71-.36-1.76c0-1.64.95-2.87 2.14-2.87 1.01 0 1.5.76 1.5 1.66 0 1.02-.65 2.54-.98 3.95-.28 1.18.59 2.14 1.76 2.14 2.11 0 3.73-2.22 3.73-5.44 0-2.84-2.04-4.83-4.96-4.83-3.38 0-5.36 2.53-5.36 5.15 0 1.02.39 2.11.88 2.71.1.12.11.22.08.34l-.33 1.34c-.05.22-.17.27-.4.16-1.49-.69-2.42-2.87-2.42-4.62 0-3.76 2.73-7.22 7.88-7.22 4.14 0 7.36 2.95 7.36 6.89 0 4.11-2.59 7.42-6.19 7.42-1.21 0-2.35-.63-2.74-1.37l-.74 2.84c-.27 1.04-1 2.35-1.49 3.15A12 12 0 1 0 12 0z"
+                            ></path></svg
+                        ></a
+                    >
+                    <a href="#" aria-label="Facebook"
+                        ><svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            ><path
+                                d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"
+                            ></path></svg
+                        ></a
+                    >
+                    <a href="mailto:sunflorabyaru@gmail.com" aria-label="Email"
+                        ><svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            ><rect x="2" y="5" width="20" height="14" rx="2"
+                            ></rect><path d="M2 7l10 6 10-6"></path></svg
+                        ></a
+                    >
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="desktop-chrome">
+        <LandingFooter />
+    </div>
+</Layout>
+
+<script define:vars={{ topicsData: topics }}>
+    const ICONS_MAP = {
+        sparkle: `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M5 5l2.8 2.8M16.2 16.2L19 19M3 12h4M17 12h4M5 19l2.8-2.8M16.2 7.8L19 5"/><circle cx="12" cy="12" r="2.4"/></svg>`,
+        handshake: `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 12l2.5 2.5a1.8 1.8 0 0 0 2.5 0l.3-.3a1.8 1.8 0 0 0 0-2.5L11 9.4"/><path d="M2 11l4-4 4.3 4.3a1.6 1.6 0 0 1 0 2.3l-.2.2a1.6 1.6 0 0 1-2.3 0"/><path d="M22 11l-4-4-5.5 5.5"/><path d="M14 15l1.5 1.5a1.6 1.6 0 0 0 2.3 0l3.2-3.2"/></svg>`,
+        compass: `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polygon points="14.5 9.5 12.8 12.8 9.5 14.5 11.2 11.2 14.5 9.5"/></svg>`,
+        box: `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg>`,
+        bulb: `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.6.5 1.1 1.4 1.1 2.2h5c0-.8.5-1.7 1.1-2.2A6 6 0 0 0 12 3z"/></svg>`,
+        "heart-alert": `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 8.6c0 5.6-8.8 10.9-8.8 10.9S3.2 14.2 3.2 8.6a4.8 4.8 0 0 1 8.8-2.7 4.8 4.8 0 0 1 8.8 2.7z"/><line x1="12" y1="7" x2="12" y2="11"/><circle cx="12" cy="13.6" r="0.6" fill="currentColor"/></svg>`,
+    };
+
+    const fieldSets = {
+        custom: [
+            {
+                id: "idea",
+                label: "What would you like us to create?",
+                type: "textarea",
+                full: true,
+                placeholder:
+                    "Describe your dream creation — character, colours, size...",
+            },
+            {
+                id: "reference",
+                label: "Reference / Inspiration Link (Optional)",
+                type: "url",
+                placeholder: "Pinterest, Instagram, or image link",
+            },
+            {
+                id: "budget",
+                label: "Budget Range",
+                type: "select",
+                options: [
+                    "Under ₹500",
+                    "₹500 – ₹1000",
+                    "₹1000 – ₹2500",
+                    "₹2500+",
+                    "Not sure yet",
+                ],
+            },
+            {
+                id: "timeline",
+                label: "Needed By (if any)",
+                type: "text",
+                placeholder: "e.g. Within 2 weeks / No rush",
+            },
+        ],
+        partner: [
+            {
+                id: "business",
+                label: "Business / Brand Name",
+                type: "text",
+                placeholder: "Your brand or company name",
+            },
+            {
+                id: "website",
+                label: "Website / Social Media (Optional)",
+                type: "url",
+                placeholder: "Link to your website or Instagram",
+            },
+            {
+                id: "collab",
+                label: "How would you like to collaborate?",
+                type: "textarea",
+                full: true,
+                placeholder: "Tell us about your idea or proposal",
+            },
+            {
+                id: "quantity",
+                label: "Expected Order Quantity (if applicable)",
+                type: "text",
+                placeholder: "e.g. 50 pieces per month",
+            },
+            {
+                id: "contactMethod",
+                label: "Preferred Contact Method",
+                type: "select",
+                options: ["Email", "WhatsApp", "Phone Call", "Instagram DM"],
+            },
+        ],
+        journey: [
+            {
+                id: "role",
+                label: "What role interests you?",
+                type: "select",
+                options: [
+                    "Collaborator",
+                    "Intern",
+                    "Local Reseller",
+                    "Something else",
+                ],
+            },
+            {
+                id: "about",
+                label: "Tell us about yourself",
+                type: "textarea",
+                full: true,
+                placeholder:
+                    "Your experience, skills, or what excites you about Sunflora",
+            },
+            {
+                id: "portfolio",
+                label: "Portfolio / Instagram Link (Optional)",
+                type: "url",
+                placeholder: "Link to your work or profile",
+            },
+        ],
+        support: [
+            {
+                id: "orderNumber",
+                label: "Order Number",
+                type: "text",
+                placeholder: "e.g. SF-10234",
+            },
+            {
+                id: "issueType",
+                label: "What do you need help with?",
+                type: "select",
+                options: [
+                    "Order Status / Delay",
+                    "Change to my Order",
+                    "Shipping Address Update",
+                    "Damaged / Wrong Item",
+                    "Other",
+                ],
+            },
+        ],
+        feedback: [
+            {
+                id: "feedbackType",
+                label: "What's on your mind?",
+                type: "select",
+                options: [
+                    "Product Feedback",
+                    "Website Feedback",
+                    "An Idea or Suggestion",
+                    "Just a Compliment ♡",
+                ],
+            },
+        ],
+        wrong: [
+            {
+                id: "orderNumber",
+                label: "Order Number (if applicable)",
+                type: "text",
+                placeholder: "e.g. SF-10234",
+            },
+            {
+                id: "wrongType",
+                label: "What went wrong?",
+                type: "select",
+                options: [
+                    "Payment Issue",
+                    "Shipping Problem",
+                    "Product Issue",
+                    "Website Bug",
+                    "Other",
+                ],
+            },
+        ],
+    };
+
+    const topicsById = Object.fromEntries(topicsData.map((t) => [t.id, t]));
+
+    const grid = document.getElementById("topic-grid");
+    const noteCard = document.getElementById("note-card");
+    const noteIcon = document.getElementById("note-icon");
+    const noteTitle = document.getElementById("note-title");
+    const noteDesc = document.getElementById("note-desc");
+    const subjectIcon = document.getElementById("subject-icon");
+    const subjectText = document.getElementById("subject-text");
+    const dynamicFields = document.getElementById("dynamic-fields");
+
+    function renderFieldsInto(container, topicId) {
+        container.innerHTML = "";
+        const fields = fieldSets[topicId] || [];
+        let row = null;
+
+        fields.forEach((f, i) => {
+            const wrapClass = f.full ? "field field-full" : "field";
+            const el = document.createElement("label");
+            el.className = wrapClass;
+
+            const labelEl = document.createElement("span");
+            labelEl.className = "field-label";
+            labelEl.textContent = f.label;
+            el.appendChild(labelEl);
+
+            let input;
+            if (f.type === "textarea") {
+                input = document.createElement("textarea");
+                input.rows = 3;
+                input.placeholder = f.placeholder || "";
+            } else if (f.type === "select") {
+                input = document.createElement("select");
+                const blank = document.createElement("option");
+                blank.value = "";
+                blank.textContent = "Please select...";
+                blank.disabled = true;
+                blank.selected = true;
+                input.appendChild(blank);
+                (f.options || []).forEach((opt) => {
+                    const o = document.createElement("option");
+                    o.value = opt;
+                    o.textContent = opt;
+                    input.appendChild(o);
+                });
+            } else {
+                input = document.createElement("input");
+                input.type = f.type || "text";
+                input.placeholder = f.placeholder || "";
+            }
+            input.name = f.id;
+            input.id = `f-${f.id}`;
+            el.appendChild(input);
+
+            if (f.full) {
+                container.appendChild(el);
+                row = null;
+            } else {
+                if (!row) {
+                    row = document.createElement("div");
+                    row.className = "field-row";
+                    container.appendChild(row);
+                }
+                row.appendChild(el);
+                if (row.children.length >= 2) row = null;
+            }
+        });
+    }
+
+    function selectTopic(id) {
+        const topic = topicsById[id];
+        if (!topic) return;
+
+        grid.querySelectorAll(".topic-card").forEach((card) => {
+            const active = card.dataset.topic === id;
+            card.classList.toggle("active", active);
+            card.setAttribute("aria-pressed", active ? "true" : "false");
+        });
+
+        noteIcon.innerHTML = ICONS_MAP[topic.icon] || "";
+        noteTitle.textContent = topic.noteTitle;
+        noteDesc.textContent = topic.noteDesc;
+        subjectIcon.innerHTML = ICONS_MAP[topic.icon] || "";
+        subjectText.textContent = topic.subject;
+
+        renderFieldsInto(dynamicFields, id);
+    }
+
+    grid.querySelectorAll(".topic-card").forEach((card) => {
+        card.addEventListener("click", () => selectTopic(card.dataset.topic));
+    });
+
+    // Initial state: "Partner With Us" pre-selected, matching the reference design
+    selectTopic("partner");
+
+    // ── Form submission ──
+    const form = document.getElementById("contact-form");
+    const submitBtn = document.getElementById("submit-btn");
+    const submitLabel = document.getElementById("submit-label");
+    const successMsg = document.getElementById("form-success");
+
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const activeCard = grid.querySelector(".topic-card.active");
+        const topicId = activeCard ? activeCard.dataset.topic : "partner";
+        const topic = topicsById[topicId];
+
+        const payload = {
+            topic: topicId,
+            subject: topic.subject,
+            name: document.getElementById("f-name").value,
+            email: document.getElementById("f-email").value,
+            message: document.getElementById("f-message").value,
+            details: Object.fromEntries(new FormData(form).entries()),
+        };
+
+        submitBtn.disabled = true;
+        submitLabel.textContent = "Sending...";
+
+        try {
+            // Wire this up to your backend of choice (Supabase, a form API, etc.)
+            // Example, matching this project's existing Supabase pattern:
+            //
+            // const { createClient } = await import("@supabase/supabase-js");
+            // const supabase = createClient(import.meta.env.SUPABASE_URL, import.meta.env.SUPABASE_KEY);
+            // await supabase.from("contact_messages").insert(payload);
+
+            await new Promise((res) => setTimeout(res, 500)); // simulated latency
+
+            form.reset();
+            renderFieldsInto(dynamicFields, topicId);
+            successMsg.hidden = false;
+            submitLabel.textContent = "Send Message";
+        } catch (err) {
+            console.error("Contact form submission failed:", err);
+            submitLabel.textContent = "Send Message";
+            alert(
+                "Something went wrong sending your message — please try again.",
+            );
+        } finally {
+            submitBtn.disabled = false;
+        }
+    });
+
+    // ══════════════════════════════════════════════
+    // MOBILE STEP-FLOW (screens < 768px)
+    // ══════════════════════════════════════════════
+    const mobileFlow = document.getElementById("mobile-flow");
+    if (mobileFlow) {
+        const screens = mobileFlow.querySelectorAll(".mobile-screen");
+        const backBtn = document.getElementById("mobile-back-btn");
+        const topicListEl = document.getElementById("mobile-topic-list");
+        const mDynamicFields = document.getElementById("mobile-dynamic-fields");
+        const mFormTitle = document.getElementById("mobile-form-title");
+        const mFormDesc = document.getElementById("mobile-form-desc");
+        const mSubjectIcon = document.getElementById("mobile-subject-icon");
+        const mSubjectText = document.getElementById("mobile-subject-text");
+        const mForm = document.getElementById("mobile-contact-form");
+        const mSubmitBtn = document.getElementById("mobile-submit-btn");
+        const mSubmitLabel = document.getElementById("mobile-submit-label");
+        const hamburgerBtn = document.getElementById("mobile-hamburger-btn");
+        const drawer = document.getElementById("mobile-drawer");
+
+        let mobileTopicId = "partner";
+
+        function showScreen(n) {
+            screens.forEach((s) =>
+                s.classList.toggle("active", s.dataset.screen === String(n)),
+            );
+            backBtn.hidden = n !== 2;
+            mobileFlow.scrollTo({ top: 0, behavior: "instant" });
+            window.scrollTo({ top: 0, behavior: "instant" });
+        }
+
+        function loadMobileTopic(id) {
+            const topic = topicsById[id];
+            if (!topic) return;
+            mobileTopicId = id;
+            mFormTitle.innerHTML = `${topic.noteTitle} <span class="heart-icon">♡</span>`;
+            mFormDesc.textContent = topic.noteDesc;
+            mSubjectIcon.innerHTML = ICONS_MAP[topic.icon] || "";
+            mSubjectText.textContent = topic.subject;
+            renderFieldsInto(mDynamicFields, id);
+        }
+
+        topicListEl.querySelectorAll(".mobile-topic-row").forEach((row) => {
+            row.addEventListener("click", () => {
+                loadMobileTopic(row.dataset.topic);
+                showScreen(2);
+            });
+        });
+
+        backBtn.addEventListener("click", () => showScreen(1));
+
+        mForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            mSubmitBtn.disabled = true;
+            mSubmitLabel.textContent = "Sending...";
+
+            const payload = {
+                topic: mobileTopicId,
+                subject: topicsById[mobileTopicId]?.subject,
+                details: Object.fromEntries(new FormData(mForm).entries()),
+            };
+
+            try {
+                // Same backend hook as the desktop form — see comment above.
+                await new Promise((res) => setTimeout(res, 500));
+                mForm.reset();
+                showScreen(3);
+            } catch (err) {
+                console.error("Contact form submission failed:", err);
+                alert(
+                    "Something went wrong sending your message — please try again.",
+                );
+            } finally {
+                mSubmitBtn.disabled = false;
+                mSubmitLabel.textContent = "Send Message";
+            }
+        });
+
+        hamburgerBtn.addEventListener("click", () =>
+            drawer.classList.toggle("open"),
+        );
+        drawer
+            .querySelectorAll("a")
+            .forEach((a) =>
+                a.addEventListener("click", () =>
+                    drawer.classList.remove("open"),
+                ),
+            );
+
+        loadMobileTopic("partner");
+    }
+
+    // ── Fade-up on scroll (matches the rest of the site) ──
+    const observer = new IntersectionObserver(
+        (entries) => {
+            entries.forEach((el) => {
+                if (el.isIntersecting) {
+                    el.target.classList.add("in-view");
+                    observer.unobserve(el.target);
+                }
+            });
+        },
+        { threshold: 0.08, rootMargin: "-60px 0px" },
+    );
+    document
+        .querySelectorAll(".kn-fade-up")
+        .forEach((el) => observer.observe(el));
+</script>
+
+<style>
+    .contact-page {
+        padding-top: 96px;
+    }
+
+    .heart-icon {
+        color: var(--kn-rose-light);
+        display: inline-block;
+    }
+
+    /* ── Hero ── */
+    .contact-hero {
+        padding: 48px 0 40px;
+        position: relative;
+    }
+
+    .contact-hero-inner {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 40px;
+        align-items: start;
+    }
+
+    .contact-eyebrow {
+        display: inline-block;
+        font-family: var(--kn-font-body);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--kn-rose);
+        margin-bottom: 18px;
+    }
+
+    .contact-heading {
+        font-family: var(--kn-font-heading);
+        font-size: clamp(34px, 4.4vw, 54px);
+        font-weight: 700;
+        line-height: 1.12;
+        color: var(--kn-brown);
+        margin-bottom: 20px;
+    }
+
+    .contact-sub {
+        font-family: var(--kn-font-body);
+        font-size: 15px;
+        line-height: 1.75;
+        color: var(--kn-brown-light);
+        max-width: 42ch;
+    }
+
+    .contact-hero-visual {
+        position: relative;
+        min-height: 220px;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding-top: 4px;
+    }
+
+    .hero-visual-label {
+        position: absolute;
+        top: -8px;
+        left: 4%;
+        font-family: var(--kn-font-script);
+        font-size: 20px;
+        color: var(--kn-rose);
+        transform: rotate(-3deg);
+    }
+
+    .deco {
+        position: absolute;
+        pointer-events: none;
+    }
+
+    .deco-yarn {
+        top: 30px;
+        right: 4%;
+        width: 110px;
+        height: auto;
+    }
+
+    .deco-teddy {
+        top: 90px;
+        right: 22%;
+        width: 130px;
+        height: auto;
+    }
+
+    .deco-tag {
+        top: 10px;
+        right: 40%;
+        background: var(--kn-white);
+        border-radius: var(--kn-radius-sm);
+        padding: 14px 18px;
+        box-shadow: 0 8px 24px rgba(92, 61, 46, 0.1);
+        transform: rotate(4deg);
+        max-width: 150px;
+    }
+
+    .deco-tag p {
+        font-family: var(--kn-font-script);
+        font-size: 15px;
+        color: var(--kn-brown-light);
+        line-height: 1.35;
+    }
+
+    .deco-tag .heart-icon {
+        margin-top: 4px;
+        font-size: 13px;
+    }
+
+    /* ── Topic selector ── */
+    .topic-section {
+        padding: 8px 0 40px;
+    }
+
+    .topic-grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 16px;
+    }
+
+    .topic-card {
+        position: relative;
+        background: var(--kn-white);
+        border: 1.5px solid var(--kn-taupe);
+        border-radius: var(--kn-radius-md);
+        padding: 22px 14px 18px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 8px;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        font-family: var(--kn-font-body);
+    }
+
+    .topic-card:hover {
+        border-color: var(--kn-rose-soft);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 26px rgba(92, 61, 46, 0.08);
+    }
+
+    .topic-card.active {
+        border-color: var(--kn-rose);
+        box-shadow: 0 10px 26px rgba(139, 69, 87, 0.14);
+    }
+
+    .topic-check {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: var(--kn-rose);
+        color: var(--kn-white);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transform: scale(0.7);
+        transition: all 0.2s ease;
+    }
+
+    .topic-card.active .topic-check {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    .topic-icon {
+        color: var(--kn-rose);
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: var(--kn-pink-bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 4px;
+    }
+
+    .topic-title {
+        font-size: 13.5px;
+        font-weight: 700;
+        color: var(--kn-brown);
+        line-height: 1.3;
+    }
+
+    .topic-desc {
+        font-size: 11.5px;
+        color: var(--kn-brown-muted);
+        line-height: 1.5;
+    }
+
+    .topic-hint {
+        text-align: center;
+        font-family: var(--kn-font-script);
+        font-size: 18px;
+        color: var(--kn-brown-light);
+        margin-top: 28px;
+    }
+
+    .topic-hint .heart-icon {
+        font-size: 14px;
+    }
+
+    /* ── Form section ── */
+    .form-section {
+        padding: 24px 0 var(--kn-section-py);
+    }
+
+    .form-grid {
+        background: var(--kn-cream-alt);
+        border-radius: var(--kn-radius-xl);
+        padding: 48px;
+        display: grid;
+        grid-template-columns: 0.85fr 1.4fr;
+        gap: 48px;
+        align-items: start;
+    }
+
+    .note-wrap {
+        position: relative;
+    }
+
+    .note-card {
+        position: relative;
+        background: var(--kn-white);
+        border-radius: var(--kn-radius-md);
+        padding: 40px 32px;
+        text-align: center;
+        box-shadow: 0 12px 32px rgba(92, 61, 46, 0.08);
+    }
+
+    .note-tape {
+        position: absolute;
+        top: -10px;
+        left: 24px;
+        width: 56px;
+        height: 22px;
+        background: rgba(212, 112, 143, 0.28);
+        transform: rotate(-6deg);
+        border-radius: 2px;
+    }
+
+    .note-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: var(--kn-pink-bg);
+        color: var(--kn-rose);
+        margin-bottom: 16px;
+    }
+
+    .note-title {
+        font-family: var(--kn-font-heading);
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--kn-brown);
+        margin-bottom: 14px;
+    }
+
+    .note-desc {
+        font-family: var(--kn-font-body);
+        font-size: 13.5px;
+        line-height: 1.75;
+        color: var(--kn-brown-light);
+    }
+
+    .note-heart {
+        display: block;
+        margin-top: 18px;
+        font-size: 16px;
+    }
+
+    .note-yarn-deco {
+        position: absolute;
+        bottom: -36px;
+        left: -10px;
+        width: 96px;
+        opacity: 0.85;
+        pointer-events: none;
+    }
+
+    /* ── Form fields ── */
+    .contact-form {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .field-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+        margin-bottom: 0;
+    }
+
+    .field-row .field {
+        margin: 0;
+    }
+
+    .field-full {
+        width: 100%;
+    }
+
+    .field-label {
+        font-family: var(--kn-font-body);
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--kn-brown);
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+        font-family: var(--kn-font-body);
+        font-size: 13.5px;
+        color: var(--kn-brown);
+        background: var(--kn-white);
+        border: 1px solid var(--kn-taupe);
+        border-radius: var(--kn-radius-sm);
+        padding: 12px 14px;
+        outline: none;
+        transition: border-color 0.2s ease;
+        resize: vertical;
+        width: 100%;
+    }
+
+    .field input::placeholder,
+    .field textarea::placeholder {
+        color: var(--kn-brown-muted);
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+        border-color: var(--kn-rose-light);
+    }
+
+    .subject-display {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--kn-white);
+        border: 1px solid var(--kn-taupe);
+        border-radius: var(--kn-radius-sm);
+        padding: 12px 14px;
+        font-family: var(--kn-font-body);
+        font-size: 13.5px;
+        font-weight: 600;
+        color: var(--kn-brown);
+    }
+
+    .subject-display :global(svg) {
+        color: var(--kn-rose);
+        flex-shrink: 0;
+    }
+
+    #subject-icon {
+        display: flex;
+        align-items: center;
+    }
+
+    #subject-icon :global(svg) {
+        width: 18px;
+        height: 18px;
+    }
+
+    #subject-text {
+        flex: 1;
+    }
+
+    .lock-icon {
+        color: var(--kn-brown-muted) !important;
+    }
+
+    .form-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-top: 8px;
+    }
+
+    .form-note {
+        font-family: var(--kn-font-body);
+        font-size: 12.5px;
+        color: var(--kn-brown-muted);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .form-success {
+        font-family: var(--kn-font-body);
+        font-size: 13px;
+        color: var(--kn-rose);
+        background: var(--kn-pink-bg);
+        border-radius: var(--kn-radius-sm);
+        padding: 14px 16px;
+        text-align: center;
+    }
+
+    /* ── Next steps strip ── */
+    .next-strip {
+        background: var(--kn-cream-dark);
+        padding: 56px 0;
+    }
+
+    .next-strip-inner {
+        display: grid;
+        grid-template-columns: auto auto 1fr;
+        gap: 36px;
+        align-items: center;
+    }
+
+    .polaroid-wrap {
+        display: flex;
+        align-items: center;
+        gap: -20px;
+        position: relative;
+    }
+
+    .polaroid {
+        background: var(--kn-white);
+        padding: 10px 10px 14px;
+        box-shadow: 0 10px 28px rgba(92, 61, 46, 0.12);
+        transform: rotate(-4deg);
+        width: 150px;
+    }
+
+    .polaroid img {
+        width: 100%;
+        height: 110px;
+        object-fit: cover;
+        display: block;
+    }
+
+    .sticky-note {
+        background: var(--kn-white);
+        border-radius: var(--kn-radius-sm);
+        padding: 16px 18px;
+        box-shadow: 0 10px 28px rgba(92, 61, 46, 0.1);
+        transform: rotate(3deg);
+        margin-left: -30px;
+        max-width: 190px;
+    }
+
+    .sticky-title {
+        font-family: var(--kn-font-script);
+        font-size: 20px;
+        color: var(--kn-rose);
+        margin-bottom: 4px;
+    }
+
+    .sticky-body {
+        font-family: var(--kn-font-body);
+        font-size: 12px;
+        color: var(--kn-brown-light);
+        line-height: 1.5;
+    }
+
+    .envelope-deco {
+        opacity: 0.8;
+    }
+
+    .next-title {
+        font-family: var(--kn-font-heading);
+        font-size: 19px;
+        font-weight: 700;
+        color: var(--kn-brown);
+        margin-bottom: 6px;
+    }
+
+    .next-body {
+        font-family: var(--kn-font-body);
+        font-size: 13.5px;
+        color: var(--kn-brown-light);
+        line-height: 1.6;
+    }
+
+    .made-with-love {
+        text-align: center;
+        font-family: var(--kn-font-script);
+        font-size: 16px;
+        color: var(--kn-brown-muted);
+        padding: 28px 0 40px;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 1100px) {
+        .topic-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+        .form-grid {
+            grid-template-columns: 1fr;
+            padding: 32px;
+        }
+        .note-yarn-deco {
+            display: none;
+        }
+        .contact-hero-inner {
+            grid-template-columns: 1fr;
+        }
+        .contact-hero-visual {
+            display: none;
+        }
+        .next-strip-inner {
+            grid-template-columns: 1fr;
+            text-align: center;
+            justify-items: center;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .topic-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        .field-row {
+            grid-template-columns: 1fr;
+        }
+        .form-grid {
+            padding: 24px;
+            border-radius: var(--kn-radius-lg);
+        }
+        .form-footer {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .form-footer .kn-btn-primary {
+            justify-content: center;
+        }
+    }
+
+    /* ══════════════════════════════════════════════
+     MOBILE STEP-FLOW
+     Hidden by default; swapped in for the desktop
+     flow below 768px.
+  ══════════════════════════════════════════════ */
+    .mobile-flow {
+        display: none;
+    }
+
+    @media (max-width: 767px) {
+        .desktop-chrome,
+        .desktop-flow {
+            display: none !important;
+        }
+        .mobile-flow {
+            display: block;
+            background: var(--kn-cream);
+            min-height: 100vh;
+        }
+    }
+
+    .mobile-screen {
+        display: none;
+    }
+    .mobile-screen.active {
+        display: block;
+        animation: mobileScreenIn 0.25s ease;
+    }
+    @keyframes mobileScreenIn {
+        from {
+            opacity: 0;
+            transform: translateY(8px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* ── App bar ── */
+    .mobile-appbar {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 18px;
+        background: rgba(255, 248, 240, 0.95);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(232, 213, 196, 0.5);
+    }
+
+    .mobile-back-btn {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        background: none;
+        border: none;
+        font-family: var(--kn-font-body);
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--kn-brown);
+        cursor: pointer;
+        padding: 4px 2px;
+    }
+
+    .mobile-appbar > *:first-child {
+        min-width: 56px;
+    }
+
+    .mobile-logo {
+        font-family: var(--kn-font-script);
+        font-size: 22px;
+        color: var(--kn-brown);
+        text-decoration: none;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .mobile-hamburger {
+        margin-left: auto;
+        background: none;
+        border: none;
+        color: var(--kn-brown);
+        cursor: pointer;
+        padding: 4px;
+    }
+
+    .mobile-drawer {
+        position: fixed;
+        top: 0;
+        right: 0;
+        height: 100%;
+        width: 72%;
+        max-width: 280px;
+        background: var(--kn-white);
+        box-shadow: -8px 0 32px rgba(92, 61, 46, 0.18);
+        z-index: 60;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        padding: 90px 28px 28px;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+    }
+
+    .mobile-drawer.open {
+        transform: translateX(0);
+    }
+
+    .mobile-drawer a {
+        font-family: var(--kn-font-heading);
+        font-size: 18px;
+        color: var(--kn-brown);
+        text-decoration: none;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--kn-taupe-light);
+    }
+
+    .mobile-drawer a.active {
+        color: var(--kn-rose);
+    }
+
+    /* ── Hero photo ── */
+    .mobile-hero-photo {
+        position: relative;
+        height: 220px;
+        overflow: hidden;
+    }
+
+    .mobile-hero-photo > img:first-child {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .mobile-hero-yarn {
+        position: absolute !important;
+        top: 14px;
+        left: 14px;
+        width: 60px !important;
+        height: auto !important;
+    }
+
+    .mobile-hero-flower {
+        position: absolute !important;
+        bottom: -14px;
+        left: 14px;
+        width: 56px !important;
+        height: auto !important;
+        filter: drop-shadow(0 6px 10px rgba(92, 61, 46, 0.2));
+    }
+
+    .mobile-hero-tag {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        background: var(--kn-white);
+        border-radius: var(--kn-radius-sm);
+        padding: 10px 14px;
+        box-shadow: 0 8px 20px rgba(92, 61, 46, 0.15);
+        transform: rotate(3deg);
+        max-width: 110px;
+    }
+
+    .mobile-hero-tag p {
+        font-family: var(--kn-font-script);
+        font-size: 13px;
+        line-height: 1.3;
+        color: var(--kn-brown-light);
+    }
+
+    .mobile-hero-tag .heart-icon {
+        font-size: 12px;
+    }
+
+    /* ── Content ── */
+    .mobile-content {
+        padding: 24px 20px 40px;
+    }
+
+    .mobile-content .contact-eyebrow {
+        margin-bottom: 12px;
+    }
+
+    .mobile-content .contact-heading {
+        font-size: 30px;
+        margin-bottom: 14px;
+    }
+
+    .mobile-content .contact-sub {
+        font-size: 14px;
+        max-width: none;
+    }
+
+    .mobile-hint {
+        font-family: var(--kn-font-script);
+        font-size: 17px;
+        color: var(--kn-rose);
+        margin: 24px 0 14px;
+    }
+
+    /* ── Topic list ── */
+    .mobile-topic-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .mobile-topic-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        background: var(--kn-white);
+        border: 1px solid var(--kn-taupe-light);
+        border-radius: var(--kn-radius-md);
+        padding: 14px 16px;
+        text-align: left;
+        cursor: pointer;
+        transition:
+            border-color 0.2s ease,
+            transform 0.2s ease;
+    }
+
+    .mobile-topic-row:active {
+        transform: scale(0.98);
+    }
+
+    .mobile-topic-row:hover {
+        border-color: var(--kn-rose-soft);
+    }
+
+    .mtr-icon {
+        flex-shrink: 0;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: var(--kn-pink-bg);
+        color: var(--kn-rose);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .mtr-icon :global(svg) {
+        width: 22px;
+        height: 22px;
+    }
+
+    .mtr-text {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .mtr-title {
+        font-family: var(--kn-font-body);
+        font-size: 14.5px;
+        font-weight: 700;
+        color: var(--kn-brown);
+    }
+
+    .mtr-desc {
+        font-family: var(--kn-font-body);
+        font-size: 12px;
+        color: var(--kn-brown-muted);
+        line-height: 1.4;
+    }
+
+    .mtr-chevron {
+        flex-shrink: 0;
+        color: var(--kn-brown-muted);
+    }
+
+    .mobile-footnote {
+        margin-top: 24px;
+        text-align: center;
+        font-family: var(--kn-font-body);
+        font-size: 12px;
+        color: var(--kn-brown-muted);
+        border: 1px dashed var(--kn-rose-soft);
+        border-radius: var(--kn-radius-md);
+        padding: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+
+    /* ── Form screen ── */
+    .mobile-form-title {
+        font-family: var(--kn-font-heading);
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--kn-brown);
+        margin-bottom: 10px;
+    }
+
+    .mobile-form-desc {
+        font-family: var(--kn-font-body);
+        font-size: 13.5px;
+        line-height: 1.7;
+        color: var(--kn-brown-light);
+        margin-bottom: 24px;
+    }
+
+    .mobile-contact-form {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .mobile-form-note {
+        justify-content: center;
+        margin-top: 4px;
+    }
+
+    .mobile-submit-btn {
+        width: 100%;
+        justify-content: center;
+        margin-top: 4px;
+    }
+
+    /* ── Thank-you screen ── */
+    .thankyou-content {
+        text-align: center;
+        padding-top: 36px;
+    }
+
+    .thankyou-icon-wrap {
+        position: relative;
+        width: 96px;
+        height: 96px;
+        margin: 0 auto 20px;
+        border-radius: 50%;
+        border: 2px solid rgba(212, 112, 143, 0.35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .thankyou-heart-mini {
+        position: absolute;
+        color: var(--kn-rose-light);
+        font-size: 16px;
+        opacity: 0.7;
+    }
+
+    .thankyou-heart-1 {
+        top: -8px;
+        right: -6px;
+    }
+
+    .thankyou-heart-2 {
+        bottom: -4px;
+        left: -10px;
+        font-size: 12px;
+    }
+
+    .thankyou-title {
+        font-family: var(--kn-font-heading);
+        font-size: 30px;
+        font-weight: 700;
+        color: var(--kn-brown);
+        margin-bottom: 14px;
+    }
+
+    .thankyou-sub {
+        font-family: var(--kn-font-body);
+        font-size: 14px;
+        line-height: 1.6;
+        color: var(--kn-brown-light);
+        max-width: 32ch;
+        margin: 0 auto 4px;
+    }
+
+    .thankyou-basket-wrap {
+        position: relative;
+        display: inline-block;
+        margin: 28px auto 24px;
+    }
+
+    .thankyou-basket-wrap img {
+        width: 220px;
+        border-radius: var(--kn-radius-md);
+    }
+
+    .basket-tag {
+        position: absolute;
+        bottom: -10px;
+        right: -14px;
+        background: var(--kn-white);
+        border-radius: var(--kn-radius-sm);
+        padding: 8px 12px;
+        box-shadow: 0 8px 20px rgba(92, 61, 46, 0.15);
+        transform: rotate(-3deg);
+    }
+
+    .basket-tag p {
+        font-family: var(--kn-font-script);
+        font-size: 13px;
+        line-height: 1.25;
+        color: var(--kn-brown-light);
+    }
+
+    .basket-tag .heart-icon {
+        font-size: 11px;
+    }
+
+    .next-steps-card {
+        background: var(--kn-white);
+        border-radius: var(--kn-radius-lg);
+        padding: 24px 22px;
+        text-align: left;
+        box-shadow: 0 10px 28px rgba(92, 61, 46, 0.08);
+        margin-bottom: 28px;
+    }
+
+    .next-steps-heading {
+        font-family: var(--kn-font-body);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--kn-rose);
+        margin-bottom: 18px;
+        text-align: center;
+    }
+
+    .timeline {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .timeline-item {
+        position: relative;
+        display: flex;
+        gap: 14px;
+        padding-bottom: 22px;
+    }
+
+    .timeline-item:last-child {
+        padding-bottom: 0;
+    }
+
+    .timeline-item:not(:last-child)::after {
+        content: "";
+        position: absolute;
+        top: 36px;
+        left: 17px;
+        bottom: 4px;
+        width: 1px;
+        border-left: 1.5px dashed var(--kn-rose-soft);
+    }
+
+    .timeline-icon {
+        flex-shrink: 0;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: var(--kn-pink-bg);
+        color: var(--kn-rose);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1;
+    }
+
+    .timeline-title {
+        display: block;
+        font-family: var(--kn-font-body);
+        font-size: 13.5px;
+        font-weight: 700;
+        color: var(--kn-brown);
+        margin-bottom: 3px;
+    }
+
+    .timeline-desc {
+        display: block;
+        font-family: var(--kn-font-body);
+        font-size: 12px;
+        color: var(--kn-brown-muted);
+        line-height: 1.5;
+    }
+
+    .thankyou-home-btn {
+        width: 100%;
+        justify-content: center;
+        text-decoration: none;
+        margin-bottom: 24px;
+    }
+
+    .thankyou-follow {
+        font-family: var(--kn-font-body);
+        font-size: 12.5px;
+        color: var(--kn-brown-muted);
+        margin-bottom: 14px;
+    }
+
+    .thankyou-socials {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        padding-bottom: 32px;
+    }
+
+    .thankyou-socials a {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        border: 1px solid var(--kn-taupe);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--kn-brown-light);
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .thankyou-socials a:hover {
+        background: var(--kn-rose);
+        border-color: var(--kn-rose);
+        color: var(--kn-white);
+    }
+</style>

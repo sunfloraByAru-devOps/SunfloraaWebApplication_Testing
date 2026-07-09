@@ -1,0 +1,29 @@
+---
+import Layout from "../layouts/Layout.astro";
+import LandingNav from "../components/landing/LandingNav.astro";
+import LandingFooter from "../components/landing/LandingFooter.astro";
+import CustomComponent from "../components/Custom.astro";
+---
+
+<Layout
+  title="Custom Orders — Sunflora | Handmade Crochet"
+  description="Bring us your strangest little idea. You dream it, we'll crochet it."
+>
+  <div class="desktop-chrome">
+    <LandingNav />
+  </div>
+
+  <main class="desktop-flow">
+    <!-- Wrap in a div that pushes down from the fixed header -->
+    <div class="pt-[90px] md:pt-[100px] bg-[var(--kn-cream-alt,#FDF2E9)]">
+      <CustomComponent />
+    </div>
+  </main>
+  
+  <!-- Reuse mobile flow nav styles if needed, or rely on LandingNav which handles it -->
+  <LandingFooter />
+</Layout>
+
+<style>
+  /* Base styles inherited from Layout and global.css */
+</style>

@@ -3,10 +3,10 @@ import Logo from "../../assets/logo.png";
 const links = [
   { label: "Home", href: "/" },
   { label: "Shop", href: "/productlist", hasDropdown: true },
-  { label: "Custom Orders", href: "/#custom-orders" },
+  { label: "Custom Orders", href: "/custom" },
   { label: "About Us", href: "/#about" },
   { label: "Our Story", href: "/#story" },
-  { label: "Contact", href: "/#contact" },
+  { label: "Contact", href: "/contact" },
 ];
 
 const pathname = Astro.url.pathname;
@@ -30,10 +30,12 @@ const cleanPathname = pathname.replace(/\/$/, "");
       {
         links.map((l) => {
           const isShop = cleanPathname === "/productlist" && l.label === "Shop";
+          const isCustom = cleanPathname === "/custom" && l.label === "Custom Orders";
+          const isContact = cleanPathname === "/contact" && l.label === "Contact";
           const isHome =
             (cleanPathname === "" || cleanPathname === "/") &&
             l.label === "Home";
-          const isActive = isShop || isHome;
+          const isActive = isShop || isHome || isCustom || isContact;
           return (
             <a
               href={l.href}
