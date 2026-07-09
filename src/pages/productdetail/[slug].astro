@@ -1,7 +1,7 @@
 ---
 import { Image } from "astro:assets";
 import Layout from "../../layouts/Layout.astro";
-import Nav from "../../components/Nav.astro";
+import LandingNav from "../../components/landing/LandingNav.astro";
 import SPIDEY from "../../assets/spiderman.jpg";
 
 import PRODUCT_MAIN from "../../assets/sun_on_desk.png";
@@ -31,9 +31,17 @@ export async function getStaticPaths() {
     import.meta.env.SUPABASE_URL,
     import.meta.env.SUPABASE_KEY,
   );
-  const { data } = await supabase.from("products").select("name").eq("is_active", true);
+  const { data } = await supabase
+    .from("products")
+    .select("name")
+    .eq("is_active", true);
   const paths = (data || []).map((p: any) => ({
-    params: { slug: p.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') }
+    params: {
+      slug: p.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)+/g, ""),
+    },
   }));
   paths.push({ params: { slug: "product-not-found" } });
   return paths;
@@ -130,7 +138,10 @@ const getRelatedProducts = (currentId: any) => {
       return {
         id: r.id,
         name: r.name,
-        slug: r.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, ''),
+        slug: r.name
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/(^-|-$)+/g, ""),
         tag: r.tag || "",
         price: r.base_price,
         mrp: r.base_mrp,
@@ -147,7 +158,10 @@ const mappedProducts: Record<string, any> = {};
 
 if (allDbProducts) {
   for (const data of allDbProducts) {
-    const slug = data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+    const slug = data.name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)+/g, "");
     mappedProducts[slug] = {
       id: data.id,
       slug: slug,
@@ -186,33 +200,29 @@ if (allDbProducts) {
       includes: (data.product_includes || [])
         .sort((a: any, b: any) => a.display_order - b.display_order)
         .map((i: any) => i.item),
-      reviews: (data.reviews || [])
-        .map((r: any) => ({
-          id: r.id,
-          stars: r.stars,
-          title: r.title,
-          date: new Date(r.created_at).toLocaleDateString("en-GB", {
-            day: "numeric",
-            month: "short",
-            year: "numeric",
-          }),
-          helpful: r.helpful_count,
-          unhelpful: r.unhelpful_count,
-          author: r.profiles?.full_name || r.guest_name || "Anonymous",
-          verified: r.is_verified,
-          body: r.body,
-          photos: (r.review_photos || []).map(
-            (p: any) =>
-              supabase.storage
-                .from("review-images")
-                .getPublicUrl(p.storage_path).data.publicUrl,
-          ),
-        })),
+      reviews: (data.reviews || []).map((r: any) => ({
+        id: r.id,
+        stars: r.stars,
+        title: r.title,
+        date: new Date(r.created_at).toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        }),
+        helpful: r.helpful_count,
+        unhelpful: r.unhelpful_count,
+        author: r.profiles?.full_name || r.guest_name || "Anonymous",
+        verified: r.is_verified,
+        body: r.body,
+        photos: (r.review_photos || []).map(
+          (p: any) =>
+            supabase.storage.from("review-images").getPublicUrl(p.storage_path)
+              .data.publicUrl,
+        ),
+      })),
       ratingBreakdown: [5, 4, 3, 2, 1].map((star) => ({
         stars: star,
-        count: (data.reviews || []).filter(
-          (r: any) => r.stars === star,
-        ).length,
+        count: (data.reviews || []).filter((r: any) => r.stars === star).length,
       })),
       totalRatings: (data.reviews || []).length,
       customerInsights: (data.customer_insights || [])
@@ -233,7 +243,7 @@ if (allDbProducts) {
           ? data.product_images
               .sort((a: any, b: any) => a.display_order - b.display_order)
               .map((img: any) => ({
-                src: getImageUrl(img.storage_path, 'product-images'),
+                src: getImageUrl(img.storage_path, "product-images"),
                 alt: img.alt_text || data.name || "",
               }))
           : [{ src: getFallbackImage(data.id), alt: data.name || "" }],
@@ -279,7 +289,8 @@ const productsJson = JSON.stringify(mappedProducts);
   title={`${product.name} — ${product.brand}`}
   description={product.description}
 >
-  <Nav />
+  <LandingNav />
+  <div style="height: 72px; background-color: #fff8f0;"></div>
   <ProductBreadcrumb product={product} />
 
   <!-- MAIN PDP LAYOUT — white background -->
@@ -321,7 +332,7 @@ const productsJson = JSON.stringify(mappedProducts);
     const products = JSON.parse(productsJson);
 
     // 1. Get Product from URL Path
-    const pathParts = window.location.pathname.split('/').filter(Boolean);
+    const pathParts = window.location.pathname.split("/").filter(Boolean);
     const productSlug = pathParts[pathParts.length - 1] || "sunshine-amigurumi";
     const product = products[productSlug] || Object.values(products)[0];
 

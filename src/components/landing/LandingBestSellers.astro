@@ -37,6 +37,9 @@ const products = [
         <h2 class="kn-section-title" style="text-align:left; margin-bottom:0;">
           Most Loved
         </h2>
+        <p class="kn-section-subtitle">
+          100+ orders on these products every month
+        </p>
       </div>
       <a href="/productlist" class="kn-view-all">View All →</a>
     </div>
@@ -80,8 +83,18 @@ const products = [
       </div>
       <!-- Gradient veil on right edge with arrow -->
       <div class="sellers-veil" aria-hidden="true">
-        <svg class="veil-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--kn-rose, #D4708F)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M9 18l6-6-6-6" />
+        <svg
+          class="veil-arrow"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="var(--kn-rose, #D4708F)"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M9 18l6-6-6-6"></path>
         </svg>
       </div>
     </div>
@@ -89,6 +102,13 @@ const products = [
 </section>
 
 <style>
+  .kn-section-subtitle {
+    font-size: 0.95rem;
+    color: #8a6d5c; /* muted rust/brown, matches your View All link */
+    margin-top: 4px;
+    margin-bottom: 0;
+    font-weight: 500;
+  }
   .sellers-header {
     display: flex;
     align-items: center;
@@ -124,8 +144,15 @@ const products = [
   }
 
   @keyframes arrowPulse {
-    0%, 100% { transform: translateX(0); opacity: 0.7; }
-    50% { transform: translateX(4px); opacity: 1; }
+    0%,
+    100% {
+      transform: translateX(0);
+      opacity: 0.7;
+    }
+    50% {
+      transform: translateX(4px);
+      opacity: 1;
+    }
   }
 
   /* ── Carousel track ── */
@@ -187,11 +214,19 @@ const products = [
   }
 
   @media (max-width: 640px) {
+    .kn-section-subtitle,
+    .kn-section-subtitle-right {
+      font-size: 0.8rem;
+      margin-top: 2px;
+      margin-bottom: 8px;
+    }
+
+    /* existing rules below stay as-is */
     .sellers-carousel-wrap {
       width: 90%;
     }
     .sellers-carousel .carousel-card {
-      flex: 0 0 calc((100% - 14px) / 2); /* 2 cards on mobile */
+      flex: 0 0 calc((100% - 14px) / 2);
     }
     .sellers-carousel {
       gap: 14px;
@@ -217,7 +252,9 @@ const products = [
     let timer: ReturnType<typeof setInterval>;
 
     function getCardWidth(): number {
-      const card = carousel!.querySelector(".carousel-card") as HTMLElement | null;
+      const card = carousel!.querySelector(
+        ".carousel-card",
+      ) as HTMLElement | null;
       if (!card) return 0;
       const style = getComputedStyle(carousel!);
       const gap = parseFloat(style.gap) || 20;
@@ -248,13 +285,15 @@ const products = [
     carousel.addEventListener("mouseenter", stopAutoScroll);
     carousel.addEventListener("mouseleave", startAutoScroll);
     carousel.addEventListener("touchstart", stopAutoScroll, { passive: true });
-    carousel.addEventListener("touchend", () => setTimeout(startAutoScroll, 2000));
+    carousel.addEventListener("touchend", () =>
+      setTimeout(startAutoScroll, 2000),
+    );
 
     const io = new IntersectionObserver(
       ([entry]) => {
         entry.isIntersecting ? startAutoScroll() : stopAutoScroll();
       },
-      { threshold: 0.3 }
+      { threshold: 0.3 },
     );
     io.observe(carousel);
   })();

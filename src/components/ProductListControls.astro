@@ -57,4 +57,10 @@ const { productCount } = Astro.props;
     color: #6B5B4E;
     letter-spacing: 0.02em;
   }
+
+  @media (max-width: 900px) {
+    .category-heading-section {
+      padding-top: 5rem; /* Increased top padding on mobile to prevent overlap with the hanging Sort button */
+    }
+  }
 </style>

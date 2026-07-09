@@ -6,18 +6,18 @@ const { categories } = Astro.props;
 
 // Map category names to user-friendly titles matching the mockup if possible
 function getCatDisplayLabel(cat: string): string {
-  if (cat.toLowerCase() === 'all') return 'All Products';
-  if (cat.toLowerCase() === 'amigurumi') return 'Soft Toys';
-  if (cat.toLowerCase() === 'bouquets') return 'Flower Bouquets';
-  if (cat.toLowerCase() === 'flower stems') return 'Flower Stems';
-  if (cat.toLowerCase() === 'wall hangings') return 'Home Decor';
-  if (cat.toLowerCase() === 'keychains') return 'Accessories';
+  if (cat.toLowerCase() === "all") return "All Products";
+  if (cat.toLowerCase() === "amigurumi") return "Soft Toys";
+  if (cat.toLowerCase() === "bouquets") return "Flower Bouquets";
+  if (cat.toLowerCase() === "flower stems") return "Flower Stems";
+  if (cat.toLowerCase() === "wall hangings") return "Home Decor";
+  if (cat.toLowerCase() === "keychains") return "Accessories";
   return cat;
 }
 ---
+
 <div class="category-bar-wrap" id="category-bar-wrap">
   <div class="category-bar-container">
-    
     <!-- Category pills scroll list -->
     <div
       class="category-pills-list"
@@ -42,7 +42,10 @@ function getCatDisplayLabel(cat: string): string {
     <!-- Sort Wrap and decorative flower -->
     <div class="category-bar-right">
       <div class="sort-dropdown-wrap">
-        <label for="sort-select" class="sort-dropdown-label">Sort by:</label>
+        <label for="sort-select" class="sort-dropdown-label desktop-only"
+          >Sort by:</label
+        >
+        <span class="mobile-sort-label mobile-only">Sort by</span>
         <select
           class="sort-dropdown-select"
           id="sort-select"
@@ -56,21 +59,25 @@ function getCatDisplayLabel(cat: string): string {
         </select>
         <div class="sort-select-arrow">
           <svg width="10" height="6" viewBox="0 0 10 6" fill="none">
-            <path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path
+              d="M1 1L5 5L9 1"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"></path>
           </svg>
         </div>
       </div>
-      
+
       <!-- Flower decoration ornament -->
       <span class="flower-ornament-deco">❀</span>
     </div>
-
   </div>
 </div>
 
 <style>
   .category-bar-wrap {
-    background: #FFF8F0;
+    background: #fff8f0;
     border-bottom: 1px solid rgba(232, 213, 196, 0.4);
     padding: 1.5rem clamp(1.25rem, 5vw, 5rem);
     position: sticky;
@@ -107,9 +114,9 @@ function getCatDisplayLabel(cat: string): string {
     flex-shrink: 0;
     padding: 0.75rem 1.4rem;
     border-radius: 9999px;
-    background: #FDF2E9; /* Warm cream/beige background */
+    background: #fdf2e9; /* Warm cream/beige background */
     border: 1px solid transparent;
-    color: #5C3D2E;
+    color: #5c3d2e;
     font-size: 0.8rem;
     font-weight: 500;
     cursor: pointer;
@@ -119,13 +126,13 @@ function getCatDisplayLabel(cat: string): string {
   }
 
   .cat-pill-btn:hover {
-    background: #F5E6D8;
-    color: #8B4557;
+    background: #f5e6d8;
+    color: #8b4557;
   }
 
   .cat-pill-btn.active {
-    background: #8B4557; /* Rose background */
-    color: #FFFFFF;
+    background: #8b4557; /* Rose background */
+    color: #ffffff;
     box-shadow: 0 4px 12px rgba(139, 69, 87, 0.2);
   }
 
@@ -139,8 +146,8 @@ function getCatDisplayLabel(cat: string): string {
   .sort-dropdown-wrap {
     display: flex;
     align-items: center;
-    background: #FFFFFF;
-    border: 1px solid #E8D5C4;
+    background: #ffffff;
+    border: 1px solid #e8d5c4;
     border-radius: 9999px;
     padding: 0.6rem 2.2rem 0.6rem 1.2rem;
     position: relative;
@@ -148,14 +155,25 @@ function getCatDisplayLabel(cat: string): string {
     transition: border-color 0.3s;
   }
 
+  .mobile-only {
+    display: none;
+  }
+
   .sort-dropdown-wrap:hover {
-    border-color: #8B4557;
+    border-color: #8b4557;
   }
 
   .sort-dropdown-label {
     font-size: 0.75rem;
-    color: #9C8B7E;
+    color: #9c8b7e;
     margin-right: 0.35rem;
+    pointer-events: none;
+  }
+
+  .mobile-sort-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #5c3d2e;
     pointer-events: none;
   }
 
@@ -165,7 +183,7 @@ function getCatDisplayLabel(cat: string): string {
     background: transparent;
     font-size: 0.78rem;
     font-weight: 600;
-    color: #5C3D2E;
+    color: #5c3d2e;
     outline: none;
     cursor: pointer;
     padding-right: 0.5rem;
@@ -177,27 +195,127 @@ function getCatDisplayLabel(cat: string): string {
     top: 50%;
     transform: translateY(-50%);
     pointer-events: none;
-    color: #5C3D2E;
+    color: #5c3d2e;
   }
 
   .flower-ornament-deco {
-    color: #E8A0B0;
+    color: #e8a0b0;
     font-size: 1.1rem;
     pointer-events: none;
   }
 
   @media (max-width: 900px) {
+    .desktop-only {
+      display: none;
+    }
+
+    .mobile-only {
+      display: inline-block;
+      margin-right: 0.5rem;
+    }
+    .category-bar-wrap {
+      padding: 1rem 0; /* Vertical padding for the bar, no horizontal so pills scroll to edge */
+    }
+
     .category-bar-container {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 1rem;
+      display: block;
     }
+
     .category-pills-list {
-      width: 100%;
+      padding: 0 1.25rem;
     }
+
     .category-bar-right {
+      position: absolute;
+      right: 0;
+      bottom: -1px; /* Overlap the bottom border to look connected */
+      transform: translateY(100%);
+      padding: 0;
+      z-index: 10;
+    }
+
+    .sort-dropdown-wrap {
+      background: #fff8f0; /* "give it its color" */
+      border: 1px solid rgba(232, 213, 196, 0.4); /* match category bar border */
+      border-top: none; /* remove top border so it merges */
+      border-right: none; /* remove right border to be flush with boundary */
+
+      border-top-right-radius: 0;
+      border-top-left-radius: 0; /* Flush with bottom of bar */
+      border-bottom-right-radius: 0; /* "remove its round border from right side" */
+      border-bottom-left-radius: 12px; /* Keep bottom-left rounded for tab look */
+
+      padding: 0.4rem 1.25rem;
+      box-shadow: -2px 4px 8px rgba(232, 213, 196, 0.15); /* subtle shadow */
+    }
+
+    .flower-ornament-deco {
+      display: none; /* Hide decorative flower on mobile so button stands alone */
+    }
+
+    .sort-dropdown-select {
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
-      justify-content: space-between;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
     }
   }
 </style>
+
+<script>
+  // Auto-scroll functionality for category pills
+  document.addEventListener("DOMContentLoaded", () => {
+    const pillsList = document.getElementById("category-bar");
+    if (!pillsList) return;
+
+    let autoScrollInterval: ReturnType<typeof setInterval>;
+    let isInteracting = false;
+
+    const startAutoScroll = () => {
+      autoScrollInterval = setInterval(() => {
+        if (isInteracting) {
+          clearInterval(autoScrollInterval);
+          return;
+        }
+
+        // Mobile only check roughly (if it's scrollable)
+        if (pillsList.scrollWidth <= pillsList.clientWidth) {
+          clearInterval(autoScrollInterval);
+          return;
+        }
+
+        // Check if we hit the end
+        if (
+          pillsList.scrollLeft + pillsList.clientWidth >=
+          pillsList.scrollWidth - 10
+        ) {
+          // Reached the end: scroll back to start and stop
+          pillsList.scrollTo({ left: 0, behavior: "smooth" });
+          clearInterval(autoScrollInterval);
+        } else {
+          // Scroll roughly one item (pill width + gap)
+          const firstItem = pillsList.querySelector(".cat-pill-btn");
+          const scrollAmount = firstItem
+            ? firstItem.getBoundingClientRect().width + 12
+            : 100;
+          pillsList.scrollBy({ left: scrollAmount, behavior: "smooth" });
+        }
+      }, 3000); // wait 3 secs between each scroll
+    };
+
+    // Initial delay before starting the scrolling
+    setTimeout(startAutoScroll, 3000);
+
+    const stopScroll = () => {
+      isInteracting = true;
+      clearInterval(autoScrollInterval);
+    };
+
+    pillsList.addEventListener("touchstart", stopScroll, { passive: true });
+    pillsList.addEventListener("mousedown", stopScroll, { passive: true });
+    pillsList.addEventListener("wheel", stopScroll, { passive: true });
+  });
+</script>
