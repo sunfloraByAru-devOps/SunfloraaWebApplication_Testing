@@ -29,9 +29,9 @@ const cleanPathname = pathname.replace(/\/$/, "");
     <nav class="kn-desktop-nav">
       {
         links.map((l) => {
-          const isShop = cleanPathname === "/productlist" && l.label === "Shop";
-          const isCustom = cleanPathname === "/custom" && l.label === "Custom Orders";
-          const isContact = cleanPathname === "/contact" && l.label === "Contact";
+          const isShop = cleanPathname.includes("/productlist") && l.label === "Shop";
+          const isCustom = cleanPathname.includes("/custom") && l.label === "Custom Orders";
+          const isContact = cleanPathname.includes("/contact") && l.label === "Contact";
           const isHome =
             (cleanPathname === "" || cleanPathname === "/") &&
             l.label === "Home";
@@ -481,15 +481,18 @@ const cleanPathname = pathname.replace(/\/$/, "");
       });
     });
   } else {
-    // If not home page, check if we are on /productlist
-    if (pathname.includes("/productlist")) {
-      desktopLinks.forEach((link) => {
-        if (link.getAttribute("data-label") === "Shop") {
-          link.classList.add("active");
-        } else {
-          link.classList.remove("active");
-        }
-      });
-    }
+    // If not home page, check active states based on path
+    desktopLinks.forEach((link) => {
+      const label = link.getAttribute("data-label");
+      if (pathname.includes("/productlist") && label === "Shop") {
+        link.classList.add("active");
+      } else if (pathname.includes("/custom") && label === "Custom Orders") {
+        link.classList.add("active");
+      } else if (pathname.includes("/contact") && label === "Contact") {
+        link.classList.add("active");
+      } else {
+        link.classList.remove("active");
+      }
+    });
   }
 </script>
