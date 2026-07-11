@@ -4,8 +4,8 @@ const links = [
   { label: "Home", href: "/" },
   { label: "Shop", href: "/productlist", hasDropdown: true },
   { label: "Custom Orders", href: "/custom" },
+  { label: "Track Order", href: "/track-order" },
   { label: "About Us", href: "/#about" },
-  { label: "Our Story", href: "/#story" },
   { label: "Contact", href: "/contact" },
 ];
 
@@ -83,7 +83,7 @@ const cleanPathname = pathname.replace(/\/$/, "");
           ></path>
         </svg>
       </button>
-      <button class="nav-icon-btn" aria-label="Account">
+      <a href="/account/orders" id="kn-account-link" class="nav-icon-btn" aria-label="Account">
         <svg
           width="20"
           height="20"
@@ -99,8 +99,8 @@ const cleanPathname = pathname.replace(/\/$/, "");
             cy="7"
             r="4"></circle>
         </svg>
-      </button>
-      <button class="nav-icon-btn cart-btn" aria-label="Cart">
+      </a>
+      <a href="/cart" class="nav-icon-btn cart-btn" aria-label="Cart">
         <svg
           width="20"
           height="20"
@@ -115,8 +115,8 @@ const cleanPathname = pathname.replace(/\/$/, "");
           ></path><line x1="3" y1="6" x2="21" y2="6"></line><path
             d="M16 10a4 4 0 0 1-8 0"></path>
         </svg>
-        <span class="cart-badge">0</span>
-      </button>
+        <span class="cart-badge" id="kn-cart-badge">0</span>
+      </a>
     </div>
 
     <!-- Mobile Toggle -->
@@ -370,6 +370,26 @@ const cleanPathname = pathname.replace(/\/$/, "");
 </style>
 
 <script>
+  import { getCart, cartCount } from "../../lib/cart";
+  import { supabase } from "../../lib/supabase";
+
+  function refreshCartBadge() {
+    const badge = document.getElementById("kn-cart-badge");
+    if (badge) badge.textContent = String(cartCount());
+  }
+  refreshCartBadge();
+  window.addEventListener("cart:updated", refreshCartBadge);
+  window.addEventListener("storage", refreshCartBadge);
+
+  supabase.auth.getSession().then(({ data }) => {
+    const accountLink = document.getElementById(
+      "kn-account-link",
+    ) as HTMLAnchorElement | null;
+    if (accountLink && !data.session) {
+      accountLink.href = "/login";
+    }
+  });
+
   const header = document.getElementById("kn-header")!;
   const toggle = document.getElementById("kn-mobile-toggle")!;
   const menu = document.getElementById("kn-mobile-menu")!;
@@ -402,7 +422,6 @@ const cleanPathname = pathname.replace(/\/$/, "");
     hero: "Home",
     "custom-orders": "Custom Orders",
     about: "About Us",
-    story: "Our Story",
     contact: "Contact",
   };
 

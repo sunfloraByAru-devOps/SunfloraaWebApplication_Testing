@@ -1,0 +1,57 @@
+---
+import Layout from "../layouts/Layout.astro";
+import LandingNav from "../components/landing/LandingNav.astro";
+---
+
+<Layout title="Log In — Sunflora Studio" description="Log in to your account">
+  <LandingNav />
+  <div style="height: 72px; background-color: #FFF8F0;"></div>
+
+  <main class="min-h-[60vh] max-w-sm mx-auto px-6 py-16">
+    <h1 class="font-serif-display text-3xl mb-6 text-[#5C3D2E]">Log In</h1>
+
+    <div id="form-error" class="hidden bg-red-50 text-red-700 text-sm p-3 rounded-lg mb-4"></div>
+
+    <form id="login-form" class="flex flex-col gap-4">
+      <label class="flex flex-col gap-1 text-sm text-[#5C3D2E]">
+        Email
+        <input name="email" type="email" required class="border border-[#E8D5C4] rounded-lg px-3 py-2" />
+      </label>
+      <label class="flex flex-col gap-1 text-sm text-[#5C3D2E]">
+        Password
+        <input name="password" type="password" required class="border border-[#E8D5C4] rounded-lg px-3 py-2" />
+      </label>
+      <button type="submit" class="bg-[#5C3D2E] text-[#FFF8F0] px-6 py-3 rounded-lg mt-2">
+        Log In
+      </button>
+    </form>
+
+    <p class="text-sm text-[#9a8b7a] mt-6">
+      New here? <a href="/signup" class="text-[#D4708F] underline">Create an account</a>
+      — any past guest orders under this email will be linked automatically.
+    </p>
+  </main>
+
+  <script type="module">
+    import { supabase } from "../lib/supabase.ts";
+
+    document.getElementById("login-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const errorEl = document.getElementById("form-error");
+      errorEl.classList.add("hidden");
+
+      const { error } = await supabase.auth.signInWithPassword({
+        email: fd.get("email"),
+        password: fd.get("password"),
+      });
+
+      if (error) {
+        errorEl.textContent = error.message;
+        errorEl.classList.remove("hidden");
+        return;
+      }
+      window.location.href = "/account/orders";
+    });
+  </script>
+</Layout>

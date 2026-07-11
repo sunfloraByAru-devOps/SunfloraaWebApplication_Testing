@@ -1,0 +1,267 @@
+---
+import Layout from "../layouts/Layout.astro";
+import LandingNav from "../components/landing/LandingNav.astro";
+---
+
+<Layout title="Checkout — Sunflora Studio" description="Complete your order">
+  <LandingNav />
+  <div style="height: 72px; background-color: #FFF8F0;"></div>
+
+  <main class="min-h-[60vh] max-w-4xl mx-auto px-6 py-12 grid md:grid-cols-[1.3fr_1fr] gap-10">
+    <section>
+      <h1 class="font-serif-display text-3xl mb-6 text-[#5C3D2E]">Checkout</h1>
+
+      <div id="checkout-error" class="hidden bg-red-50 text-red-700 text-sm p-3 rounded-lg mb-4"></div>
+
+      <form id="checkout-form" class="flex flex-col gap-4">
+        <div id="saved-addresses" class="hidden flex flex-col gap-2 mb-2"></div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <label class="flex flex-col gap-1 text-sm text-[#5C3D2E]">
+            Full name
+            <input name="name" required class="border border-[#E8D5C4] rounded-lg px-3 py-2" />
+          </label>
+          <label class="flex flex-col gap-1 text-sm text-[#5C3D2E]">
+            Phone
+            <input name="phone" required pattern="[0-9]{10}" class="border border-[#E8D5C4] rounded-lg px-3 py-2" />
+          </label>
+        </div>
+
+        <label class="flex flex-col gap-1 text-sm text-[#5C3D2E]">
+          Email
+          <input name="email" type="email" required class="border border-[#E8D5C4] rounded-lg px-3 py-2" />
+          <span class="text-xs text-[#9a8b7a]">We'll send your order confirmation and tracking here. No account needed.</span>
+        </label>
+
+        <label class="flex flex-col gap-1 text-sm text-[#5C3D2E]">
+          Address line 1
+          <input name="line1" required class="border border-[#E8D5C4] rounded-lg px-3 py-2" />
+        </label>
+        <label class="flex flex-col gap-1 text-sm text-[#5C3D2E]">
+          Address line 2 (optional)
+          <input name="line2" class="border border-[#E8D5C4] rounded-lg px-3 py-2" />
+        </label>
+
+        <div class="grid grid-cols-3 gap-4">
+          <label class="flex flex-col gap-1 text-sm text-[#5C3D2E]">
+            City
+            <input name="city" required class="border border-[#E8D5C4] rounded-lg px-3 py-2" />
+          </label>
+          <label class="flex flex-col gap-1 text-sm text-[#5C3D2E]">
+            State
+            <input name="state" required class="border border-[#E8D5C4] rounded-lg px-3 py-2" />
+          </label>
+          <label class="flex flex-col gap-1 text-sm text-[#5C3D2E]">
+            Pincode
+            <input name="pincode" required pattern="[0-9]{6}" class="border border-[#E8D5C4] rounded-lg px-3 py-2" />
+          </label>
+        </div>
+
+        <label class="flex items-center gap-2 text-sm text-[#5C3D2E]" id="save-address-row" style="display:none;">
+          <input type="checkbox" name="save_address" />
+          Save this address to my account
+        </label>
+
+        <label class="flex flex-col gap-1 text-sm text-[#5C3D2E]">
+          Order notes (optional)
+          <textarea name="notes" rows="2" class="border border-[#E8D5C4] rounded-lg px-3 py-2"></textarea>
+        </label>
+
+        <button
+          type="submit"
+          id="pay-btn"
+          class="mt-4 bg-[#D4708F] text-white px-6 py-3 rounded-lg font-medium disabled:opacity-60"
+        >
+          Pay with Paytm
+        </button>
+        <p class="text-xs text-[#9a8b7a] text-center">
+          You'll be redirected to Paytm's secure payment page.
+        </p>
+      </form>
+    </section>
+
+    <aside class="bg-[#FFF8F0] border border-[#E8D5C4] rounded-xl p-6 h-fit">
+      <h2 class="font-serif-display text-xl mb-4 text-[#5C3D2E]">Order Summary</h2>
+      <div id="summary-items" class="flex flex-col gap-3 mb-4"></div>
+      <div class="flex justify-between text-sm text-[#5C3D2E] border-t border-[#E8D5C4] pt-3">
+        <span>Subtotal</span><span id="summary-subtotal">₹0.00</span>
+      </div>
+      <div class="flex justify-between text-sm text-[#5C3D2E]">
+        <span>Shipping</span><span id="summary-shipping">—</span>
+      </div>
+      <div class="flex justify-between font-medium text-[#5C3D2E] border-t border-[#E8D5C4] mt-2 pt-2">
+        <span>Total (approx.)</span><span id="summary-total">₹0.00</span>
+      </div>
+    </aside>
+  </main>
+
+  <!-- This form is auto-submitted (via JS) to Paytm's hosted checkout page. -->
+  <form id="paytm-form" method="POST" style="display:none;"></form>
+
+  <script type="module">
+    import { getCart, cartSubtotal, clearCart } from "../lib/cart.ts";
+    import { supabase } from "../lib/supabase.ts";
+
+    const FREE_SHIPPING_THRESHOLD = 999;
+    const FLAT_SHIPPING_FEE = 79;
+
+    function money(n) {
+      return "₹" + (Number(n) || 0).toFixed(2);
+    }
+
+    function renderSummary() {
+      const items = getCart();
+      const list = document.getElementById("summary-items");
+      list.innerHTML = items
+        .map(
+          (i) => `
+        <div class="flex justify-between text-sm text-[#5C3D2E]">
+          <span>${i.name}${i.size_label ? " (" + i.size_label + ")" : ""} × ${i.quantity}</span>
+          <span>${money(i.unit_price * i.quantity)}</span>
+        </div>`,
+        )
+        .join("");
+
+      const subtotal = cartSubtotal();
+      const shipping = subtotal >= FREE_SHIPPING_THRESHOLD || subtotal === 0 ? 0 : FLAT_SHIPPING_FEE;
+      document.getElementById("summary-subtotal").textContent = money(subtotal);
+      document.getElementById("summary-shipping").textContent =
+        subtotal === 0 ? "—" : shipping === 0 ? "Free" : money(shipping);
+      document.getElementById("summary-total").textContent = money(subtotal + shipping);
+
+      if (items.length === 0) {
+        window.location.href = "/cart";
+      }
+    }
+    renderSummary();
+    window.addEventListener("cart:updated", renderSummary);
+
+    // Pre-fill for logged-in users + offer saved addresses
+    let currentUser = null;
+    supabase.auth.getSession().then(async ({ data }) => {
+      if (!data.session) return;
+      currentUser = data.session.user;
+      document.getElementById("save-address-row").style.display = "flex";
+
+      const form = document.getElementById("checkout-form");
+      if (currentUser.email) form.email.value = currentUser.email;
+
+      const { data: addresses } = await supabase
+        .from("addresses")
+        .select("*")
+        .order("is_default", { ascending: false });
+
+      if (addresses && addresses.length > 0) {
+        const wrap = document.getElementById("saved-addresses");
+        wrap.classList.remove("hidden");
+        wrap.innerHTML =
+          `<p class="text-sm text-[#5C3D2E] mb-1">Use a saved address:</p>` +
+          addresses
+            .map(
+              (a, i) => `
+          <label class="flex items-start gap-2 text-sm border border-[#E8D5C4] rounded-lg p-2 cursor-pointer">
+            <input type="radio" name="saved_address" value="${i}" />
+            <span>${a.line1}, ${a.city}, ${a.state} ${a.pincode}</span>
+          </label>`,
+            )
+            .join("");
+
+        wrap.querySelectorAll('input[name="saved_address"]').forEach((radio) => {
+          radio.addEventListener("change", () => {
+            const a = addresses[Number(radio.value)];
+            form.line1.value = a.line1;
+            form.line2.value = a.line2 || "";
+            form.city.value = a.city;
+            form.state.value = a.state;
+            form.pincode.value = a.pincode;
+          });
+        });
+      }
+    });
+
+    function showError(msg) {
+      const el = document.getElementById("checkout-error");
+      el.textContent = msg;
+      el.classList.remove("hidden");
+    }
+
+    document.getElementById("checkout-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const payBtn = document.getElementById("pay-btn");
+      document.getElementById("checkout-error").classList.add("hidden");
+
+      const items = getCart();
+      if (items.length === 0) {
+        showError("Your cart is empty.");
+        return;
+      }
+
+      payBtn.disabled = true;
+      payBtn.textContent = "Placing order...";
+
+      const fd = new FormData(form);
+      const payload = {
+        items: items.map((i) => ({
+          product_id: i.product_id,
+          size_label: i.size_label,
+          color_name: i.color_name,
+          quantity: i.quantity,
+        })),
+        email: fd.get("email"),
+        phone: fd.get("phone"),
+        name: fd.get("name"),
+        shipping: {
+          line1: fd.get("line1"),
+          line2: fd.get("line2"),
+          city: fd.get("city"),
+          state: fd.get("state"),
+          pincode: fd.get("pincode"),
+          country: "India",
+        },
+        notes: fd.get("notes"),
+        save_address: fd.get("save_address") === "on",
+      };
+
+      try {
+        const { data: orderResult, error: orderErr } = await supabase.functions.invoke(
+          "create-order",
+          { body: payload },
+        );
+        if (orderErr || orderResult?.error) {
+          throw new Error(orderResult?.error || orderErr?.message || "Could not place order");
+        }
+
+        // Remember the order for the confirmation / tracking page
+        sessionStorage.setItem(
+          "sunflora_last_order",
+          JSON.stringify({ order_number: orderResult.order_number, email: orderResult.email }),
+        );
+
+        const { data: paytmResult, error: paytmErr } = await supabase.functions.invoke(
+          "paytm-initiate",
+          { body: { order_id: orderResult.order_id } },
+        );
+        if (paytmErr || paytmResult?.error) {
+          throw new Error(paytmResult?.error || paytmErr?.message || "Could not start payment");
+        }
+
+        clearCart();
+
+        const paytmForm = document.getElementById("paytm-form");
+        paytmForm.action = paytmResult.action_url;
+        paytmForm.innerHTML = Object.entries(paytmResult.params)
+          .map(
+            ([k, v]) =>
+              `<input type="hidden" name="${k}" value="${String(v).replace(/"/g, "&quot;")}" />`,
+          )
+          .join("");
+        paytmForm.submit();
+      } catch (err) {
+        showError(err.message || "Something went wrong. Please try again.");
+        payBtn.disabled = false;
+        payBtn.textContent = "Pay with Paytm";
+      }
+    });
+  </script>
+</Layout>

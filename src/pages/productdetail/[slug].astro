@@ -917,4 +917,107 @@ const productsJson = JSON.stringify(mappedProducts);
       mobileSticky.style.transition = "transform 0.3s";
     }
   </script>
+
+  <script type="module">
+    import { addToCart } from "../../lib/cart.ts";
+
+    function getSelected() {
+      const panel = document.getElementById("product-panel");
+      const productId = panel?.dataset.productId;
+      const sku = panel?.dataset.productSku;
+      const name = panel?.dataset.productName;
+      const image = panel?.dataset.productImage;
+
+      const activeSizeBtn = document.querySelector(
+        "#sizes-container .size-btn.active",
+      );
+      const sizeLabel =
+        activeSizeBtn?.querySelector(".sz-label")?.textContent?.trim() ||
+        null;
+      const price = activeSizeBtn
+        ? parseFloat(activeSizeBtn.dataset.price)
+        : parseFloat(
+            (document.getElementById("active-price")?.textContent || "0").replace(
+              /[^\d.]/g,
+              "",
+            ),
+          );
+      const mrp = activeSizeBtn
+        ? parseFloat(activeSizeBtn.dataset.mrp)
+        : parseFloat(
+            (document.getElementById("active-mrp")?.textContent || "0").replace(
+              /[^\d.]/g,
+              "",
+            ),
+          );
+
+      const activeColorBtn = document.querySelector(
+        "#color-container .color-swatch.active",
+      );
+      const colorName = activeColorBtn?.dataset.name || null;
+
+      const qtyInput = document.getElementById("qty-input");
+      const quantity = Math.max(1, parseInt(qtyInput?.value || "1", 10) || 1);
+
+      return {
+        productId,
+        sku,
+        name,
+        image,
+        sizeLabel,
+        price,
+        mrp,
+        colorName,
+        quantity,
+      };
+    }
+
+    function showFeedback(msg) {
+      const el = document.getElementById("cart-feedback");
+      if (!el) return;
+      el.textContent = msg;
+      el.style.display = "block";
+      setTimeout(() => {
+        el.style.display = "none";
+      }, 2200);
+    }
+
+    document.getElementById("qty-minus")?.addEventListener("click", () => {
+      const input = document.getElementById("qty-input");
+      if (input)
+        input.value = String(Math.max(1, parseInt(input.value || "1", 10) - 1));
+    });
+    document.getElementById("qty-plus")?.addEventListener("click", () => {
+      const input = document.getElementById("qty-input");
+      if (input)
+        input.value = String(
+          Math.min(20, parseInt(input.value || "1", 10) + 1),
+        );
+    });
+
+    function addSelectedToCart() {
+      const sel = getSelected();
+      if (!sel.productId) return null;
+      addToCart({
+        product_id: sel.productId,
+        name: sel.name,
+        sku: sel.sku,
+        size_label: sel.sizeLabel,
+        color_name: sel.colorName,
+        unit_price: sel.price,
+        unit_mrp: sel.mrp,
+        image_url: sel.image,
+        quantity: sel.quantity,
+      });
+      return sel;
+    }
+
+    document.getElementById("add-to-cart-btn")?.addEventListener("click", () => {
+      if (addSelectedToCart()) showFeedback("Added to cart!");
+    });
+
+    document.getElementById("buy-now-btn")?.addEventListener("click", () => {
+      if (addSelectedToCart()) window.location.href = "/checkout";
+    });
+  </script>
 </Layout>

@@ -1,0 +1,113 @@
+---
+import Layout from "../layouts/Layout.astro";
+import LandingNav from "../components/landing/LandingNav.astro";
+---
+
+<Layout title="Your Cart — Sunflora Studio" description="Review your cart">
+  <LandingNav />
+  <div style="height: 72px; background-color: #FFF8F0;"></div>
+
+  <main class="min-h-[60vh] max-w-3xl mx-auto px-6 py-12">
+    <h1 class="font-serif-display text-3xl md:text-4xl mb-8 text-[#5C3D2E]">
+      Your Cart
+    </h1>
+
+    <div id="cart-empty" class="hidden text-center py-20">
+      <p class="text-[#5C3D2E] mb-6">Your cart is empty.</p>
+      <a
+        href="/productlist"
+        class="inline-block bg-[#5C3D2E] text-[#FFF8F0] px-6 py-3 rounded-lg"
+        >Continue Shopping</a
+      >
+    </div>
+
+    <div id="cart-items" class="flex flex-col gap-4"></div>
+
+    <div
+      id="cart-summary"
+      class="hidden mt-8 border-t border-[#E8D5C4] pt-6 flex flex-col gap-3"
+    >
+      <div class="flex justify-between text-[#5C3D2E]">
+        <span>Subtotal</span>
+        <span id="cart-subtotal">₹0.00</span>
+      </div>
+      <p class="text-xs text-[#9a8b7a]">
+        Shipping &amp; final total calculated at checkout. Free shipping over ₹999.
+      </p>
+      <a
+        href="/checkout"
+        class="mt-3 text-center bg-[#D4708F] text-white px-6 py-3 rounded-lg font-medium"
+      >
+        Proceed to Checkout
+      </a>
+    </div>
+  </main>
+
+  <script type="module">
+    import { getCart, updateQuantity, removeFromCart, cartSubtotal } from "../lib/cart.ts";
+
+    function money(n) {
+      return "₹" + (Number(n) || 0).toFixed(2);
+    }
+
+    function render() {
+      const items = getCart();
+      const container = document.getElementById("cart-items");
+      const empty = document.getElementById("cart-empty");
+      const summary = document.getElementById("cart-summary");
+
+      if (items.length === 0) {
+        container.innerHTML = "";
+        empty.classList.remove("hidden");
+        summary.classList.add("hidden");
+        return;
+      }
+      empty.classList.add("hidden");
+      summary.classList.remove("hidden");
+
+      container.innerHTML = items
+        .map(
+          (item, idx) => `
+        <div class="flex gap-4 items-center border border-[#E8D5C4] rounded-lg p-4">
+          <img src="${item.image_url || ""}" alt="${item.name}" class="w-20 h-20 object-cover rounded-md bg-[#FFF8F0]" />
+          <div class="flex-1">
+            <p class="font-medium text-[#5C3D2E]">${item.name}</p>
+            <p class="text-xs text-[#9a8b7a]">${item.size_label || ""}${item.size_label && item.color_name ? " · " : ""}${item.color_name || ""}</p>
+            <p class="text-sm text-[#5C3D2E] mt-1">${money(item.unit_price)}</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button data-idx="${idx}" class="qty-minus w-8 h-8 border border-[#E8D5C4] rounded">−</button>
+            <span class="w-6 text-center">${item.quantity}</span>
+            <button data-idx="${idx}" class="qty-plus w-8 h-8 border border-[#E8D5C4] rounded">+</button>
+          </div>
+          <button data-idx="${idx}" class="remove-btn text-[#D4708F] text-sm ml-2">Remove</button>
+        </div>
+      `,
+        )
+        .join("");
+
+      document.getElementById("cart-subtotal").textContent = money(cartSubtotal());
+
+      container.querySelectorAll(".qty-minus").forEach((btn) =>
+        btn.addEventListener("click", () => {
+          const item = items[Number(btn.dataset.idx)];
+          updateQuantity(item, item.quantity - 1);
+        }),
+      );
+      container.querySelectorAll(".qty-plus").forEach((btn) =>
+        btn.addEventListener("click", () => {
+          const item = items[Number(btn.dataset.idx)];
+          updateQuantity(item, item.quantity + 1);
+        }),
+      );
+      container.querySelectorAll(".remove-btn").forEach((btn) =>
+        btn.addEventListener("click", () => {
+          removeFromCart(items[Number(btn.dataset.idx)]);
+        }),
+      );
+    }
+
+    render();
+    window.addEventListener("cart:updated", render);
+  </script>
+</Layout>

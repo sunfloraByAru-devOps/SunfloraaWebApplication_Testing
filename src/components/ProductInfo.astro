@@ -31,7 +31,14 @@ interface Props {
 const { product, discount } = Astro.props;
 ---
 
-<div class="product-panel">
+<div
+  class="product-panel"
+  id="product-panel"
+  data-product-id={product.id}
+  data-product-sku={product.sku}
+  data-product-name={product.name}
+  data-product-image={product.images?.[0]?.src || ""}
+>
   <p class="prod-brand">{product.brand}</p>
   <h1 class="prod-title">{product.name}</h1>
 
@@ -171,6 +178,39 @@ const { product, discount } = Astro.props;
       Delivery available · Ships in 7–10 working days
     </div>
   </div>
+
+  <!-- Quantity + Cart CTAs -->
+  <div class="qty-cart-row" style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1rem;">
+    <div class="qty-stepper" style="display:flex; align-items:center; border:1px solid #E8D5C4; border-radius:8px; overflow:hidden;">
+      <button type="button" id="qty-minus" style="width:36px; height:36px; background:#FFF8F0; color:#5C3D2E; font-size:1.1rem;">−</button>
+      <input
+        type="number"
+        id="qty-input"
+        value="1"
+        min="1"
+        max="20"
+        style="width:44px; height:36px; text-align:center; border-left:1px solid #E8D5C4; border-right:1px solid #E8D5C4; color:#5C3D2E;"
+      />
+      <button type="button" id="qty-plus" style="width:36px; height:36px; background:#FFF8F0; color:#5C3D2E; font-size:1.1rem;">+</button>
+    </div>
+    <button
+      type="button"
+      id="add-to-cart-btn"
+      class="btn-order"
+      style="flex:1; background:#FFF8F0; color:#5C3D2E; border:1.5px solid #5C3D2E;"
+    >
+      Add to Cart
+    </button>
+    <button
+      type="button"
+      id="buy-now-btn"
+      class="btn-order"
+      style="flex:1; background:#D4708F; color:#fff; border:1.5px solid #D4708F;"
+    >
+      Buy Now
+    </button>
+  </div>
+  <div id="cart-feedback" style="display:none; font-size:0.85rem; color:#5C3D2E; margin:-0.6rem 0 1rem;"></div>
 
   <!-- CTAs -->
   <div class="cta-section">
