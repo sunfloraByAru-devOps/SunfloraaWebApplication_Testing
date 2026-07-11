@@ -10,27 +10,24 @@ import LandingNav from "../components/landing/LandingNav.astro";
   <main class="min-h-[60vh] max-w-sm mx-auto px-6 py-16">
     <h1 class="font-serif-display text-3xl mb-2 text-[#5C3D2E]">Create Account</h1>
     <p class="text-sm text-[#9a8b7a] mb-6">
-      Use the same email you checked out with as a guest and we'll link your past orders automatically.
+      No password to remember — just your name and email. If you've checked
+      out as a guest with this email before, those orders will show up here too.
     </p>
 
     <div id="form-error" class="hidden bg-red-50 text-red-700 text-sm p-3 rounded-lg mb-4"></div>
-    <div id="form-success" class="hidden bg-green-50 text-green-700 text-sm p-3 rounded-lg mb-4"></div>
+    <div id="form-sent" class="hidden bg-green-50 text-green-700 text-sm p-3 rounded-lg mb-4"></div>
 
-    <form id="signup-form" class="flex flex-col gap-4">
+    <form id="magic-form" class="flex flex-col gap-4">
       <label class="flex flex-col gap-1 text-sm text-[#5C3D2E]">
-        Full name
-        <input name="full_name" required class="border border-[#E8D5C4] rounded-lg px-3 py-2" />
+        Your name
+        <input name="name" required class="border border-[#E8D5C4] rounded-lg px-3 py-2" />
       </label>
       <label class="flex flex-col gap-1 text-sm text-[#5C3D2E]">
         Email
         <input name="email" type="email" required class="border border-[#E8D5C4] rounded-lg px-3 py-2" />
       </label>
-      <label class="flex flex-col gap-1 text-sm text-[#5C3D2E]">
-        Password
-        <input name="password" type="password" required minlength="6" class="border border-[#E8D5C4] rounded-lg px-3 py-2" />
-      </label>
-      <button type="submit" class="bg-[#5C3D2E] text-[#FFF8F0] px-6 py-3 rounded-lg mt-2">
-        Create Account
+      <button type="submit" id="magic-submit" class="bg-[#5C3D2E] text-[#FFF8F0] px-6 py-3 rounded-lg mt-2">
+        Email me a sign-in link
       </button>
     </form>
 
@@ -40,36 +37,37 @@ import LandingNav from "../components/landing/LandingNav.astro";
   </main>
 
   <script type="module">
-    import { supabase } from "../lib/supabase.ts";
+    import { sendMagicLink } from "../lib/auth.ts";
 
-    document.getElementById("signup-form").addEventListener("submit", async (e) => {
+    document.getElementById("magic-form").addEventListener("submit", async (e) => {
       e.preventDefault();
       const fd = new FormData(e.target);
       const errorEl = document.getElementById("form-error");
-      const successEl = document.getElementById("form-success");
+      const sentEl = document.getElementById("form-sent");
+      const submitBtn = document.getElementById("magic-submit");
       errorEl.classList.add("hidden");
-      successEl.classList.add("hidden");
+      sentEl.classList.add("hidden");
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Sending...";
 
-      const { data, error } = await supabase.auth.signUp({
-        email: fd.get("email"),
-        password: fd.get("password"),
-        options: { data: { full_name: fd.get("full_name") } },
-      });
+      const { error } = await sendMagicLink(
+        fd.get("email"),
+        fd.get("name"),
+        window.location.origin + "/account/orders",
+      );
+
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Email me a sign-in link";
 
       if (error) {
         errorEl.textContent = error.message;
         errorEl.classList.remove("hidden");
         return;
       }
-
-      if (data.session) {
-        window.location.href = "/account/orders";
-      } else {
-        successEl.textContent =
-          "Account created! Check your email to confirm, then log in.";
-        successEl.classList.remove("hidden");
-        e.target.reset();
-      }
+      sentEl.textContent =
+        "Check your inbox! Click the link we sent to finish creating your account.";
+      sentEl.classList.remove("hidden");
+      e.target.reset();
     });
   </script>
 </Layout>

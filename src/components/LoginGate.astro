@@ -1,0 +1,113 @@
+---
+// A soft, dismissible "sign in" nudge. Never blocks guest checkout —
+// it just offers passwordless email sign-in and can be skipped.
+---
+
+<div
+  id="login-gate-overlay"
+  class="hidden fixed inset-0 z-[999] bg-black/40 flex items-center justify-center px-4"
+>
+  <div class="bg-[#FFF8F0] rounded-xl max-w-sm w-full p-6 relative">
+    <button
+      id="login-gate-dismiss"
+      class="absolute top-3 right-3 text-[#9a8b7a] text-xl leading-none"
+      aria-label="Continue as guest"
+    >
+      ×
+    </button>
+
+    <h2 class="font-serif-display text-2xl text-[#5C3D2E] mb-1">Sign in?</h2>
+    <p class="text-sm text-[#9a8b7a] mb-4">
+      Sign in with just your email to track orders and check out faster —
+      or continue as a guest, no account needed.
+    </p>
+
+    <div id="login-gate-error" class="hidden bg-red-50 text-red-700 text-xs p-2 rounded-lg mb-3"></div>
+    <div id="login-gate-sent" class="hidden bg-green-50 text-green-700 text-xs p-2 rounded-lg mb-3"></div>
+
+    <form id="login-gate-form" class="flex flex-col gap-3">
+      <input
+        name="name"
+        placeholder="Your name"
+        class="border border-[#E8D5C4] rounded-lg px-3 py-2 text-sm"
+      />
+      <input
+        name="email"
+        type="email"
+        required
+        placeholder="you@example.com"
+        class="border border-[#E8D5C4] rounded-lg px-3 py-2 text-sm"
+      />
+      <button
+        type="submit"
+        class="bg-[#5C3D2E] text-[#FFF8F0] px-4 py-2 rounded-lg text-sm"
+      >
+        Email me a sign-in link
+      </button>
+    </form>
+
+    <button
+      id="login-gate-guest"
+      class="mt-3 w-full text-center text-sm text-[#D4708F] underline"
+    >
+      Continue as guest
+    </button>
+  </div>
+</div>
+
+<script>
+  import { supabase } from "../lib/supabase";
+  import { sendMagicLink } from "../lib/auth";
+
+  const DISMISS_KEY = "sunflora_guest_dismissed";
+
+  async function initLoginGate() {
+    const overlay = document.getElementById("login-gate-overlay");
+    if (!overlay) return;
+
+    if (sessionStorage.getItem(DISMISS_KEY)) return;
+
+    const { data } = await supabase.auth.getSession();
+    if (data.session) return; // already signed in, nothing to do
+
+    overlay.classList.remove("hidden");
+
+    const close = () => {
+      overlay.classList.add("hidden");
+      sessionStorage.setItem(DISMISS_KEY, "1");
+    };
+
+    document.getElementById("login-gate-dismiss")?.addEventListener("click", close);
+    document.getElementById("login-gate-guest")?.addEventListener("click", close);
+
+    document
+      .getElementById("login-gate-form")
+      ?.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const fd = new FormData(e.target as HTMLFormElement);
+        const errorEl = document.getElementById("login-gate-error");
+        const sentEl = document.getElementById("login-gate-sent");
+        errorEl?.classList.add("hidden");
+        sentEl?.classList.add("hidden");
+
+        const { error } = await sendMagicLink(
+          String(fd.get("email")),
+          String(fd.get("name") || ""),
+        );
+
+        if (error) {
+          if (errorEl) {
+            errorEl.textContent = error.message;
+            errorEl.classList.remove("hidden");
+          }
+          return;
+        }
+        if (sentEl) {
+          sentEl.textContent = "Check your email for a sign-in link!";
+          sentEl.classList.remove("hidden");
+        }
+      });
+  }
+
+  initLoginGate();
+</script>
