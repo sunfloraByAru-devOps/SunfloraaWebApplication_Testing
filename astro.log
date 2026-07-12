@@ -1,0 +1,41 @@
+
+> sunflora@0.0.1 dev
+> astro dev
+
+[vite] connected.
+06:55:05 [types] Generated 1ms
+06:55:05 [vite] Port 4321 is in use, trying another one...
+06:55:05 [vite] Port 4322 is in use, trying another one...
+ astro  v6.3.3 ready in 2993 ms
+┃ Local    http://localhost:4323/
+┃ Network  use --host to expose
+06:55:05 watching for file changes...
+06:55:51 [200] / 271ms
+06:55:52 [vite] ✨ new dependencies optimized: lenis, @supabase/supabase-js
+06:55:52 [vite] ✨ optimized dependencies changed. reloading
+06:55:53 [200] / 13ms
+06:56:33 [200] / 94ms
+[vite] program reload
+[vite] An error happened during full reload
+Failed to load url astro:server-app.js (resolved id: astro:server-app.js). Does the file exist?
+Error: Failed to load url astro:server-app.js (resolved id: astro:server-app.js). Does the file exist?
+    at loadAndTransform (file:///home/someone_practicing/sledje-softwares/sunflora/node_modules/vite/dist/node/chunks/config.js:22679:33)
+06:57:06 [200] / 212ms
+[vite] program reload
+06:57:44 [200] / 202ms
+[vite] program reload
+06:59:43 [200] / 312ms
+[vite] program reload
+07:00:55 [200] / 232ms
+[vite] program reload
+07:02:08 [200] / 129ms
+[vite] program reload
+07:02:40 [200] / 215ms
+[vite] program reload
+07:03:36 [200] / 89ms
+[vite] program reload
+[vite] program reload
+07:03:55 [200] / 510ms
+07:03:55 [200] / 105ms
+07:04:01 [200] /account/orders 25ms
+07:04:08 [200] /account/orders 23ms

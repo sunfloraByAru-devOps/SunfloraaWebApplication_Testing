@@ -1,0 +1,1 @@
+import{s as i}from"./supabase.pi5ZXsf7.js";async function o(a,t,e){return i.auth.signInWithOtp({email:a,options:{data:t?{full_name:t}:void 0,shouldCreateUser:!0,emailRedirectTo:e||window.location.href}})}export{o as s};

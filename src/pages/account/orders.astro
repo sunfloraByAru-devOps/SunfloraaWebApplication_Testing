@@ -3,31 +3,41 @@ import Layout from "../../layouts/Layout.astro";
 import LandingNav from "../../components/landing/LandingNav.astro";
 ---
 
-<Layout title="My Orders — Sunflora Studio" description="View your order history">
+<Layout
+  title="My Orders — Sunflora Studio"
+  description="View your order history"
+>
   <LandingNav />
   <div style="height: 72px; background-color: #FFF8F0;"></div>
 
   <main class="min-h-[60vh] max-w-3xl mx-auto px-6 py-12">
     <div class="flex items-center justify-between mb-8">
       <h1 class="font-serif-display text-3xl text-[#5C3D2E]">My Orders</h1>
-      <button id="logout-btn" class="text-sm text-[#D4708F] underline">Log out</button>
+      <button id="logout-btn" class="text-sm text-[#D4708F] underline"
+        >Log out</button
+      >
     </div>
 
     <div id="signed-out" class="hidden text-center py-16">
       <p class="text-[#5C3D2E] mb-4">Please log in to see your orders.</p>
-      <a href="/login" class="bg-[#5C3D2E] text-[#FFF8F0] px-6 py-3 rounded-lg">Log In</a>
+      <a href="/login" class="bg-[#5C3D2E] text-[#FFF8F0] px-6 py-3 rounded-lg"
+        >Log In</a
+      >
     </div>
 
     <div id="orders-empty" class="hidden text-center py-16">
       <p class="text-[#5C3D2E]">You haven't placed any orders yet.</p>
-      <a href="/productlist" class="text-[#D4708F] underline text-sm">Browse products</a>
+      <a href="/productlist" class="text-[#D4708F] underline text-sm"
+        >Browse products</a
+      >
     </div>
 
     <div id="orders-list" class="flex flex-col gap-4"></div>
   </main>
 
-  <script type="module">
-    import { supabase } from "../../lib/supabase.ts";
+  <script>
+    // @ts-nocheck
+    import { supabase } from "../../lib/supabase";
 
     function money(n) {
       return "₹" + (Number(n) || 0).toFixed(2);
@@ -35,7 +45,8 @@ import LandingNav from "../../components/landing/LandingNav.astro";
 
     const { data: sessionData } = await supabase.auth.getSession();
     if (!sessionData.session) {
-      document.getElementById("signed-out").classList.remove("hidden");
+      const signedOut = document.getElementById("signed-out");
+      if (signedOut) signedOut.classList.remove("hidden");
     } else {
       const { data: orders } = await supabase
         .from("orders")
@@ -43,14 +54,16 @@ import LandingNav from "../../components/landing/LandingNav.astro";
         .order("created_at", { ascending: false });
 
       const list = document.getElementById("orders-list");
-      if (!orders || orders.length === 0) {
-        document.getElementById("orders-empty").classList.remove("hidden");
-      } else {
-        const email = sessionData.session.user.email;
-        list.innerHTML = orders
-          .map(
-            (o) => `
-          <a href="/track-order?order=${encodeURIComponent(o.order_number)}&email=${encodeURIComponent(email)}"
+      if (list) {
+        if (!orders || orders.length === 0) {
+          const empty = document.getElementById("orders-empty");
+          if (empty) empty.classList.remove("hidden");
+        } else {
+          const email = sessionData.session.user.email;
+          list.innerHTML = orders
+            .map(
+              (o) => `
+          <a href="/track-order?order=${encodeURIComponent(o.order_number)}&email=${encodeURIComponent(email || "")}"
              class="flex justify-between items-center border border-[#E8D5C4] rounded-lg p-4 hover:bg-[#FFF8F0]">
             <div>
               <p class="font-medium text-[#5C3D2E]">${o.order_number}</p>
@@ -58,14 +71,18 @@ import LandingNav from "../../components/landing/LandingNav.astro";
             </div>
             <span class="text-[#5C3D2E] font-medium">${money(o.total)}</span>
           </a>`,
-          )
-          .join("");
+            )
+            .join("");
+        }
       }
     }
 
-    document.getElementById("logout-btn").addEventListener("click", async () => {
-      await supabase.auth.signOut();
-      window.location.href = "/";
-    });
+    const logoutBtn = document.getElementById("logout-btn");
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", async () => {
+        await supabase.auth.signOut();
+        window.location.href = "/";
+      });
+    }
   </script>
 </Layout>

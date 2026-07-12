@@ -1,6 +1,7 @@
 ---
 interface Props {
   product: {
+    id: string;
     brand: string;
     name: string;
     rating: number;
@@ -24,6 +25,7 @@ interface Props {
       value: string;
     }>;
     includes: string[];
+    images?: Array<{ src: string; alt?: string }>;
   };
   discount: number;
 }

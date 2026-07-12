@@ -43,7 +43,7 @@ import LandingNav from "../components/landing/LandingNav.astro";
     <div id="track-result" class="hidden flex flex-col gap-6"></div>
   </main>
 
-  <script type="module">
+  <script>
     import { supabase } from "../lib/supabase.ts";
 
     const params = new URLSearchParams(window.location.search);

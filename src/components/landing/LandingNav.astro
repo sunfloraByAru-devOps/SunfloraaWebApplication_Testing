@@ -372,6 +372,7 @@ const cleanPathname = pathname.replace(/\/$/, "");
 <script>
   import { getCart, cartCount } from "../../lib/cart";
   import { supabase } from "../../lib/supabase";
+  console.log("LandingNav script is executing!");
 
   function refreshCartBadge() {
     const badge = document.getElementById("kn-cart-badge");
@@ -399,6 +400,7 @@ const cleanPathname = pathname.replace(/\/$/, "");
   });
 
   toggle.addEventListener("click", () => {
+    console.log("Hamburger menu toggle clicked!");
     menu.classList.toggle("open");
     toggle.classList.toggle("active");
   });
