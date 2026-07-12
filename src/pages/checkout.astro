@@ -169,6 +169,7 @@ import LoginGate from "../components/LoginGate.astro";
     let currentUser = null;
     supabase.auth.getSession().then(async ({ data }) => {
       if (!data.session) return;
+      try {
       currentUser = data.session.user;
       document.getElementById("save-address-row").style.display = "flex";
 
@@ -206,6 +207,11 @@ import LoginGate from "../components/LoginGate.astro";
           });
         });
       }
+      } catch (err) {
+        console.error("[Sunflora] Could not load saved addresses:", err);
+      }
+    }).catch((err) => {
+      console.error("[Sunflora] Could not check login session for checkout:", err);
     });
 
     function showError(msg) {

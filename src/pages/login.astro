@@ -30,6 +30,10 @@ import LandingNav from "../components/landing/LandingNav.astro";
         Email me a sign-in link
       </button>
     </form>
+
+    <p class="text-sm text-[#9a8b7a] mt-6">
+      New here? <a href="/signup" class="text-[#D4708F] underline">Create an account</a>
+    </p>
   </main>
 
   <script>
@@ -46,24 +50,32 @@ import LandingNav from "../components/landing/LandingNav.astro";
       submitBtn.disabled = true;
       submitBtn.textContent = "Sending...";
 
-      const { error } = await sendMagicLink(
-        fd.get("email"),
-        fd.get("name"),
-        window.location.origin + "/account/orders",
-      );
+      try {
+        const { error } = await sendMagicLink(
+          fd.get("email"),
+          fd.get("name"),
+          window.location.origin + "/account/orders",
+        );
 
-      submitBtn.disabled = false;
-      submitBtn.textContent = "Email me a sign-in link";
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Email me a sign-in link";
 
-      if (error) {
-        errorEl.textContent = error.message;
+        if (error) {
+          errorEl.textContent = error.message;
+          errorEl.classList.remove("hidden");
+          return;
+        }
+        sentEl.textContent =
+          "Check your inbox! Click the link we sent to finish signing in.";
+        sentEl.classList.remove("hidden");
+        e.target.reset();
+      } catch (err) {
+        console.error("[Sunflora] Sign-in link request failed:", err);
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Email me a sign-in link";
+        errorEl.textContent = "Something went wrong. Please try again.";
         errorEl.classList.remove("hidden");
-        return;
       }
-      sentEl.textContent =
-        "Check your inbox! Click the link we sent to finish signing in.";
-      sentEl.classList.remove("hidden");
-      e.target.reset();
     });
   </script>
 </Layout>

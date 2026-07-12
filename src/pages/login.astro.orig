@@ -3,15 +3,15 @@ import Layout from "../layouts/Layout.astro";
 import LandingNav from "../components/landing/LandingNav.astro";
 ---
 
-<Layout title="Create Account — Sunflora Studio" description="Create your account">
+<Layout title="Log In — Sunflora Studio" description="Log in to your account">
   <LandingNav />
   <div style="height: 72px; background-color: #FFF8F0;"></div>
 
   <main class="min-h-[60vh] max-w-sm mx-auto px-6 py-16">
-    <h1 class="font-serif-display text-3xl mb-2 text-[#5C3D2E]">Create Account</h1>
+    <h1 class="font-serif-display text-3xl mb-2 text-[#5C3D2E]">Log In / Sign Up</h1>
     <p class="text-sm text-[#9a8b7a] mb-6">
-      No password to remember — just your name and email. If you've checked
-      out as a guest with this email before, those orders will show up here too.
+      No password needed — we'll email you a secure sign-in link. If you've
+      ordered as a guest before, use the same email to see those orders here.
     </p>
 
     <div id="form-error" class="hidden bg-red-50 text-red-700 text-sm p-3 rounded-lg mb-4"></div>
@@ -20,7 +20,7 @@ import LandingNav from "../components/landing/LandingNav.astro";
     <form id="magic-form" class="flex flex-col gap-4">
       <label class="flex flex-col gap-1 text-sm text-[#5C3D2E]">
         Your name
-        <input name="name" required class="border border-[#E8D5C4] rounded-lg px-3 py-2" />
+        <input name="name" class="border border-[#E8D5C4] rounded-lg px-3 py-2" />
       </label>
       <label class="flex flex-col gap-1 text-sm text-[#5C3D2E]">
         Email
@@ -30,10 +30,6 @@ import LandingNav from "../components/landing/LandingNav.astro";
         Email me a sign-in link
       </button>
     </form>
-
-    <p class="text-sm text-[#9a8b7a] mt-6">
-      Already have an account? <a href="/login" class="text-[#D4708F] underline">Log in</a>
-    </p>
   </main>
 
   <script>
@@ -50,32 +46,24 @@ import LandingNav from "../components/landing/LandingNav.astro";
       submitBtn.disabled = true;
       submitBtn.textContent = "Sending...";
 
-      try {
-        const { error } = await sendMagicLink(
-          fd.get("email"),
-          fd.get("name"),
-          window.location.origin + "/account/orders",
-        );
+      const { error } = await sendMagicLink(
+        fd.get("email"),
+        fd.get("name"),
+        window.location.origin + "/account/orders",
+      );
 
-        submitBtn.disabled = false;
-        submitBtn.textContent = "Email me a sign-in link";
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Email me a sign-in link";
 
-        if (error) {
-          errorEl.textContent = error.message;
-          errorEl.classList.remove("hidden");
-          return;
-        }
-        sentEl.textContent =
-          "Check your inbox! Click the link we sent to finish creating your account.";
-        sentEl.classList.remove("hidden");
-        e.target.reset();
-      } catch (err) {
-        console.error("[Sunflora] Sign-up link request failed:", err);
-        submitBtn.disabled = false;
-        submitBtn.textContent = "Email me a sign-in link";
-        errorEl.textContent = "Something went wrong. Please try again.";
+      if (error) {
+        errorEl.textContent = error.message;
         errorEl.classList.remove("hidden");
+        return;
       }
+      sentEl.textContent =
+        "Check your inbox! Click the link we sent to finish signing in.";
+      sentEl.classList.remove("hidden");
+      e.target.reset();
     });
   </script>
 </Layout>

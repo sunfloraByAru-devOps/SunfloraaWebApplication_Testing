@@ -67,8 +67,13 @@
 
     if (sessionStorage.getItem(DISMISS_KEY)) return;
 
-    const { data } = await supabase.auth.getSession();
-    if (data.session) return; // already signed in, nothing to do
+    try {
+      const { data } = await supabase.auth.getSession();
+      if (data.session) return; // already signed in, nothing to do
+    } catch (err) {
+      console.error("[Sunflora] Could not check login session for login gate:", err);
+      return;
+    }
 
     overlay.classList.remove("hidden");
 
@@ -90,24 +95,34 @@
         errorEl?.classList.add("hidden");
         sentEl?.classList.add("hidden");
 
-        const { error } = await sendMagicLink(
-          String(fd.get("email")),
-          String(fd.get("name") || ""),
-        );
+        try {
+          const { error } = await sendMagicLink(
+            String(fd.get("email")),
+            String(fd.get("name") || ""),
+          );
 
-        if (error) {
+          if (error) {
+            if (errorEl) {
+              errorEl.textContent = error.message;
+              errorEl.classList.remove("hidden");
+            }
+            return;
+          }
+          if (sentEl) {
+            sentEl.textContent = "Check your email for a sign-in link!";
+            sentEl.classList.remove("hidden");
+          }
+        } catch (err) {
+          console.error("[Sunflora] Magic link request failed:", err);
           if (errorEl) {
-            errorEl.textContent = error.message;
+            errorEl.textContent = "Something went wrong. Please try again.";
             errorEl.classList.remove("hidden");
           }
-          return;
-        }
-        if (sentEl) {
-          sentEl.textContent = "Check your email for a sign-in link!";
-          sentEl.classList.remove("hidden");
         }
       });
   }
 
-  initLoginGate();
+  initLoginGate().catch((err) =>
+    console.error("[Sunflora] Login gate failed to initialize:", err),
+  );
 </script>

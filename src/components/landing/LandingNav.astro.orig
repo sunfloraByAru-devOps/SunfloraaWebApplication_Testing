@@ -382,19 +382,14 @@ const cleanPathname = pathname.replace(/\/$/, "");
   window.addEventListener("cart:updated", refreshCartBadge);
   window.addEventListener("storage", refreshCartBadge);
 
-  supabase.auth
-    .getSession()
-    .then(({ data }) => {
-      const accountLink = document.getElementById(
-        "kn-account-link",
-      ) as HTMLAnchorElement | null;
-      if (accountLink && !data.session) {
-        accountLink.href = "/login";
-      }
-    })
-    .catch((err) => {
-      console.error("[Sunflora] Could not check login session for nav:", err);
-    });
+  supabase.auth.getSession().then(({ data }) => {
+    const accountLink = document.getElementById(
+      "kn-account-link",
+    ) as HTMLAnchorElement | null;
+    if (accountLink && !data.session) {
+      accountLink.href = "/login";
+    }
+  });
 
   const header = document.getElementById("kn-header")!;
   const toggle = document.getElementById("kn-mobile-toggle")!;
