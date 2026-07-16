@@ -21,15 +21,15 @@ import RelatedProducts from "../../components/RelatedProducts.astro";
 import "../../styles/productdetail.css";
 
 const supabase = createClient(
-  import.meta.env.SUPABASE_URL,
-  import.meta.env.SUPABASE_KEY,
+  import.meta.env.PUBLIC_SUPABASE_URL,
+  import.meta.env.PUBLIC_SUPABASE_KEY,
 );
 
 export async function getStaticPaths() {
   const { createClient } = await import("@supabase/supabase-js");
   const supabase = createClient(
-    import.meta.env.SUPABASE_URL,
-    import.meta.env.SUPABASE_KEY,
+    import.meta.env.PUBLIC_SUPABASE_URL,
+    import.meta.env.PUBLIC_SUPABASE_KEY,
   );
   const { data } = await supabase
     .from("products")
@@ -932,15 +932,13 @@ const productsJson = JSON.stringify(mappedProducts);
         "#sizes-container .size-btn.active",
       );
       const sizeLabel =
-        activeSizeBtn?.querySelector(".sz-label")?.textContent?.trim() ||
-        null;
+        activeSizeBtn?.querySelector(".sz-label")?.textContent?.trim() || null;
       const price = activeSizeBtn
         ? parseFloat(activeSizeBtn.dataset.price)
         : parseFloat(
-            (document.getElementById("active-price")?.textContent || "0").replace(
-              /[^\d.]/g,
-              "",
-            ),
+            (
+              document.getElementById("active-price")?.textContent || "0"
+            ).replace(/[^\d.]/g, ""),
           );
       const mrp = activeSizeBtn
         ? parseFloat(activeSizeBtn.dataset.mrp)
@@ -1012,9 +1010,11 @@ const productsJson = JSON.stringify(mappedProducts);
       return sel;
     }
 
-    document.getElementById("add-to-cart-btn")?.addEventListener("click", () => {
-      if (addSelectedToCart()) showFeedback("Added to cart!");
-    });
+    document
+      .getElementById("add-to-cart-btn")
+      ?.addEventListener("click", () => {
+        if (addSelectedToCart()) showFeedback("Added to cart!");
+      });
 
     document.getElementById("buy-now-btn")?.addEventListener("click", () => {
       if (addSelectedToCart()) window.location.href = "/checkout";

@@ -24,8 +24,8 @@ import ProductListServiceBar from "../components/ProductListServiceBar.astro";
 import "../styles/productlist.css";
 
 const supabase = createClient(
-    import.meta.env.SUPABASE_URL,
-    import.meta.env.SUPABASE_KEY,
+    import.meta.env.PUBLIC_SUPABASE_URL,
+    import.meta.env.PUBLIC_SUPABASE_KEY,
 );
 
 function getFallbackImg(name: string, categoryName: string | null): string {
@@ -34,21 +34,34 @@ function getFallbackImg(name: string, categoryName: string | null): string {
 
     // Map by exact name keywords first
     if (n.includes("bunny")) return BUNNY.src;
-    if (n.includes("tulip") || n.includes("bouquet") || n.includes("flower")) return TULIPS.src;
+    if (n.includes("tulip") || n.includes("bouquet") || n.includes("flower"))
+        return TULIPS.src;
     if (n.includes("bag") || n.includes("tote")) return TOTE.src;
-    if (n.includes("beanie") || n.includes("cap") || n.includes("hat")) return BEANIE.src;
+    if (n.includes("beanie") || n.includes("cap") || n.includes("hat"))
+        return BEANIE.src;
     if (n.includes("bear") || n.includes("teddy")) return BEAR.src;
     if (n.includes("keychain") || n.includes("daisy")) return KEYCHAIN.src;
     if (n.includes("basket") || n.includes("pot")) return BASKET.src;
     if (n.includes("clip") || n.includes("hair")) return CLIPS.src;
 
     // Map by category keywords
-    if (cat.includes("soft") || cat.includes("toy") || cat.includes("amigurumi")) return BUNNY.src;
+    if (
+        cat.includes("soft") ||
+        cat.includes("toy") ||
+        cat.includes("amigurumi")
+    )
+        return BUNNY.src;
     if (cat.includes("flower") || cat.includes("bouquet")) return TULIPS.src;
     if (cat.includes("bag")) return TOTE.src;
     if (cat.includes("wearable")) return BEANIE.src;
-    if (cat.includes("keychain") || cat.includes("accessory") || cat.includes("accessories")) return KEYCHAIN.src;
-    if (cat.includes("decor") || cat.includes("basket") || cat.includes("home")) return BASKET.src;
+    if (
+        cat.includes("keychain") ||
+        cat.includes("accessory") ||
+        cat.includes("accessories")
+    )
+        return KEYCHAIN.src;
+    if (cat.includes("decor") || cat.includes("basket") || cat.includes("home"))
+        return BASKET.src;
 
     return BUNNY.src;
 }
@@ -66,37 +79,40 @@ const { data: products } = await supabase
     .order("display_order");
 
 // ── All products ──────────────────────────────────────────
-const allProducts = products?.map((p) => {
-    const rating = parseFloat(String(p.avg_rating)) || 0
-    const reviewCount = p.review_count || 0
+const allProducts =
+    products?.map((p) => {
+        const rating = parseFloat(String(p.avg_rating)) || 0;
+        const reviewCount = p.review_count || 0;
 
-    return {
-        id: p.id,
-        name: p.name,
-        category: p.category_name,
-        price: p.base_price,
-        mrp: p.base_mrp,
-        rating,
-        reviews: reviewCount,
-        tag: p.tag,
-        img: p.primary_image_path
-            ? getImageUrl(p.primary_image_path, 'product-images')
-            : getFallbackImg(p.name, p.category_name),
-        isNew: p.is_new,
-        inStock: p.in_stock,
-    };
-}) || [];
+        return {
+            id: p.id,
+            name: p.name,
+            category: p.category_name,
+            price: p.base_price,
+            mrp: p.base_mrp,
+            rating,
+            reviews: reviewCount,
+            tag: p.tag,
+            img: p.primary_image_path
+                ? getImageUrl(p.primary_image_path, "product-images")
+                : getFallbackImg(p.name, p.category_name),
+            isNew: p.is_new,
+            inStock: p.in_stock,
+        };
+    }) || [];
 
 // ── Recommendation products (shown after 8 main products) ──
 const { data: recoData } = await supabase
     .from("products_with_image")
-    .select("id, name, category_name, base_price, base_mrp, avg_rating, review_count, tag, primary_image_path")
+    .select(
+        "id, name, category_name, base_price, base_mrp, avg_rating, review_count, tag, primary_image_path",
+    )
     .eq("is_active", true)
     .order("avg_rating", { ascending: false })
-    .limit(4)
+    .limit(4);
 
 const recommendations = (recoData || []).map((p) => {
-    const rating = parseFloat(String(p.avg_rating)) || 0
+    const rating = parseFloat(String(p.avg_rating)) || 0;
     return {
         id: p.id,
         name: p.name,
@@ -107,29 +123,37 @@ const recommendations = (recoData || []).map((p) => {
         reviews: p.review_count || 0,
         tag: p.tag,
         img: p.primary_image_path
-            ? getImageUrl(p.primary_image_path, 'product-images')
+            ? getImageUrl(p.primary_image_path, "product-images")
             : getFallbackImg(p.name, p.category_name),
     };
-})
-
+});
 
 const { data: dbCategories } = await supabase
     .from("categories")
     .select("name")
     .eq("is_active", true)
-    .order("display_order")
+    .order("display_order");
 
 // Extract unique categories directly from products as a reliable fallback
-const uniqueCategories = [...new Set(products?.map(p => p.category_name).filter(Boolean))];
+const uniqueCategories = [
+    ...new Set(products?.map((p) => p.category_name).filter(Boolean)),
+];
 
 const categories = [
     "All",
-    ...(dbCategories && dbCategories.length > 0 
-        ? dbCategories.map((c) => c.name) 
-        : uniqueCategories.length > 0 
-            ? uniqueCategories 
-            : ["Amigurumi", "Keychains", "Flower Stems", "Wall Hangings", "Bouquets", "Customs"])
-]
+    ...(dbCategories && dbCategories.length > 0
+        ? dbCategories.map((c) => c.name)
+        : uniqueCategories.length > 0
+          ? uniqueCategories
+          : [
+                "Amigurumi",
+                "Keychains",
+                "Flower Stems",
+                "Wall Hangings",
+                "Bouquets",
+                "Customs",
+            ]),
+];
 ---
 
 <Layout
@@ -191,12 +215,12 @@ const categories = [
         let activeCategory = "All";
 
         function getCatDisplayLabel(cat) {
-            if (cat.toLowerCase() === 'all') return 'All Products';
-            if (cat.toLowerCase() === 'amigurumi') return 'Soft Toys';
-            if (cat.toLowerCase() === 'bouquets') return 'Flower Bouquets';
-            if (cat.toLowerCase() === 'flower stems') return 'Flower Stems';
-            if (cat.toLowerCase() === 'wall hangings') return 'Home Decor';
-            if (cat.toLowerCase() === 'keychains') return 'Accessories';
+            if (cat.toLowerCase() === "all") return "All Products";
+            if (cat.toLowerCase() === "amigurumi") return "Soft Toys";
+            if (cat.toLowerCase() === "bouquets") return "Flower Bouquets";
+            if (cat.toLowerCase() === "flower stems") return "Flower Stems";
+            if (cat.toLowerCase() === "wall hangings") return "Home Decor";
+            if (cat.toLowerCase() === "keychains") return "Accessories";
             return cat;
         }
 
@@ -223,7 +247,7 @@ const categories = [
                     behavior: "auto",
                     block: "nearest",
                     inline: "center",
-                    behavior: "smooth"
+                    behavior: "smooth",
                 });
             }
         }
@@ -274,13 +298,16 @@ const categories = [
             if (countEl) countEl.textContent = filtered.length;
 
             // Update heading title dynamically
-            const headingTitleEl = document.getElementById("category-heading-title");
+            const headingTitleEl = document.getElementById(
+                "category-heading-title",
+            );
             if (headingTitleEl) {
                 headingTitleEl.textContent = getCatDisplayLabel(activeCategory);
             }
 
             // Empty state
-            if (emptyEl) emptyEl.classList.toggle("show", filtered.length === 0);
+            if (emptyEl)
+                emptyEl.classList.toggle("show", filtered.length === 0);
         }
 
         catBtns.forEach((btn) => {

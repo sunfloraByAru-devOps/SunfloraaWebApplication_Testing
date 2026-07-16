@@ -166,7 +166,8 @@ const ICONS: Record<string, string> = {
                 </div>
                 <p class="topic-hint">
                     Tell us more so we can help better <span class="heart-icon"
-                        >♡</span>
+                        >♡</span
+                    >
                 </p>
             </div>
         </section>
@@ -1134,7 +1135,7 @@ const ICONS: Record<string, string> = {
             // Example, matching this project's existing Supabase pattern:
             //
             // const { createClient } = await import("@supabase/supabase-js");
-            // const supabase = createClient(import.meta.env.SUPABASE_URL, import.meta.env.SUPABASE_KEY);
+            // const supabase = createClient(import.meta.env.PUBLIC_SUPABASE_URL, import.meta.env.PUBLIC_SUPABASE_KEY);
             // await supabase.from("contact_messages").insert(payload);
 
             await new Promise((res) => setTimeout(res, 500)); // simulated latency
