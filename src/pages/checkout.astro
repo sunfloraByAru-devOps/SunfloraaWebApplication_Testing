@@ -143,7 +143,7 @@ import LoginGate from "../components/LoginGate.astro";
           Place Order
         </button>
         <p class="text-xs text-[#9a8b7a] text-center">
-          Secure payment via Paytm.
+          You'll be redirected to Paytm's secure payment page.
         </p>
       </form>
     </section>
@@ -169,11 +169,11 @@ import LoginGate from "../components/LoginGate.astro";
     </aside>
   </main>
 
-  <!-- Paytm's JS Checkout renders into this container as an overlay. -->
-  <div id="paytm-checkout-container"></div>
+  <!-- Hidden form auto-submitted to Paytm's hosted checkout page -->
+  <form id="paytm-form" method="POST" style="display:none;"></form>
 
   <script>
-    import { getCart, cartSubtotal, clearCart } from "../lib/cart.ts";
+    import { getCart, cartSubtotal } from "../lib/cart.ts";
     import { supabase } from "../lib/supabase.ts";
 
     const FREE_SHIPPING_THRESHOLD = 999;
@@ -311,31 +311,6 @@ import LoginGate from "../components/LoginGate.astro";
       }
     }
 
-    /** @param {string} src */
-    function loadPaytmCheckoutScript(src) {
-      return new Promise((resolve, reject) => {
-        const existing = document.getElementById("paytm-checkout-js");
-        if (existing) {
-          // Script tag from a previous attempt (e.g. user retried after a
-          // failure) — reuse it rather than injecting a duplicate.
-          // @ts-ignore
-          if (window.Paytm && window.Paytm.CheckoutJS) return resolve();
-          existing.addEventListener("load", () => resolve());
-          existing.addEventListener("error", () =>
-            reject(new Error("Could not load Paytm checkout script")),
-          );
-          return;
-        }
-        const script = document.createElement("script");
-        script.id = "paytm-checkout-js";
-        script.src = src;
-        script.onload = () => resolve();
-        script.onerror = () =>
-          reject(new Error("Could not load Paytm checkout script"));
-        document.body.appendChild(script);
-      });
-    }
-
     document
       .getElementById("checkout-form")
       ?.addEventListener("submit", async (e) => {
@@ -382,6 +357,9 @@ import LoginGate from "../components/LoginGate.astro";
         };
 
         try {
+          // Step 1 — Create an order record in the DB.
+          // The backend must create this with payment_status = "pending".
+          // It is NOT confirmed yet — the shopper still has to pay.
           const { data: orderResult, error: orderErr } =
             await supabase.functions.invoke("create-order", { body: payload });
           if (orderErr || orderResult?.error) {
@@ -392,81 +370,68 @@ import LoginGate from "../components/LoginGate.astro";
             );
           }
 
-          // Remember the order for the confirmation / tracking page
-          sessionStorage.setItem(
-            "sunflora_last_order",
-            JSON.stringify({
-              order_number: orderResult.order_number,
-              email: orderResult.email,
-            }),
-          );
-
+          // Step 2 — Initiate payment with the gateway.
+          payBtn.textContent = "Starting payment...";
           const { data: paytmResult, error: paytmErr } =
             await supabase.functions.invoke("paytm-initiate", {
               body: { order_id: orderResult.order_id },
             });
           if (paytmErr || paytmResult?.error) {
-            throw new Error(
-              paytmResult?.error ||
-                paytmErr?.message ||
-                "Could not start payment",
+            // Order was created but payment could not start.
+            // Direct the user to the tracking page to retry payment.
+            showError(
+              (paytmResult?.error || paytmErr?.message || "Could not start payment") +
+              " Your order " + (orderResult.order_number || "") +
+              " has been saved — you can retry payment from the Track Order page."
             );
-          }
-
-          clearCart();
-
-          if (paytmResult.mock) {
-            // Payment gateway is switched off for now — the order was auto-marked
-            // as paid server-side. Go straight to the success screen.
-            window.location.href = `/order-confirmation?order=${encodeURIComponent(paytmResult.order_number)}&email=${encodeURIComponent(paytmResult.email || orderResult.email)}&status=success`;
+            // @ts-ignore
+            payBtn.disabled = false;
+            payBtn.textContent = "Place Order";
             return;
           }
 
-          payBtn.textContent = "Opening secure payment...";
-          await loadPaytmCheckoutScript(paytmResult.checkout_js_url);
-
-          // @ts-ignore
-          if (!window.Paytm || !window.Paytm.CheckoutJS) {
-            throw new Error("Paytm checkout failed to load. Please try again.");
+          // Require a real payment gateway response with action_url + params.
+          if (!paytmResult.action_url || !paytmResult.params) {
+            showError(
+              "Payment gateway is not available right now. " +
+              "Your order " + (orderResult.order_number || "") +
+              " has been saved — you can retry payment from the Track Order page."
+            );
+            // @ts-ignore
+            payBtn.disabled = false;
+            payBtn.textContent = "Place Order";
+            return;
           }
 
-          const config = {
-            root: "",
-            flow: "DEFAULT",
-            data: {
-              orderId: paytmResult.paytm_order_id,
-              token: paytmResult.txn_token,
-              tokenType: "TXN_TOKEN",
-              amount: paytmResult.amount,
-            },
-            merchant: {
-              mid: paytmResult.mid,
-              // Paytm itself redirects the browser to our callbackUrl
-              // (paytm-callback) once the payment finishes, which is what
-              // sends the shopper to /order-confirmation or /order-failed.
-              redirect: true,
-            },
-          };
+          // Step 3 — Everything is ready. Save order reference ONLY now,
+          // right before we redirect to the payment page.
+          sessionStorage.setItem(
+            "sunflora_last_order",
+            JSON.stringify({
+              order_number: orderResult.order_number,
+              email: orderResult.email,
+              payment_pending: true,   // flag: NOT confirmed until callback
+            }),
+          );
 
-          // @ts-ignore
-          window.Paytm.CheckoutJS.init(config)
-            .then(() => {
-              // @ts-ignore
-              window.Paytm.CheckoutJS.invoke();
-            })
-            .catch(/** @param {any} err */ (err) => {
-              console.error("[Sunflora] Paytm CheckoutJS init failed:", err);
-              showError("Could not open the payment window. Please try again.");
-              // @ts-ignore
-              payBtn.disabled = false;
-              payBtn.textContent = "Pay with Paytm";
-            });
+          // Redirect to Paytm's hosted checkout via form POST.
+          payBtn.textContent = "Redirecting to payment...";
+          const paytmForm = /** @type {HTMLFormElement} */ (document.getElementById("paytm-form"));
+          if (!paytmForm) throw new Error("Payment form not found. Please refresh and try again.");
+          paytmForm.action = paytmResult.action_url;
+          paytmForm.innerHTML = Object.entries(paytmResult.params)
+            .map(
+              ([k, v]) =>
+                `<input type="hidden" name="${k}" value="${String(v).replace(/"/g, "&quot;")}" />`,
+            )
+            .join("");
+          paytmForm.submit();
         } catch (e) {
           const err = /** @type {Error} */ (e);
           showError(err.message || "Something went wrong. Please try again.");
           // @ts-ignore
           payBtn.disabled = false;
-          payBtn.textContent = "Pay with Paytm";
+          payBtn.textContent = "Place Order";
         }
       });
   </script>

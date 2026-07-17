@@ -17,18 +17,28 @@ import LandingNav from "../components/landing/LandingNav.astro";
 
   <script>
     import { supabase } from "../lib/supabase.ts";
+    import { clearCart } from "../lib/cart.ts";
 
     const params = new URLSearchParams(window.location.search);
     const status = params.get("status");
     const orderNumber = params.get("order");
     const email = params.get("email");
 
+    // Do NOT clear the cart based on URL params alone — those can be
+    // spoofed or arrive from a mock/test flow.  We verify with the
+    // server that payment actually succeeded before wiping items.
+
     const banner = document.getElementById("banner");
-    const bannerMap = {
+    const bannerMap: Record<string, { icon: string; title: string; sub: string }> = {
       success: {
         icon: "🎉",
         title: "Payment successful!",
         sub: "Thank you — your order is confirmed. A confirmation email is on its way.",
+      },
+      pending: {
+        icon: "⏳",
+        title: "Payment pending",
+        sub: "We're waiting for payment confirmation. Your cart has not been cleared — you can retry from the tracking page if needed.",
       },
       failed: {
         icon: "⚠️",
@@ -46,30 +56,67 @@ import LandingNav from "../components/landing/LandingNav.astro";
         sub: "Please check your order status on the tracking page.",
       },
     };
-    const b = bannerMap[status] || bannerMap.invalid;
-    banner.innerHTML = `
-      <div class="text-5xl mb-3">${b.icon}</div>
-      <h1 class="font-serif-display text-3xl text-[#5C3D2E] mb-2">${b.title}</h1>
-      <p class="text-[#9a8b7a]">${b.sub}</p>
-      ${orderNumber ? `<p class="mt-3 text-sm text-[#5C3D2E]">Order number: <strong>${orderNumber}</strong></p>` : ""}
-    `;
 
-    async function loadDetails() {
-      if (!orderNumber || !email) return;
-      const { data, error } = await supabase.functions.invoke("track-order", {
-        body: { order_number: orderNumber, email },
-      });
-      if (error || data?.error) return;
-
-      const el = document.getElementById("details");
-      el.innerHTML = `
-        <div class="border border-[#E8D5C4] rounded-xl p-6 bg-[#FFF8F0]">
-          <p class="font-medium text-[#5C3D2E]">${data.stage_label}</p>
-          <p class="text-sm text-[#9a8b7a] mb-3">${data.stage_description}</p>
-          <a href="/track-order?order=${encodeURIComponent(orderNumber)}&email=${encodeURIComponent(email)}" class="text-sm text-[#D4708F] underline">View full order tracking →</a>
-        </div>
-      `;
+    // Show initial banner from URL param (may be updated after verification)
+    let displayStatus = status || "invalid";
+    function renderBanner(s: string) {
+      const b = bannerMap[s] || bannerMap.invalid;
+      if (banner) {
+        banner.innerHTML = `
+          <div class="text-5xl mb-3">${b.icon}</div>
+          <h1 class="font-serif-display text-3xl text-[#5C3D2E] mb-2">${b.title}</h1>
+          <p class="text-[#9a8b7a]">${b.sub}</p>
+          ${orderNumber ? `<p class="mt-3 text-sm text-[#5C3D2E]">Order number: <strong>${orderNumber}</strong></p>` : ""}
+        `;
+      }
     }
-    loadDetails();
+    renderBanner(displayStatus);
+
+    async function verifyAndLoad() {
+      if (!orderNumber || !email) return;
+
+      try {
+        const { data, error } = await supabase.functions.invoke("track-order", {
+          body: { order_number: orderNumber, email },
+        });
+
+        if (error || data?.error) {
+          // Could not verify — show not_found and do NOT clear cart
+          renderBanner("not_found");
+          return;
+        }
+
+        // Server confirms the real payment status — use that, not the URL param.
+        const serverPaymentStatus = data.payment_status;   // "paid", "failed", "pending", etc.
+        const serverOrderStatus = data.status;             // "confirmed", "processing", etc.
+
+        if (serverPaymentStatus === "paid") {
+          // Payment verified by server — safe to clear the cart now.
+          clearCart();
+          renderBanner("success");
+        } else if (serverPaymentStatus === "failed") {
+          renderBanner("failed");
+        } else {
+          // pending / any other state — don't clear cart
+          renderBanner("pending");
+        }
+
+        // Show order details
+        const el = document.getElementById("details");
+        if (el) {
+          el.innerHTML = `
+            <div class="border border-[#E8D5C4] rounded-xl p-6 bg-[#FFF8F0]">
+              <p class="font-medium text-[#5C3D2E]">${data.stage_label}</p>
+              <p class="text-sm text-[#9a8b7a] mb-3">${data.stage_description}</p>
+              <a href="/track-order?order=${encodeURIComponent(orderNumber)}&email=${encodeURIComponent(email)}" class="text-sm text-[#D4708F] underline">View full order tracking →</a>
+            </div>
+          `;
+        }
+      } catch (err) {
+        console.error("[Sunflora] Could not verify order:", err);
+        // On network error, don't clear cart — fail safe.
+      }
+    }
+    verifyAndLoad();
   </script>
 </Layout>
