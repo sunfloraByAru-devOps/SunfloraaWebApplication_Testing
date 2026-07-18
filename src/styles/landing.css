@@ -23,7 +23,7 @@
   /* Typography */
   --kn-font-heading: 'Playfair Display', serif;
   --kn-font-body: 'Inter', sans-serif;
-  --kn-font-script: 'Dancing Script', cursive;
+  --kn-font-script: 'Playfair Display', serif;
 
   /* Spacing */
   --kn-section-py: 96px;
@@ -61,7 +61,7 @@
 .kn-section-title {
   font-family: var(--kn-font-heading);
   font-size: clamp(28px, 3vw, 40px);
-  font-weight: 600;
+  font-weight: 700;
   color: var(--kn-brown);
   text-align: center;
   margin-bottom: 8px;
@@ -111,7 +111,7 @@
 .kn-product-card .card-price {
   font-family: var(--kn-font-body);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--kn-rose);
 }
 
@@ -124,7 +124,7 @@
   color: var(--kn-white);
   font-family: var(--kn-font-body);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   padding: 14px 28px;
   border-radius: var(--kn-radius-full);
   border: none;
@@ -163,7 +163,7 @@
 .kn-view-all {
   font-family: var(--kn-font-body);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--kn-rose);
   text-decoration: none;
   display: inline-flex;

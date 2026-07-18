@@ -9,42 +9,37 @@
 const galleryItems = [
   {
     img: "/images/community/yellow_rose_bouquet.jpg",
-    caption: "Wrapped this one at midnight \ud83c\udf37",
-    rotate: -3,
-    tall: true,
+    review:
+      "Wrapped this one at midnight — the detail on the petals is unreal.",
   },
   {
     img: "/images/community/crochet_hair_clips.png",
-    caption: null,
-    rotate: 2,
+    review: "So soft and well made, exactly like the photos. Ordering more!",
   },
   {
     img: "/images/community/sun_and_moon.jpg",
-    caption: "My Sunny came home today!",
-    rotate: -2,
+    review: "My Sunny came home today! Even better in person.",
   },
-  { img: "/images/community/Sunflower_Pot_1.png", caption: null, rotate: 3 },
+  {
+    img: "/images/community/Sunflower_Pot_1.png",
+    review: "Perfect little desk companion. Great quality for the price.",
+  },
   {
     img: "/images/community/Yello_orchid_(1).jpg",
-    caption: "Best unboxing moment \ud83d\udc9b",
-    rotate: -2,
-    tall: true,
+    review: "Best unboxing moment — the packaging alone felt like a gift.",
   },
   {
     img: "/images/community/sun_on_desk.png",
-    caption: "Found the perfect little spot",
-    rotate: -2,
+    review: "Found the perfect little spot for it. Love the craftsmanship.",
   },
   {
     img: "/images/community/sunflower_rosebig_.jpg",
-    caption: null,
-    rotate: 2,
+    review: "Bigger and cozier than I expected. Worth every rupee.",
   },
   {
     img: "/images/community/sun_on_couch.jpg",
-    caption: "Settling into his new home",
-    rotate: -3,
-    framed: true,
+    review:
+      "Settling into his new home. Already my favorite thing on the couch.",
   },
 ];
 
@@ -87,74 +82,33 @@ const founderPromises = [
             stroke-width="1.1"></path></svg
         >
       </p>
-      <h2 class="wall-heading">
-        Loved, Used, and Shared by <em>You</em>
-        <svg
-          class="heading-heart"
-          width="30"
-          height="27"
-          viewBox="0 0 30 27"
-          fill="none"
-          ><path
-            d="M15 26S2 18 2 9.5C2 4.8 5.4 2 9.2 2c2.4 0 4.6 1.3 5.8 3.4C16.2 3.3 18.4 2 20.8 2 24.6 2 28 4.8 28 9.5 28 18 15 26 15 26z"
-            stroke="var(--kn-rose)"
-            stroke-width="1.4"></path></svg
-        >
-      </h2>
+
       <p class="wall-sub">
         A small glimpse into the homes and hands our pieces have found.
       </p>
     </header>
 
-    <div class="wall-gallery">
-      {
-        galleryItems.map((item, i) => (
-          <figure
-            class:list={[
-              "wall-item",
-              "kn-fade-up",
-              { "wall-item--tall": item.tall },
-            ]}
-            style={`--rot:${item.rotate}deg; transition-delay:${i * 70}ms`}
-          >
-            {item.framed ? (
+    <div class="wall-marquee-viewport">
+      <div class="wall-gallery">
+        {
+          [...galleryItems, ...galleryItems].map((item) => (
+            <div class="review-card">
               <img
-                class="wall-img wall-img--framed"
+                class="review-card-img"
                 src={item.img}
                 alt="Sunflora customer moment"
                 loading="lazy"
               />
-            ) : (
-              <div class="polaroid">
-                <span class="tape" aria-hidden="true" />
-                <img
-                  src={item.img}
-                  alt="Sunflora customer moment"
-                  loading="lazy"
-                />
+              <div class="review-card-stars">
+                {"★★★★★".split("").map((s) => (
+                  <span>{s}</span>
+                ))}
               </div>
-            )}
-            {item.caption && (
-              <figcaption class="note-card">
-                {item.caption}
-                <svg
-                  width="11"
-                  height="10"
-                  viewBox="0 0 11 10"
-                  fill="none"
-                  class="note-heart"
-                >
-                  <path
-                    d="M5.5 9.3S1 6.5 1 3.6C1 2 2.1 1 3.4 1c.8 0 1.6.4 2.1 1.1C6 1.4 6.8 1 7.6 1 8.9 1 10 2 10 3.6c0 2.9-4.5 5.7-4.5 5.7z"
-                    stroke="var(--kn-brown-muted)"
-                    stroke-width="0.9"
-                  />
-                </svg>
-              </figcaption>
-            )}
-          </figure>
-        ))
-      }
+              <p class="review-card-text">{item.review}</p>
+            </div>
+          ))
+        }
+      </div>
     </div>
 
     <div class="wall-cta">
@@ -396,15 +350,6 @@ const founderPromises = [
     border: 1px solid rgba(255, 255, 255, 0.4);
   }
 
-  /* image that already has its own physical frame (instax-style) */
-  .wall-img--framed {
-    display: block;
-    width: 100%;
-    aspect-ratio: 1;
-    object-fit: cover;
-    box-shadow: 0 10px 24px rgba(92, 61, 46, 0.14);
-  }
-
   /* ---------- community wall ---------- */
   .wall-section {
     position: relative;
@@ -464,56 +409,61 @@ const founderPromises = [
     color: var(--kn-brown-light);
   }
 
-  .wall-gallery {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    grid-auto-flow: dense;
-    grid-auto-rows: minmax(150px, auto);
-    gap: 20px 24px;
+  .wall-marquee-viewport {
+    overflow: hidden;
     position: relative;
     z-index: 1;
+    margin: 0 -5vw;
+    padding: 0 5vw;
   }
-  .wall-item {
+  .wall-gallery {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    width: max-content;
+    animation: wall-scroll 45s linear infinite;
+  }
+  .wall-marquee-viewport:hover .wall-gallery {
+    animation-play-state: paused;
+  }
+  @keyframes wall-scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  .review-card {
+    flex: 0 0 auto;
+    width: 240px;
+    background: var(--kn-white);
+    border: 1px solid rgba(92, 61, 46, 0.1);
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 6px 18px rgba(92, 61, 46, 0.08);
+    padding: 14px;
     display: flex;
     flex-direction: column;
     gap: 10px;
-    /* override the generic .kn-fade-up transform so rotation survives the reveal */
-    transform: rotate(var(--rot)) translateY(20px);
   }
-  .wall-item.in-view {
-    transform: rotate(var(--rot)) translateY(0);
+  .review-card-img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 0;
+    display: block;
   }
-  .wall-item--tall {
-    grid-row: span 2;
-  }
-  .wall-item--tall .polaroid img,
-  .wall-item--tall .wall-img--framed {
-    aspect-ratio: 3/4;
-    height: 100%;
-  }
-  .wall-item:hover {
-    transform: rotate(0deg) scale(1.03);
-    transition: transform 0.35s ease;
-  }
-
-  .note-card {
-    align-self: center;
-    transform: rotate(calc(var(--rot) * -0.6));
-    background: var(--kn-white);
-    border: 1px solid rgba(92, 61, 46, 0.08);
-    box-shadow: 0 6px 14px rgba(92, 61, 46, 0.1);
-    padding: 10px 14px;
-    font-family: var(--kn-font-body);
-    font-size: 13px;
-    color: var(--kn-brown);
+  .review-card-stars {
     display: flex;
-    align-items: center;
-    gap: 6px;
-    justify-content: center;
-    text-align: center;
+    gap: 2px;
+    color: var(--kn-rose);
+    font-size: 13px;
   }
-  .note-heart {
-    flex-shrink: 0;
+  .review-card-text {
+    font-family: var(--kn-font-body);
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--kn-brown);
   }
 
   .wall-cta {
@@ -699,9 +649,6 @@ const founderPromises = [
 
   /* ---------- responsive ---------- */
   @media (max-width: 1024px) {
-    .wall-gallery {
-      grid-template-columns: repeat(3, 1fr);
-    }
     .founder-layout {
       grid-template-columns: 1fr;
     }
@@ -713,17 +660,8 @@ const founderPromises = [
     }
   }
   @media (max-width: 640px) {
-    .wall-gallery {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
-    }
-    .wall-item--tall {
-      grid-row: span 1;
-    }
-    .wall-item--tall .polaroid img,
-    .wall-item--tall .wall-img--framed {
-      aspect-ratio: 1;
-      height: auto;
+    .review-card {
+      width: 180px;
     }
     .wall-heading {
       font-size: 30px;
@@ -740,8 +678,8 @@ const founderPromises = [
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .wall-item {
-      transition: none;
+    .wall-gallery {
+      animation: none;
     }
     .share-btn:hover {
       transform: none;
