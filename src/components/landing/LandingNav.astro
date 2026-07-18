@@ -32,10 +32,11 @@ const cleanPathname = pathname.replace(/\/$/, "");
           const isShop = cleanPathname.includes("/productlist") && l.label === "Shop";
           const isCustom = cleanPathname.includes("/custom") && l.label === "Custom Orders";
           const isContact = cleanPathname.includes("/contact") && l.label === "Contact";
+          const isTrackOrder = cleanPathname.includes("/track-order") && l.label === "Track Order";
           const isHome =
             (cleanPathname === "" || cleanPathname === "/") &&
             l.label === "Home";
-          const isActive = isShop || isHome || isCustom || isContact;
+          const isActive = isShop || isHome || isCustom || isContact || isTrackOrder;
           return (
             <a
               href={l.href}
@@ -515,6 +516,8 @@ const cleanPathname = pathname.replace(/\/$/, "");
       } else if (pathname.includes("/custom") && label === "Custom Orders") {
         link.classList.add("active");
       } else if (pathname.includes("/contact") && label === "Contact") {
+        link.classList.add("active");
+      } else if (pathname.includes("/track-order") && label === "Track Order") {
         link.classList.add("active");
       } else {
         link.classList.remove("active");
