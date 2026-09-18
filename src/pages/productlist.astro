@@ -15,7 +15,6 @@ import CLIPS from "../assets/crochet_hair_clips.png";
 
 import { getImageUrl } from "../lib/images";
 import { createClient } from "@supabase/supabase-js";
-import ProductListHeader from "../components/ProductListHeader.astro";
 import ProductListCategoryBar from "../components/ProductListCategoryBar.astro";
 import ProductListControls from "../components/ProductListControls.astro";
 import ProductListGrid from "../components/ProductListGrid.astro";
@@ -162,9 +161,6 @@ const categories = [
 >
     <!-- ── NAV ── -->
     <LandingNav />
-
-    <!-- ── SHOP HEADER ── -->
-    <ProductListHeader productCount={allProducts.length} />
 
     <!-- ── STICKY CATEGORY BAR ── -->
     <ProductListCategoryBar categories={categories} />

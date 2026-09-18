@@ -3,26 +3,31 @@
 const products = [
   {
     name: "Cozy Teddy Bear",
+    category: "Soft Toys",
     img: "/images/landing/prod-teddy.png",
     price: "₹1,199",
   },
   {
     name: "Crochet Flower Basket",
+    category: "Home Decor",
     img: "/images/landing/prod-basket.png",
     price: "₹499",
   },
   {
     name: "Tulip Bouquet",
+    category: "Flower Bouquets",
     img: "/images/landing/prod-tulips.png",
     price: "₹899",
   },
   {
     name: "Pink Bunny Amigurumi",
+    category: "Soft Toys",
     img: "/images/landing/prod-bunny.png",
     price: "₹299",
   },
   {
     name: "Round Cushion",
+    category: "Home Decor",
     img: "/images/landing/prod-pillow.png",
     price: "₹849",
   },
@@ -74,8 +79,11 @@ const products = [
                 </button>
               </div>
               <div class="card-body">
-                <p class="card-title">{p.name}</p>
-                <p class="card-price">{p.price}</p>
+                <span class="card-cat">{p.category}</span>
+                <p class="card-price-row">
+                  <span class="card-price">From {p.price}</span>
+                  <span class="card-arrow" aria-hidden="true">→</span>
+                </p>
               </div>
             </div>
           ))
@@ -181,6 +189,38 @@ const products = [
     position: relative;
     overflow: hidden;
     border-radius: var(--kn-radius-md) var(--kn-radius-md) 0 0;
+    background: var(--kn-cream-dark);
+  }
+
+  /* Full, uncropped product photo instead of a cover-cropped square */
+  .carousel-card .card-img {
+    object-fit: contain;
+  }
+
+  .card-cat {
+    font-family: var(--kn-font-body);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--kn-brown-muted);
+    font-weight: 600;
+  }
+
+  .card-price-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-top: 4px;
+  }
+
+  .card-arrow {
+    color: var(--kn-rose);
+    font-weight: 600;
+    transition: transform 0.3s ease;
+  }
+
+  .kn-product-card:hover .card-arrow {
+    transform: translateX(3px);
   }
 
   .wishlist-btn {
