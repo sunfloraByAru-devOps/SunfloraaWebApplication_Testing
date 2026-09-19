@@ -9,10 +9,10 @@ const shopLinks = [
 ];
 
 const customerLinks = [
-  { label: "FAQ", href: "#" },
-  { label: "Shipping & Delivery", href: "#" },
-  { label: "Returns & Refunds", href: "#" },
-  { label: "Track Order", href: "#" },
+  { label: "FAQ", href: "/faq" },
+  { label: "Shipping & Delivery", href: "/faq#shipping" },
+  { label: "Returns & Refunds", href: "/faq#returns" },
+  { label: "Track Order", href: "/track-order" },
   { label: "Contact Us", href: "/contact" },
 ];
 
@@ -149,7 +149,9 @@ const aboutLinks = [
 
     <!-- Bottom bar -->
     <div class="footer-bottom">
-      <p class="footer-copy">© 2025 Sunflora. All rights reserved.</p>
+      <p class="footer-copy">
+        © {new Date().getFullYear()} Sunflora. All rights reserved.
+      </p>
     </div>
   </div>
 </footer>

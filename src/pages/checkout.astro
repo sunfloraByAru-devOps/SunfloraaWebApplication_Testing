@@ -176,8 +176,8 @@ import LoginGate from "../components/LoginGate.astro";
     import { getCart, cartSubtotal } from "../lib/cart.ts";
     import { supabase } from "../lib/supabase.ts";
 
-    const FREE_SHIPPING_THRESHOLD = 999;
-    const FLAT_SHIPPING_FEE = 79;
+    const FREE_SHIPPING_THRESHOLD = 0; // every order qualifies
+    const FLAT_SHIPPING_FEE = 0; // Shipping is free on every order
 
     /** @param {number | string} n */
     function money(n) {
