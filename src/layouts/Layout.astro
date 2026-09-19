@@ -4,6 +4,9 @@ const {
   title = "My Website",
   description = "My awesome website",
 } = Astro.props;
+
+/* Canonical URL — without this, /faq and /faq/ can be indexed as duplicates. */
+const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
 ---
 
 <!DOCTYPE html>
@@ -13,6 +16,7 @@ const {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
 
     <!-- Browser UI theme color -->
     <meta name="theme-color" content="#FFF8F0" media="(prefers-color-scheme: light)" />
@@ -26,11 +30,17 @@ const {
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content="Sunflora" />
+    <meta property="og:locale" content="en_IN" />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
+
+    <!-- Per-page head extras (structured data, preloads) -->
+    <slot name="head" />
   </head>
 
   <body class="paper-grain min-h-screen relative">

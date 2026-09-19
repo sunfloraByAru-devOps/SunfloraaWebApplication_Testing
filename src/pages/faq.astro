@@ -5,10 +5,14 @@ import LandingFooter from "../components/landing/LandingFooter.astro";
 import LandingFaq from "../components/landing/LandingFaq.astro";
 import { faqGroups } from "../data/faqs";
 
-/* FAQPage structured data — lets Google surface these answers directly. */
+const site = "https://sunfloracrochet.in";
+
+/* FAQPage — lets Google surface these answers directly in search results. */
 const faqSchema = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
+  "@id": `${site}/faq#faq`,
+  inLanguage: "en-IN",
   mainEntity: faqGroups.flatMap((group) =>
     group.items.map((item) => ({
       "@type": "Question",
@@ -17,12 +21,59 @@ const faqSchema = {
     })),
   ),
 };
+
+/* Breadcrumbs — gives the result a readable path instead of a bare URL. */
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: `${site}/` },
+    { "@type": "ListItem", position: 2, name: "FAQ", item: `${site}/faq` },
+  ],
+};
+
+/* Who is answering. Ties the FAQ to the business for entity search. */
+const businessSchema = {
+  "@context": "https://schema.org",
+  "@type": "Store",
+  "@id": `${site}/#store`,
+  name: "Sunflora",
+  description:
+    "Handmade crochet studio in India — amigurumi soft toys, crochet flower bouquets, home decor and custom orders, made to order and shipped free across India.",
+  url: site,
+  email: "sunflorabyaru@gmail.com",
+  founder: { "@type": "Person", name: "Aru Jaiswal" },
+  areaServed: { "@type": "Country", name: "India" },
+  currenciesAccepted: "INR",
+  paymentAccepted: "UPI, Credit Card, Debit Card, Net Banking",
+  sameAs: ["https://www.instagram.com/sunfloraa.a/"],
+};
+
+const totalQuestions = faqGroups.reduce((n, g) => n + g.items.length, 0);
 ---
 
 <Layout
-  title="FAQ — Sunflora | Handmade Crochet"
-  description="Shipping, custom orders, returns and care — everything people ask us about our handmade crochet pieces, answered honestly."
+  title="FAQ — Sunflora | Handmade Crochet Soft Toys & Flower Bouquets"
+  description="Shipping, custom orders, returns, care and safety — everything people ask about our handmade crochet bouquets and amigurumi. Free shipping across India, made to order in 7–10 days."
 >
+  <Fragment slot="head">
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(faqSchema)}
+      is:inline
+    />
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(breadcrumbSchema)}
+      is:inline
+    />
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(businessSchema)}
+      is:inline
+    />
+  </Fragment>
+
   <LandingNav />
 
   <main>
@@ -30,13 +81,29 @@ const faqSchema = {
       <!-- Page hero -->
       <section class="faq-hero">
         <div class="kn-container">
+          <nav class="faq-crumbs" aria-label="Breadcrumb">
+            <a href="/">Home</a>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page">FAQ</span>
+          </nav>
+
           <span class="faq-hero-eyebrow">The asked things</span>
           <h1 class="faq-hero-title">Curious? <em>Same.</em></h1>
           <p class="faq-hero-sub">
-            Everything people write to us about — how long things take, what
-            they're made of, and what happens if something isn't right. If your
-            question isn't here, just <a href="/contact">ask us</a>.
+            {totalQuestions} honest answers about our handmade crochet — how long
+            a piece takes to make, what it's made of, whether it's safe for a
+            baby, and what happens if something isn't right. If your question
+            isn't here, just <a href="/contact">ask us</a>.
           </p>
+
+          <!-- Short, scannable facts. These are what people actually search for,
+               and what a featured snippet is most likely to lift. -->
+          <ul class="faq-facts">
+            <li><strong>Free shipping</strong><span>every order, all India</span></li>
+            <li><strong>7–10 days</strong><span>made to order</span></li>
+            <li><strong>7-day returns</strong><span>on ready-made pieces</span></li>
+            <li><strong>Cotton yarn</strong><span>baby-safe on request</span></li>
+          </ul>
 
           <nav class="faq-jump" aria-label="Jump to a topic">
             {
@@ -52,7 +119,7 @@ const faqSchema = {
 
       <LandingFaq variant="full" showHeader={false} />
 
-      <!-- Closing CTA -->
+      <!-- Closing CTA + internal links -->
       <section class="faq-cta">
         <div class="kn-container">
           <div class="faq-cta-card kn-fade-up">
@@ -77,6 +144,12 @@ const faqSchema = {
                 <polyline points="12 5 19 12 12 19"></polyline>
               </svg>
             </a>
+
+            <div class="faq-links">
+              <a href="/productlist">Shop all crochet pieces</a>
+              <a href="/custom">Start a custom order</a>
+              <a href="/track-order">Track an order</a>
+            </div>
           </div>
         </div>
       </section>
@@ -84,19 +157,34 @@ const faqSchema = {
   </main>
 
   <LandingFooter />
-
-  <script
-    type="application/ld+json"
-    set:html={JSON.stringify(faqSchema)}
-    is:inline
-  />
 </Layout>
 
 <style>
   .faq-hero {
     background: var(--kn-cream-alt);
-    padding: 72px 0 64px;
+    padding: 56px 0 64px;
     text-align: center;
+  }
+
+  .faq-crumbs {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: var(--kn-font-body);
+    font-size: 12px;
+    color: var(--kn-brown-muted);
+    margin-bottom: 28px;
+  }
+
+  .faq-crumbs a {
+    color: var(--kn-brown-muted);
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  .faq-crumbs a:hover {
+    color: var(--kn-rose);
   }
 
   .faq-hero-eyebrow {
@@ -129,7 +217,7 @@ const faqSchema = {
     font-size: 15px;
     line-height: 1.75;
     color: var(--kn-brown-light);
-    max-width: 520px;
+    max-width: 560px;
     margin: 0 auto;
   }
 
@@ -139,12 +227,47 @@ const faqSchema = {
     text-underline-offset: 3px;
   }
 
+  .faq-facts {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    list-style: none;
+    padding: 0;
+    margin: 36px auto 0;
+    max-width: 720px;
+  }
+
+  .faq-facts li {
+    flex: 1 1 150px;
+    background: var(--kn-white);
+    border: 1px solid var(--kn-taupe-light);
+    border-radius: var(--kn-radius-md);
+    padding: 16px 14px;
+  }
+
+  .faq-facts strong {
+    display: block;
+    font-family: var(--kn-font-body);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--kn-rose);
+    margin-bottom: 3px;
+  }
+
+  .faq-facts span {
+    font-family: var(--kn-font-body);
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--kn-brown-muted);
+  }
+
   .faq-jump {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 10px;
-    margin-top: 32px;
+    margin-top: 36px;
   }
 
   .faq-jump-link {
@@ -196,9 +319,41 @@ const faqSchema = {
     margin-bottom: 28px;
   }
 
+  .faq-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px 24px;
+    margin-top: 32px;
+    padding-top: 26px;
+    border-top: 1px solid var(--kn-taupe);
+  }
+
+  .faq-links a {
+    font-family: var(--kn-font-body);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--kn-brown-light);
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  .faq-links a:hover {
+    color: var(--kn-rose);
+  }
+
   @media (max-width: 640px) {
     .faq-hero {
-      padding: 48px 0 44px;
+      padding: 40px 0 44px;
+    }
+
+    .faq-facts {
+      gap: 8px;
+    }
+
+    .faq-facts li {
+      flex: 1 1 calc(50% - 8px);
+      padding: 13px 10px;
     }
 
     .faq-cta-card {

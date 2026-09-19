@@ -2,7 +2,7 @@
 import { faqGroups, homeFaqs, type FaqGroup } from "../../data/faqs";
 
 interface Props {
-  /** "compact" = 6-question homepage teaser, "full" = all groups on /faq */
+  /** "compact" = 4-question homepage teaser, "full" = all groups on /faq */
   variant?: "compact" | "full";
   eyebrow?: string;
   title?: string;
@@ -46,12 +46,16 @@ const groups: FaqGroup[] =
         groups.map((group) => (
           <div class="faq-group" id={variant === "full" ? group.id : undefined}>
             {group.title && (
-              <h3 class="faq-group-title kn-fade-up">{group.title}</h3>
+              <div class="faq-group-head kn-fade-up">
+                <h2 class="faq-group-title">{group.title}</h2>
+                {group.blurb && <p class="faq-group-blurb">{group.blurb}</p>}
+              </div>
             )}
 
             <div class="faq-list">
               {group.items.map((item, i) => {
                 const bodyId = `faq-${group.id}-${i}`;
+                const open = "defaultOpen" in item && item.defaultOpen === true;
                 return (
                   <div
                     class="faq-item kn-fade-up"
@@ -60,7 +64,7 @@ const groups: FaqGroup[] =
                     <button
                       class="faq-trigger"
                       type="button"
-                      aria-expanded="false"
+                      aria-expanded={open ? "true" : "false"}
                       aria-controls={bodyId}
                       data-target={bodyId}
                     >
@@ -81,7 +85,7 @@ const groups: FaqGroup[] =
                       </svg>
                     </button>
 
-                    <div class="faq-body" id={bodyId}>
+                    <div class={`faq-body${open ? " open" : ""}`} id={bodyId}>
                       <div class="faq-inner">
                         <p class="faq-a">{item.a}</p>
                       </div>
@@ -151,14 +155,27 @@ const groups: FaqGroup[] =
     scroll-margin-top: 110px;
   }
 
+  .faq-group-head {
+    margin-bottom: 8px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--kn-taupe);
+  }
+
   .faq-group-title {
     font-family: var(--kn-font-heading);
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 700;
     color: var(--kn-brown);
-    margin-bottom: 8px;
-    padding-bottom: 14px;
-    border-bottom: 1px solid var(--kn-taupe);
+    margin: 0 0 6px;
+  }
+
+  .faq-group-blurb {
+    font-family: var(--kn-font-body);
+    font-size: 13.5px;
+    line-height: 1.65;
+    color: var(--kn-brown-muted);
+    margin: 0;
+    max-width: 560px;
   }
 
   .faq-item {
@@ -277,6 +294,10 @@ const groups: FaqGroup[] =
 
     .faq-group + .faq-group {
       margin-top: 40px;
+    }
+
+    .faq-group-title {
+      font-size: 19px;
     }
   }
 
