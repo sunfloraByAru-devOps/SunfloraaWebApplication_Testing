@@ -32,11 +32,14 @@ const breadcrumbSchema = {
   ],
 };
 
-/* Who is answering. Ties the FAQ to the business for entity search. */
+/* Who is answering. Reuses the same Organization entity declared on the homepage
+   (matching @id) rather than a separate LocalBusiness/Store — Sunflora has no
+   storefront customers visit, so "Store" would misrepresent the business and
+   fragment the entity graph across two different @ids. */
 const businessSchema = {
   "@context": "https://schema.org",
-  "@type": "Store",
-  "@id": `${site}/#store`,
+  "@type": "Organization",
+  "@id": `${site}/#organization`,
   name: "Sunflora",
   description:
     "Handmade crochet studio in India — amigurumi soft toys, crochet flower bouquets, home decor and custom orders, made to order and shipped free across India.",
@@ -44,8 +47,6 @@ const businessSchema = {
   email: "sunflorabyaru@gmail.com",
   founder: { "@type": "Person", name: "Aru Jaiswal" },
   areaServed: { "@type": "Country", name: "India" },
-  currenciesAccepted: "INR",
-  paymentAccepted: "UPI, Credit Card, Debit Card, Net Banking",
   sameAs: ["https://www.instagram.com/sunfloraa.a/"],
 };
 

@@ -1,4 +1,6 @@
 ---
+import { productSlug } from "../lib/slug";
+
 interface Product {
   id: number;
   name: string;
@@ -23,7 +25,7 @@ const { products } = Astro.props;
             products.map((p) => {
                 return (
                     <a
-                        href={`/productdetail/${p.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')}`}
+                        href={`/productdetail/${productSlug(p.name)}`}
                         class={`prod-card${
                             !p.inStock ? " out-of-stock" : ""
                         }`}

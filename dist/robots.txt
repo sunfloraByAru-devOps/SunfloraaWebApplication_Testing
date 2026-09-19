@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+Disallow: /account/
+Disallow: /cart/
+Disallow: /checkout/
+Disallow: /order-confirmation/
+Disallow: /login/
+Disallow: /signup/
+Disallow: /productdetail/product-not-found/
+
+Sitemap: https://sunfloracrochet.in/sitemap-index.xml

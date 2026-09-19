@@ -61,29 +61,31 @@ const groups: FaqGroup[] =
                     class="faq-item kn-fade-up"
                     style={`transition-delay: ${i * 0.08}s`}
                   >
-                    <button
-                      class="faq-trigger"
-                      type="button"
-                      aria-expanded={open ? "true" : "false"}
-                      aria-controls={bodyId}
-                      data-target={bodyId}
-                    >
-                      <span class="faq-q">{item.q}</span>
-                      <svg
-                        class="faq-icon"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        aria-hidden="true"
+                    <h3 class="faq-q-head">
+                      <button
+                        class="faq-trigger"
+                        type="button"
+                        aria-expanded={open ? "true" : "false"}
+                        aria-controls={bodyId}
+                        data-target={bodyId}
                       >
-                        <line x1="12" y1="5" x2="12" y2="19" />
-                        <line x1="5" y1="12" x2="19" y2="12" />
-                      </svg>
-                    </button>
+                        <span class="faq-q">{item.q}</span>
+                        <svg
+                          class="faq-icon"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          aria-hidden="true"
+                        >
+                          <line x1="12" y1="5" x2="12" y2="19" />
+                          <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                      </button>
+                    </h3>
 
                     <div class={`faq-body${open ? " open" : ""}`} id={bodyId}>
                       <div class="faq-inner">
@@ -180,6 +182,11 @@ const groups: FaqGroup[] =
 
   .faq-item {
     border-bottom: 1px solid var(--kn-taupe-light);
+  }
+
+  .faq-q-head {
+    margin: 0;
+    font: inherit;
   }
 
   .faq-trigger {

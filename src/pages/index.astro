@@ -11,12 +11,51 @@ import LandingFounder from "../components/landing/LandingFounder.astro";
 import LandingFaq from "../components/landing/LandingFaq.astro";
 import LandingStoryBanner from "../components/landing/LandingStoryBanner.astro";
 import LandingFooter from "../components/landing/LandingFooter.astro";
+
+const site = "https://sunfloracrochet.in";
+
+/* Organization — ties the brand entity together for Knowledge Panel / entity search. */
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "@id": `${site}/#organization`,
+  name: "Sunflora",
+  url: site,
+  email: "sunflorabyaru@gmail.com",
+  founder: { "@type": "Person", name: "Aru Jaiswal" },
+  areaServed: { "@type": "Country", name: "India" },
+  sameAs: ["https://www.instagram.com/sunfloraa.a/"],
+};
+
+/* WebSite — required base entity most other schema (BreadcrumbList, Product) implicitly references. */
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": `${site}/#website`,
+  url: site,
+  name: "Sunflora",
+  publisher: { "@id": `${site}/#organization` },
+  inLanguage: "en-IN",
+};
 ---
 
 <Layout
   title="Sunflora — Handmade Crochet, Made with Love ♡"
   description="Handmade crochet creations crafted with love. Shop flower bouquets, soft toys, home decor, and custom orders."
 >
+  <Fragment slot="head">
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(organizationSchema)}
+      is:inline
+    />
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(websiteSchema)}
+      is:inline
+    />
+  </Fragment>
+
   <LandingNav />
   <LandingHero />
   <LandingCategories />

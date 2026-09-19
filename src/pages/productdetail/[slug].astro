@@ -11,6 +11,7 @@ import PRODUCT_LIFE from "../../assets/spiderman.jpg";
 import DINO from "../../assets/green-dino.jpg";
 import SUNMOON from "../../assets/sun_and_moon.jpg";
 import { getImageUrl } from "../../lib/images";
+import { productSlug } from "../../lib/slug";
 
 import { createClient } from "@supabase/supabase-js";
 import ProductBreadcrumb from "../../components/ProductBreadcrumb.astro";
@@ -35,20 +36,15 @@ export async function getStaticPaths() {
     .from("products")
     .select("name")
     .eq("is_active", true);
+  const { productSlug } = await import("../../lib/slug");
   const paths = (data || []).map((p: any) => ({
-    params: {
-      slug: p.name
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)+/g, ""),
-    },
+    params: { slug: productSlug(p.name) },
   }));
   paths.push({ params: { slug: "product-not-found" } });
   return paths;
 }
 
-const initialProductSlug = Astro.params.slug || "sunshine-amigurumi";
-const productSlug = initialProductSlug;
+const currentSlug = Astro.params.slug || "sunshine-amigurumi";
 
 // Fetch all active products
 const { data: allDbProducts } = await supabase
@@ -138,10 +134,7 @@ const getRelatedProducts = (currentId: any) => {
       return {
         id: r.id,
         name: r.name,
-        slug: r.name
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, "-")
-          .replace(/(^-|-$)+/g, ""),
+        slug: productSlug(r.name),
         tag: r.tag || "",
         price: r.base_price,
         mrp: r.base_mrp,
@@ -158,10 +151,7 @@ const mappedProducts: Record<string, any> = {};
 
 if (allDbProducts) {
   for (const data of allDbProducts) {
-    const slug = data.name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)+/g, "");
+    const slug = productSlug(data.name);
     mappedProducts[slug] = {
       id: data.id,
       slug: slug,
@@ -173,6 +163,7 @@ if (allDbProducts) {
       sku: data.sku || `SFL-${data.id}`,
       rating: data.avg_rating || 0,
       reviewCount: (data.reviews || []).length,
+      inStock: data.in_stock,
       price: data.base_price,
       mrp: data.base_mrp,
       description: data.description,
@@ -251,44 +242,114 @@ if (allDbProducts) {
   }
 }
 
-// Fallback if no products are found in database
-if (Object.keys(mappedProducts).length === 0) {
-  mappedProducts["product-not-found"] = {
-    id: 1,
-    slug: "product-not-found",
-    name: "Product Not Found",
-    brand: "Sunflora Studio",
-    description: "This product could not be found or has no approved reviews.",
-    price: 0,
-    mrp: 0,
-    images: [] as any[],
-    sizes: [],
-    colors: [],
-    details: [],
-    includes: [],
-    reviews: [],
-    ratingBreakdown: [] as any[],
-    customerInsights: [],
-    related: [],
-  };
-}
+// Always available so the literal "product-not-found" route (and any slug
+// that doesn't match a real product) renders a genuine not-found state
+// instead of silently falling back to an arbitrary real product.
+mappedProducts["product-not-found"] = {
+  id: 0,
+  slug: "product-not-found",
+  name: "Product Not Found",
+  brand: "Sunflora Studio",
+  description: "This product could not be found or has no approved reviews.",
+  price: 0,
+  mrp: 0,
+  images: [] as any[],
+  sizes: [],
+  colors: [],
+  details: [],
+  includes: [],
+  reviews: [],
+  ratingBreakdown: [] as any[],
+  customerInsights: [],
+  related: [],
+};
 
 // Determine initial product for server-side HTML rendering
-const product =
-  mappedProducts[productSlug] ||
-  Object.values(mappedProducts)[0] ||
-  mappedProducts["product-not-found"];
+const product = mappedProducts[currentSlug] || mappedProducts["product-not-found"];
 
 const images = product.images;
 const discount =
   product.mrp > 0 ? Math.round((1 - product.price / product.mrp) * 100) : 0;
 const productsJson = JSON.stringify(mappedProducts);
+
+const site = "https://sunfloracrochet.in";
+const productUrl = `${site}/productdetail/${product.slug}`;
+const isRealProduct = product.slug !== "product-not-found" && images.length > 0;
+
+/* Product/Offer — rendered from the same Supabase data fetched above at build
+   time, so it's present in the initial HTML rather than injected by the
+   client-side hydration script (Google processes JS-injected Product/Offer
+   markup on a delayed pass). */
+const productSchema = isRealProduct
+  ? {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "@id": `${productUrl}#product`,
+      name: product.name,
+      description: product.description,
+      sku: product.sku,
+      image: images.map((img: any) => img.src),
+      brand: { "@type": "Brand", name: product.brand },
+      offers: {
+        "@type": "Offer",
+        url: productUrl,
+        priceCurrency: "INR",
+        price: product.price,
+        availability:
+          product.inStock === false
+            ? "https://schema.org/OutOfStock"
+            : "https://schema.org/InStock",
+      },
+      ...(product.reviewCount > 0
+        ? {
+            aggregateRating: {
+              "@type": "AggregateRating",
+              ratingValue: product.rating,
+              reviewCount: product.reviewCount,
+            },
+          }
+        : {}),
+    }
+  : null;
+
+const breadcrumbSchema = isRealProduct
+  ? {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: `${site}/` },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Shop",
+          item: `${site}/productlist`,
+        },
+        { "@type": "ListItem", position: 3, name: product.name, item: productUrl },
+      ],
+    }
+  : null;
 ---
 
 <Layout
   title={`${product.name} — ${product.brand}`}
   description={product.description}
 >
+  {
+    productSchema && (
+      <Fragment slot="head">
+        <script
+          type="application/ld+json"
+          set:html={JSON.stringify(productSchema)}
+          is:inline
+        />
+        <script
+          type="application/ld+json"
+          set:html={JSON.stringify(breadcrumbSchema)}
+          is:inline
+        />
+      </Fragment>
+    )
+  }
   <LandingNav />
   <div style="height: 72px; background-color: #fff8f0;"></div>
   <ProductBreadcrumb product={product} />
@@ -402,7 +463,8 @@ const productsJson = JSON.stringify(mappedProducts);
       const stickyPrice = document.getElementById("sticky-price");
       const stickyName = document.getElementById("sticky-name");
 
-      const discount = Math.round((1 - product.price / product.mrp) * 100);
+      const discount =
+        product.mrp > 0 ? Math.round((1 - product.price / product.mrp) * 100) : 0;
       if (activePrice) activePrice.textContent = "₹ " + product.price;
       if (activeMrp) activeMrp.textContent = "MRP ₹ " + product.mrp;
       if (activeDisc) activeDisc.textContent = "(" + discount + "% OFF)";

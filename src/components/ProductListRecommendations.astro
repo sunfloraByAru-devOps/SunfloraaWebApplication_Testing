@@ -1,4 +1,6 @@
 ---
+import { productSlug } from "../lib/slug";
+
 interface Recommendation {
   id: number;
   name: string;
@@ -46,7 +48,7 @@ const { recommendations } = Astro.props;
                 recommendations.map((p) => {
                     return (
                         <a
-                            href={`/productdetail/${p.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')}`}
+                            href={`/productdetail/${productSlug(p.name)}`}
                             class="prod-card"
                             aria-label={`${p.name} — ₹${p.price}`}
                         >
