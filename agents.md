@@ -74,6 +74,13 @@ The brand identity is being redesigned to match a warm, pastel, feminine "Sunflo
 - `prod-bunny.png` — Small bunny
 - `prod-basket.png` — Crochet basket
 
+## Content management
+- Content is edited directly in Supabase for now. A purpose-built admin dashboard at
+  `/admin` is the planned replacement — see `ADMIN_DASHBOARD_PROMPT.md`.
+- A Directus CMS was trialled (Sept 2026) and removed: its admin UI exposed raw tables
+  and column names, which was not workable for a non-technical owner. Nothing in `src/`
+  ever depended on it — the storefront has always read Supabase directly.
+
 ## Notes
 - Site was previously a dark/gold artisanal theme — being redesigned to pastel "Sunflora" style
 - Supabase integration for dynamic products remains — landing page is primarily static

@@ -75,7 +75,10 @@ const { data: products } = await supabase
   `,
     )
     .eq("is_active", true)
-    .order("display_order");
+    // Deterministic shop order: owner-set display_order first (nulls last),
+    // then name as a stable tiebreaker so the build output never reshuffles.
+    .order("display_order", { ascending: true, nullsFirst: false })
+    .order("name", { ascending: true });
 
 // ── All products ──────────────────────────────────────────
 const allProducts =
@@ -108,6 +111,8 @@ const { data: recoData } = await supabase
     )
     .eq("is_active", true)
     .order("avg_rating", { ascending: false })
+    // Stable tiebreaker only — primary sort stays "best rated first".
+    .order("name", { ascending: true })
     .limit(4);
 
 const recommendations = (recoData || []).map((p) => {
@@ -131,7 +136,8 @@ const { data: dbCategories } = await supabase
     .from("categories")
     .select("name")
     .eq("is_active", true)
-    .order("display_order");
+    .order("display_order", { ascending: true, nullsFirst: false })
+    .order("name", { ascending: true });
 
 // Extract unique categories directly from products as a reliable fallback
 const uniqueCategories = [

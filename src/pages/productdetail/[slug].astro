@@ -35,7 +35,10 @@ export async function getStaticPaths() {
   const { data } = await supabase
     .from("products")
     .select("name")
-    .eq("is_active", true);
+    .eq("is_active", true)
+    // Deterministic page-generation order (display_order first, nulls last).
+    .order("display_order", { ascending: true, nullsFirst: false })
+    .order("name", { ascending: true });
   const { productSlug } = await import("../../lib/slug");
   const paths = (data || []).map((p: any) => ({
     params: { slug: productSlug(p.name) },
@@ -67,7 +70,10 @@ const { data: allDbProducts } = await supabase
     )
   `,
   )
-  .eq("is_active", true);
+  .eq("is_active", true)
+  // Deterministic order so the emitted product map/JSON is byte-stable.
+  .order("display_order", { ascending: true, nullsFirst: false })
+  .order("name", { ascending: true });
 
 // Fetch all products_with_image for related sections
 const { data: rawRelated } = await supabase
@@ -75,7 +81,10 @@ const { data: rawRelated } = await supabase
   .select(
     "id, name, category_name, base_price, base_mrp, tag, primary_image_path",
   )
-  .eq("is_active", true);
+  .eq("is_active", true)
+  // Related products follow the owner's display_order, with a name tiebreaker.
+  .order("display_order", { ascending: true, nullsFirst: false })
+  .order("name", { ascending: true });
 
 const getFallbackImage = (id: number) => {
   const cat =

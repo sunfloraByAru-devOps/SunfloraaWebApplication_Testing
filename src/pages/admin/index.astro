@@ -1,0 +1,72 @@
+---
+/* Sunflora shop dashboard.
+ *
+ * Standalone page: it deliberately does NOT use Layout.astro, so none of the
+ * storefront's global styles are pulled in and nothing here can affect the
+ * public pages.
+ *
+ * The site is statically rendered and the browser holds the anon key, so this
+ * page cannot be protected by the server. Row Level Security is the real
+ * boundary: every table requires profiles.role = 'admin' to write, and the
+ * shop tables require it to read. The sign-in gate below decides what to draw,
+ * not what is permitted.
+ */
+import "../../styles/admin.css";
+
+/* This frontmatter runs at BUILD time, so this timestamp is the moment the
+   public site was last generated. The dashboard compares it against the
+   database's content_changed_at marker to tell Aru whether her edits have
+   actually reached the live shop. */
+const BUILT_AT = new Date().toISOString();
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Shop dashboard — Sunflora</title>
+
+    <!-- Never index the dashboard. -->
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#FFF8F0" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap"
+    />
+  </head>
+
+  <body class="admin">
+    <div id="admin-root" data-built-at={BUILT_AT}>
+      <div class="a-spinner" role="status" aria-label="Loading"></div>
+    </div>
+
+    <noscript>
+      <div style="padding:24px;text-align:center;">
+        The shop dashboard needs JavaScript switched on.
+      </div>
+    </noscript>
+
+    <script>
+      import { startAdmin } from "../../lib/admin/app";
+      // Each view registers its own route when imported.
+      import "../../lib/admin/views/today";
+      import "../../lib/admin/views/orders";
+      import "../../lib/admin/views/photos";
+      import "../../lib/admin/views/products";
+      import "../../lib/admin/views/product-editor";
+      import "../../lib/admin/views/reviews";
+      import "../../lib/admin/views/custom-orders";
+      import "../../lib/admin/views/customers";
+      import "../../lib/admin/views/messages";
+      import "../../lib/admin/views/content";
+      import "../../lib/admin/views/categories";
+
+      const root = document.getElementById("admin-root");
+      startAdmin("admin-root", root?.dataset.builtAt ?? "");
+    </script>
+  </body>
+</html>

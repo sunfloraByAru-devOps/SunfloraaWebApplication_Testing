@@ -1,5 +1,9 @@
 ---
-import { faqGroups, homeFaqs, type FaqGroup } from "../../data/faqs";
+import {
+  getFaqGroups,
+  getHomeFaqs,
+  type FaqGroup,
+} from "../../lib/site-content";
 
 interface Props {
   /** "compact" = 4-question homepage teaser, "full" = all groups on /faq */
@@ -20,11 +24,15 @@ const {
 } = Astro.props;
 
 /* Both variants render the same shape: a list of groups. The compact one is a
-   single untitled group, so the markup below never branches. */
+   single untitled group, so the markup below never branches.
+
+   Frontmatter runs at build time, so awaiting the database here costs nothing
+   at request time — the answers are baked into the static HTML. Only the
+   variant actually being rendered is fetched. */
 const groups: FaqGroup[] =
   variant === "full"
-    ? faqGroups
-    : [{ id: "home", title: "", items: homeFaqs }];
+    ? await getFaqGroups()
+    : [{ id: "home", title: "", items: await getHomeFaqs() }];
 ---
 
 <section id="faq" class="kn-section faq-section">

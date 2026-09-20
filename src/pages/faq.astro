@@ -3,7 +3,11 @@ import Layout from "../layouts/Layout.astro";
 import LandingNav from "../components/landing/LandingNav.astro";
 import LandingFooter from "../components/landing/LandingFooter.astro";
 import LandingFaq from "../components/landing/LandingFaq.astro";
-import { faqGroups } from "../data/faqs";
+import { getFaqGroups } from "../lib/site-content";
+
+/* Build-time read — see src/lib/site-content.ts. Throws rather than rendering
+   an empty FAQ page if the content can't be loaded. */
+const faqGroups = await getFaqGroups();
 
 const site = "https://sunfloracrochet.in";
 
