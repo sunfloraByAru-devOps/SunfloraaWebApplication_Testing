@@ -1,4 +1,11 @@
 ---
+import { getContactLinks } from "../lib/site-content";
+
+/* Contact details come from the dashboard's "Shop details" screen rather
+   than being hardcoded here — that is how the site ended up with several
+   different handles and a placeholder phone number. */
+const contact = await getContactLinks();
+
 interface Props {
   product: {
     id: string;
@@ -217,7 +224,7 @@ const { product, discount } = Astro.props;
   <!-- CTAs -->
   <div class="cta-section">
     <a
-      href="https://wa.me/910000000000"
+      href={contact.whatsappUrl}
       class="btn-order"
       target="_blank"
       rel="noreferrer"
@@ -261,7 +268,7 @@ const { product, discount } = Astro.props;
   </div>
   <div style="margin-top:-0.4rem; margin-bottom:1.4rem;">
     <a
-      href="https://wa.me/910000000000?text=Hi! I'd love a custom version of the Sunshine Amigurumi."
+      href={`${contact.whatsappUrl}?text=${encodeURIComponent("Hi! I'd love a custom version of the " + product.name + ".")}`}
       class="btn-wa"
       target="_blank"
       rel="noreferrer"

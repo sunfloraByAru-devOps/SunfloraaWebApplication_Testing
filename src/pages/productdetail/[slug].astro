@@ -1,5 +1,6 @@
 ---
 import { Image } from "astro:assets";
+import { getContactLinks } from "../../lib/site-content";
 import Layout from "../../layouts/Layout.astro";
 import LandingNav from "../../components/landing/LandingNav.astro";
 import SPIDEY from "../../assets/spiderman.jpg";
@@ -20,6 +21,9 @@ import ProductInfo from "../../components/ProductInfo.astro";
 import ProductReviews from "../../components/ProductReviews.astro";
 import RelatedProducts from "../../components/RelatedProducts.astro";
 import "../../styles/productdetail.css";
+
+/* One source of truth for contact details — see the dashboard. */
+const contact = await getContactLinks();
 
 const supabase = createClient(
   import.meta.env.PUBLIC_SUPABASE_URL,
@@ -380,7 +384,7 @@ const breadcrumbSchema = isRealProduct
       >© {new Date().getFullYear()} Sunflora Studio — Handmade with care.</span
     >
     <span>Hooked in India · Shipped worldwide</span>
-    <a href="mailto:hello@sunflora.studio">hello@sunflora.studio</a>
+    <a href={contact.mailto}>{contact.email}</a>
   </footer>
 
   <div class="mobile-sticky" id="mobile-sticky">
@@ -389,7 +393,7 @@ const breadcrumbSchema = isRealProduct
       <div class="ms-price" id="sticky-price">₹ {product.price}</div>
     </div>
     <a
-      href="https://wa.me/910000000000"
+      href={contact.whatsappUrl}
       class="mobile-sticky-btn"
       target="_blank"
       rel="noreferrer"

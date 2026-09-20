@@ -1,5 +1,9 @@
 ---
 import Logo from "../../assets/logo.png";
+import { getContactLinks } from "../../lib/site-content";
+
+/* Contact details live in the dashboard's "Shop details" screen. */
+const contact = await getContactLinks();
 /* Full footer matching Sunflora reference */
 const shopLinks = [
   { label: "All Products", href: "/productlist" },
@@ -42,7 +46,7 @@ const aboutLinks = [
           shared with a smile ♡
         </p>
         <div class="footer-socials">
-          <a href="https://www.instagram.com/sunfloraa.a/" class="social-link" aria-label="Instagram">
+          <a href={contact.instagramUrl} class="social-link" aria-label="Instagram">
             <svg
               width="18"
               height="18"
@@ -140,10 +144,10 @@ const aboutLinks = [
       <!-- Contact -->
       <div class="footer-col">
         <h4 class="footer-col-title">Contact</h4>
-        <a href="mailto:sunflorabyaru@gmail.com" class="footer-link"
-          >📧 sunflorabyaru@gmail.com</a
+        <a href={contact.mailto} class="footer-link"
+          >📧 {contact.email}</a
         >
-        <a href="tel:+919876543210" class="footer-link">📞 +91-98765-43210</a>
+        <a href={`tel:+${contact.whatsappNumber}`} class="footer-link">📞 {contact.phoneDisplay}</a>
       </div>
     </div>
 

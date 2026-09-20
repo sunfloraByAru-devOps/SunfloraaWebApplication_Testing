@@ -1,5 +1,6 @@
 ---
 import { Image } from 'astro:assets';
+import { getContactLinks } from "../lib/site-content";
 import Layout from '../layouts/Layout.astro';
 import HERO from '../assets/sun_on_desk.png';
 import STARS from '../assets/stars.png';
@@ -7,6 +8,9 @@ import DINO from '../assets/green-dino.jpg';
 import SUNMOON from '../assets/sun_and_moon.jpg';
 import SUN_CLOSEUP from '../assets/sun_on_desk_closeup.png';
 import SPIDEY from '../assets/spiderman.jpg';
+
+/* Contact details come from the dashboard's "Shop details" screen. */
+const contact = await getContactLinks();
 
 const offerings = [
   { num: "01", name: "Sunshine Amigurumi", sub: "Best seller · 24 pieces", price: "from ₹ 649", tag: "Best seller", img: SUN_CLOSEUP, href: "#cta" },
@@ -486,7 +490,7 @@ const offerings = [
       <li><a href="#pricing">Pricing</a></li>
       <li><a href="#testimonials">Love notes</a></li>
     </ul>
-    <a href="https://wa.me/910000000000" class="nav-cta" target="_blank" rel="noreferrer">
+    <a href={contact.whatsappUrl} class="nav-cta" target="_blank" rel="noreferrer">
       Order now
       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg>
     </a>
@@ -618,7 +622,7 @@ const offerings = [
             </div>
           </div>
 
-          <a href="https://wa.me/910000000000" class="btn-primary" style="width: fit-content;" target="_blank" rel="noreferrer">
+          <a href={contact.whatsappUrl} class="btn-primary" style="width: fit-content;" target="_blank" rel="noreferrer">
             Start your order
           </a>
         </div>
@@ -633,7 +637,7 @@ const offerings = [
           <p class="label">Collections</p>
           <h2>Every little thing<br>we make.</h2>
         </div>
-        <a href="https://wa.me/910000000000" class="btn-ghost" target="_blank" rel="noreferrer">
+        <a href={contact.whatsappUrl} class="btn-ghost" target="_blank" rel="noreferrer">
           Inquire about all →
         </a>
       </div>
@@ -761,7 +765,7 @@ const offerings = [
             <li>Kraft paper packaging included</li>
             <li>Handwritten care card</li>
           </ul>
-          <a href="https://wa.me/910000000000" class="plan-btn plan-btn-dark" target="_blank" rel="noreferrer">Shop ready-made</a>
+          <a href={contact.whatsappUrl} class="plan-btn plan-btn-dark" target="_blank" rel="noreferrer">Shop ready-made</a>
         </div>
 
         <div class="plan featured reveal">
@@ -776,7 +780,7 @@ const offerings = [
             <li>Named & numbered certificate</li>
             <li>Full gift packaging with extras</li>
           </ul>
-          <a href="https://wa.me/910000000000" class="plan-btn plan-btn-amber" target="_blank" rel="noreferrer">Start a custom</a>
+          <a href={contact.whatsappUrl} class="plan-btn plan-btn-amber" target="_blank" rel="noreferrer">Start a custom</a>
         </div>
 
         <div class="plan reveal">
@@ -789,7 +793,7 @@ const offerings = [
             <li>Custom message card</li>
             <li>Free dried marigold garnish</li>
           </ul>
-          <a href="https://wa.me/910000000000" class="plan-btn plan-btn-dark" target="_blank" rel="noreferrer">Build a bundle</a>
+          <a href={contact.whatsappUrl} class="plan-btn plan-btn-dark" target="_blank" rel="noreferrer">Build a bundle</a>
         </div>
 
       </div>
@@ -806,11 +810,11 @@ const offerings = [
         we'd love to make it for you.
       </p>
       <div class="cta-actions">
-        <a href="https://wa.me/910000000000" class="btn-wa" target="_blank" rel="noreferrer">
+        <a href={contact.whatsappUrl} class="btn-wa" target="_blank" rel="noreferrer">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
           WhatsApp us
         </a>
-        <a href="https://www.instagram.com/sunfloraa.a/" class="btn-ig" target="_blank" rel="noreferrer">
+        <a href={contact.instagramUrl} class="btn-ig" target="_blank" rel="noreferrer">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
           @sunfloraa.a
         </a>
@@ -822,7 +826,7 @@ const offerings = [
   <footer>
     <span>© {new Date().getFullYear()} Sunflora Studio — Handmade with care.</span>
     <span>Hooked in India · Shipped worldwide</span>
-    <a href="mailto:hello@sunflora.studio">hello@sunflora.studio</a>
+    <a href={contact.mailto}>{contact.email}</a>
   </footer>
 
   <script>

@@ -412,3 +412,92 @@ export async function getHomePicks(
 
   return picks;
 }
+
+/* ---------- shop details ----------
+   These were previously hardcoded in a dozen components, which is how the site
+   ended up with four different Instagram handles and three different email
+   addresses. Reading them from one table means the dashboard's "Shop details"
+   screen is the single source of truth. */
+
+export type SiteSettings = {
+  emailAddress: string;
+  instagramHandle: string;
+  whatsappNumber: string;
+  heroLine1: string;
+  heroLine2: string;
+  heroSubtext: string;
+  shippingFee: number;
+  freeShippingAbove: number;
+};
+
+/* Defaults are the values the site rendered before it read this table, so a
+   missing row degrades to today's behaviour rather than a blank page. Unlike
+   the FAQ loader this does not throw: a missing contact detail is a cosmetic
+   problem, an empty FAQ page is an SEO one. */
+const SETTING_DEFAULTS: SiteSettings = {
+  emailAddress: "sunflorabyaru@gmail.com",
+  instagramHandle: "sunfloraa.a",
+  whatsappNumber: "910000000000",
+  heroLine1: "Crochet that",
+  heroLine2: "feels like home",
+  heroSubtext: "Soft toys, flower bouquets & cozy keepsakes — each one stitched by hand, just for you.",
+  shippingFee: 0,
+  freeShippingAbove: 500,
+};
+
+let cached: SiteSettings | null = null;
+
+export async function getSiteSettings(): Promise<SiteSettings> {
+  if (cached) return cached;
+
+  const { data, error } = await supabase.from("site_settings").select("key, value");
+  if (error || !data) {
+    console.warn("[site-content] Could not load shop details, using defaults:", error?.message);
+    cached = SETTING_DEFAULTS;
+    return cached;
+  }
+
+  const map = new Map(data.map((r: any) => [r.key, r.value]));
+  const str = (k: string, d: string) => {
+    const v = map.get(k);
+    return v != null && String(v).trim() !== "" ? String(v).trim() : d;
+  };
+  const num = (k: string, d: number) => {
+    const v = Number(map.get(k));
+    return Number.isFinite(v) ? v : d;
+  };
+
+  cached = {
+    emailAddress: str("email_address", SETTING_DEFAULTS.emailAddress),
+    instagramHandle: str("instagram_handle", SETTING_DEFAULTS.instagramHandle).replace(/^@/, ""),
+    whatsappNumber: str("whatsapp_number", SETTING_DEFAULTS.whatsappNumber).replace(/[^0-9]/g, ""),
+    heroLine1: str("hero_headline_line1", SETTING_DEFAULTS.heroLine1),
+    heroLine2: str("hero_headline_line2", SETTING_DEFAULTS.heroLine2),
+    heroSubtext: str("hero_subtext", SETTING_DEFAULTS.heroSubtext),
+    shippingFee: num("shipping_fee_domestic", SETTING_DEFAULTS.shippingFee),
+    freeShippingAbove: num("free_shipping_above", SETTING_DEFAULTS.freeShippingAbove),
+  };
+  return cached;
+}
+
+/** Convenience links built from the settings above. */
+export async function getContactLinks() {
+  const s = await getSiteSettings();
+  return {
+    email: s.emailAddress,
+    mailto: `mailto:${s.emailAddress}`,
+    instagramHandle: s.instagramHandle,
+    instagramUrl: `https://www.instagram.com/${s.instagramHandle}/`,
+    whatsappNumber: s.whatsappNumber,
+    whatsappUrl: `https://wa.me/${s.whatsappNumber}`,
+    /* +91 98765 43210 style, for showing rather than linking. */
+    phoneDisplay: formatIndianPhone(s.whatsappNumber),
+  };
+}
+
+function formatIndianPhone(digits: string): string {
+  const d = String(digits ?? "").replace(/[^0-9]/g, "");
+  const local = d.startsWith("91") && d.length === 12 ? d.slice(2) : d;
+  if (local.length !== 10) return d ? `+${d}` : "";
+  return `+91-${local.slice(0, 5)}-${local.slice(5)}`;
+}
