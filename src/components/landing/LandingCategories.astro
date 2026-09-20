@@ -108,17 +108,23 @@ const categories = await getHomeCategories();
     border-color: var(--kn-taupe);
   }
 
-  /* Card = the picture itself, sized to the image's own dimensions — no forced/cropped aspect box */
+  /* Card = the picture itself, no frame around it — but every card the same
+     shape. Letting each image keep its own height made the row ragged, because
+     these come in as anything from 3:4 to square; a 4:5 box is the middle of
+     that range, so it asks the least cropping of any single ratio. Same box as
+     the shop grid's cards, so the two read as one system. */
   .cat-img-wrap {
     position: relative;
     width: 100%;
+    aspect-ratio: 4/5;
     overflow: hidden;
     background: var(--kn-white);
   }
 
   .cat-img {
     width: 100%;
-    height: auto;
+    height: 100%;
+    object-fit: cover;
     display: block;
     transition: transform 0.5s ease;
   }
@@ -137,6 +143,7 @@ const categories = await getHomeCategories();
     justify-content: space-between;
     gap: 10px;
     padding: 12px 16px;
+    z-index: 2;
   }
 
   .cat-name {

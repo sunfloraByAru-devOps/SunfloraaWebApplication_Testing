@@ -43,7 +43,7 @@ const products = await getHomePicks("best_sellers");
                   width={p.width}
                   height={p.height}
                   widths={[280, 560]}
-                  sizes="(max-width: 640px) 60vw, 280px"
+                  sizes="(max-width: 640px) 60vw, 330px"
                   format="webp"
                   loading="lazy"
                   decoding="async"
@@ -51,8 +51,8 @@ const products = await getHomePicks("best_sellers");
                 />
               </div>
               <div class="card-body">
-                <p class="card-title">{p.name}</p>
                 {p.category && <span class="card-cat">{p.category}</span>}
+                <p class="card-title">{p.name}</p>
                 <p class="card-price-row">
                   <span class="card-price">From {p.price}</span>
                   <span class="card-arrow" aria-hidden="true">→</span>
@@ -167,37 +167,41 @@ const products = await getHomePicks("best_sellers");
     display: block;
   }
 
+  /* No frame, no cream backing plate: the 4:5 box and the cover fit both come
+     from .kn-product-card .card-img, and the photo fills the card. The
+     `object-fit: contain` that used to sit here is what left the cream bars
+     down either side of every picture. */
   .card-img-wrap {
     position: relative;
     overflow: hidden;
-    border-radius: var(--kn-radius-md) var(--kn-radius-md) 0 0;
-    background: var(--kn-cream-dark);
   }
 
-  /* Full, uncropped product photo instead of a cover-cropped square */
-  .carousel-card .card-img {
-    object-fit: contain;
-  }
-
+  /* The eyebrow over the product name. Muted brown went illegible once it sat
+     on a photograph, so it reads in the same near-black as the rest and earns
+     its quietness from size and letter-spacing instead. */
   .card-cat {
     font-family: var(--kn-font-body);
-    font-size: 11px;
-    letter-spacing: 0.14em;
+    font-size: 10px;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--kn-brown-muted);
-    font-weight: 600;
+    color: #000;
+    opacity: 0.72;
+    font-weight: 700;
   }
 
   .card-price-row {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
-    margin-top: 4px;
+    gap: 10px;
+    margin-top: 2px;
   }
 
   .card-arrow {
+    font-family: var(--kn-font-body);
+    font-size: 13px;
     color: var(--kn-rose);
-    font-weight: 600;
+    font-weight: 700;
     transition: transform 0.3s ease;
   }
 
@@ -230,6 +234,13 @@ const products = await getHomePicks("best_sellers");
     }
     .sellers-veil {
       width: 50px;
+    }
+    .card-cat {
+      font-size: 8.5px;
+      letter-spacing: 0.12em;
+    }
+    .card-arrow {
+      font-size: 11px;
     }
   }
 </style>

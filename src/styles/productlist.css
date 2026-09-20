@@ -73,9 +73,13 @@ body {
 }
 
 /* ── PRODUCT CARD ── */
+/* The card IS the photograph, the way the home page's category cards are —
+   no framed box, no cream letterbox bars around a contained image, and no
+   edge mask fading the picture out into the border. The frame is transparent
+   until hover, which is the only time the card announces itself. */
 .prod-card {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
+    background: transparent;
+    border: 1px solid transparent;
     border-radius: 0;
     overflow: hidden;
     display: flex;
@@ -84,11 +88,13 @@ body {
     color: inherit;
     transition:
         box-shadow 0.35s,
-        transform 0.35s;
+        transform 0.35s,
+        border-color 0.35s;
     position: relative;
 }
 .prod-card:hover {
-    box-shadow: 0 12px 40px rgba(26, 24, 21, 0.1);
+    box-shadow: 0 16px 48px rgba(92, 61, 46, 0.12);
+    border-color: var(--border);
     transform: translateY(-3px);
 }
 .prod-card:hover .card-img {
@@ -103,32 +109,27 @@ body {
     filter: grayscale(0.4);
 }
 
+/* Every card the same shape whatever the photo behind it: the product shots
+   run from about 0.70 to 0.90 wide-over-tall, so a 4:5 box sits in the middle
+   of them and asks for the least cropping across the set. `cover` is what
+   fills the card corner to corner; `contain` is what used to leave the bars. */
 .card-img-wrap {
-    aspect-ratio: 3/4;
+    aspect-ratio: 4/5;
     overflow: hidden;
-    background: var(--cream-dk);
+    background: var(--cream-lt);
     position: relative;
 }
 .card-img {
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover;
+    /* Off-centre on purpose. Several of these photos have a "FRONT VIEW"
+       caption baked into the bottom of the frame; a centred crop sliced it in
+       half, which reads as a mistake. Biasing the crop downwards takes the
+       whole caption off and leaves the product itself where it was. */
+    object-position: center 38%;
     display: block;
     transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-    mask-image: linear-gradient(
-        to right,
-        transparent,
-        black 6%,
-        black 94%,
-        transparent
-    );
-    -webkit-mask-image: linear-gradient(
-        to right,
-        transparent,
-        black 6%,
-        black 94%,
-        transparent
-    );
 }
 
 .card-wishlist {

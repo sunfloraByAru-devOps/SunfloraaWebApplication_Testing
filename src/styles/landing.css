@@ -75,44 +75,99 @@
   margin-bottom: 48px;
 }
 
-/* ── Product cards ── */
+/* ── Product cards ──
+   Built the same way as the category cards below "Browse Our Collection" and
+   the shop grid: the photograph IS the card, filling it corner to corner in a
+   fixed 4:5 box, with the details written over the foot of the picture rather
+   than in a white strip under it. There is no panel and no rounded frame — the
+   border only appears on hover, which is the one moment the card should
+   announce itself. */
 .kn-product-card {
-  background: var(--kn-white);
-  border-radius: var(--kn-radius-md);
+  background: transparent;
+  border-radius: 0;
+  border: 1px solid transparent;
   overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
   cursor: pointer;
 }
 
 .kn-product-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(92, 61, 46, 0.1);
+  box-shadow: 0 16px 48px rgba(92, 61, 46, 0.12);
+  border-color: var(--kn-taupe);
 }
 
 .kn-product-card .card-img {
   width: 100%;
-  aspect-ratio: 1;
+  aspect-ratio: 4/5;
   object-fit: cover;
+  /* Same downward bias as the shop grid: several of these photos carry a
+     "FRONT VIEW" caption along the bottom of the frame, and a centred crop
+     cut it in half instead of removing it. */
+  object-position: center 38%;
   display: block;
 }
 
+/* Over the picture, not under it. Absolute against the card rather than the
+   image wrapper, so neither carousel has to move its markup around. */
 .kn-product-card .card-body {
-  padding: 14px 16px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  z-index: 2;
+}
+
+/* The text carries itself on these shadows alone — no scrim behind it. */
+.kn-product-card .card-body > * {
+  text-shadow:
+    0 1px 3px rgba(255, 255, 255, 0.8),
+    0 0 8px rgba(255, 255, 255, 0.6);
 }
 
 .kn-product-card .card-title {
-  font-family: var(--kn-font-body);
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--kn-brown);
-  margin-bottom: 4px;
+  font-family: var(--kn-font-heading);
+  font-size: 16px;
+  font-weight: 600;
+  color: #000;
+  margin-bottom: 0;
+  line-height: 1.25;
 }
 
 .kn-product-card .card-price {
   font-family: var(--kn-font-body);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
-  color: var(--kn-rose);
+  color: #000;
+}
+
+/* On a phone the card is about 155px across, and three lines set for the
+   desktop size covered half the photograph — a long name wrapping to two
+   lines covered more. Everything shrinks, and the name is held to two lines
+   so one long product never eats the picture. */
+@media (max-width: 640px) {
+  .kn-product-card .card-body {
+    padding: 8px 10px;
+  }
+
+  .kn-product-card .card-title {
+    font-size: 12.5px;
+    line-height: 1.2;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .kn-product-card .card-price {
+    font-size: 11px;
+  }
 }
 
 /* ── Buttons ── */

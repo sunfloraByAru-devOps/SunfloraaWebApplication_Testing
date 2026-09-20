@@ -63,7 +63,7 @@ const products = await getHomePicks("new_arrivals");
                   width={p.width}
                   height={p.height}
                   widths={[280, 560]}
-                  sizes="(max-width: 640px) 60vw, 280px"
+                  sizes="(max-width: 640px) 60vw, 330px"
                   format="webp"
                   loading="lazy"
                   decoding="async"
@@ -73,7 +73,10 @@ const products = await getHomePicks("new_arrivals");
               </div>
               <div class="card-body">
                 <p class="card-title">{p.name}</p>
-                <p class="card-price">{p.price}</p>
+                <p class="card-price-row">
+                  <span class="card-price">{p.price}</span>
+                  <span class="card-arrow" aria-hidden="true">→</span>
+                </p>
               </div>
             </a>
           ))
@@ -160,10 +163,33 @@ const products = await getHomePicks("new_arrivals");
     display: block;
   }
 
+  /* Frameless, like the Most Loved cards and the category cards: the 4:5 box
+     and the cover fit come from .kn-product-card .card-img. */
   .arrivals-img-wrap {
     position: relative;
     overflow: hidden;
-    border-radius: var(--kn-radius-md) var(--kn-radius-md) 0 0;
+  }
+
+  /* The same price row Most Loved uses, so the two carousels read as one set
+     rather than two takes on the same card. */
+  .card-price-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 2px;
+  }
+
+  .card-arrow {
+    font-family: var(--kn-font-body);
+    font-size: 13px;
+    color: var(--kn-rose);
+    font-weight: 700;
+    transition: transform 0.3s ease;
+  }
+
+  .kn-product-card:hover .card-arrow {
+    transform: translateX(3px);
   }
 
   .new-badge {
@@ -200,6 +226,9 @@ const products = await getHomePicks("new_arrivals");
     }
     .arrivals-veil {
       width: 50px;
+    }
+    .card-arrow {
+      font-size: 11px;
     }
     .kn-section-subtitle,
     .kn-section-subtitle-right {
