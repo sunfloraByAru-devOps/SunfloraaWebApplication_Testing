@@ -24,6 +24,38 @@ import {
 
 const POLL_MS = 10_000;
 
+/* Cloudflare's build-status API is not usable here: CF_API_TOKEN is rejected
+ * (401) and CF_ACCOUNT_ID / CF_WORKER_TAG are 64-character values where
+ * Cloudflare uses 32, so every status poll 404s and the run ends as "unknown".
+ *
+ * The shop itself is a more reliable witness anyway. Every build stamps the
+ * dashboard page with data-built-at, and that page is served from this same
+ * origin, so fetching it needs no credentials and no CORS exemption. If the
+ * stamp on the live copy is newer than the moment we asked to publish, the
+ * build finished — whatever Cloudflare will or will not tell us.
+ *
+ * Returns null when it cannot tell, which the caller treats as "keep waiting"
+ * rather than as failure. */
+async function liveBuildStamp(): Promise<Date | null> {
+  try {
+    const res = await fetch(`/admin/?checked=${Date.now()}`, { cache: "no-store" });
+    if (!res.ok) return null;
+    const html = await res.text();
+    const m = html.match(/data-built-at="([^"]+)"/);
+    if (!m) return null;
+    const when = new Date(m[1]);
+    return isNaN(when.getTime()) ? null : when;
+  } catch {
+    return null;
+  }
+}
+
+async function siteRebuiltSince(iso: string): Promise<boolean> {
+  const stamp = await liveBuildStamp();
+  if (!stamp) return false;
+  return stamp.getTime() > new Date(iso).getTime();
+}
+
 function minutesSince(iso: string): number {
   return Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60000));
 }
@@ -201,6 +233,16 @@ route(/^#\/publish$/, async (ctx: ViewCtx) => {
       stopPolling();
       timer = window.setTimeout(async () => {
         if (!stillMounted() || watching !== id) return;
+
+        // Ask the shop first — it knows for certain, and Cloudflare may not.
+        if (await siteRebuiltSince(run!.requested_at)) {
+          if (!stillMounted() || watching !== id) return;
+          stopPolling();
+          drawDone({ ...run!, status: "success", finished_at: new Date().toISOString() });
+          ctx.refreshBadges();
+          return;
+        }
+
         try {
           const next = await getPublishRun(id);
           void watch(id, next);
@@ -210,6 +252,12 @@ route(/^#\/publish$/, async (ctx: ViewCtx) => {
         }
       }, POLL_MS);
       return;
+    }
+
+    /* Cloudflare lost track of it — but the shop can still confirm the build
+       landed, so check before telling her something went wrong. */
+    if (run.status === "unknown" && await siteRebuiltSince(run.requested_at)) {
+      run = { ...run, status: "success", finished_at: run.finished_at ?? new Date().toISOString() };
     }
 
     stopPolling();
