@@ -11,7 +11,7 @@ import PRODUCT_DETAIL from "../../assets/stars.png";
 import PRODUCT_LIFE from "../../assets/spiderman.jpg";
 import DINO from "../../assets/green-dino.jpg";
 import SUNMOON from "../../assets/sun_and_moon.jpg";
-import { getImageUrl } from "../../lib/images";
+import { getGalleryImage, getGridImage, toAbsoluteUrl } from "../../lib/product-images";
 import { productSlug } from "../../lib/slug";
 
 import { createClient } from "@supabase/supabase-js";
@@ -59,6 +59,7 @@ const { data: allDbProducts } = await supabase
   .select(
     `
     *,
+    categories(name),
     product_images(storage_path, alt_text, display_order, is_primary),
     product_sizes(label, cm_description, price, mrp, display_order),
     product_colors(name, hex, has_border, display_order),
@@ -90,59 +91,32 @@ const { data: rawRelated } = await supabase
   .order("display_order", { ascending: true, nullsFirst: false })
   .order("name", { ascending: true });
 
-const getFallbackImage = (id: number) => {
-  const cat =
-    id === 1 || id === 6 || id === 7 || id === 12
-      ? "Amigurumi"
-      : id === 2 || id === 4 || id === 11
-        ? "Keychains"
-        : id === 3 || id === 8
-          ? "Flower Stems"
-          : id === 9
-            ? "Bouquets"
-            : "Wall Hangings";
-
-  const categoryLower = cat.toLowerCase();
-  if (categoryLower.includes("amigurumi")) {
-    return PRODUCT_MAIN.src;
-  } else if (categoryLower.includes("keychain")) {
-    return SPIDEY.src;
-  } else if (categoryLower.includes("hanging")) {
-    return PRODUCT_DETAIL.src;
-  } else if (
-    categoryLower.includes("bouquet") ||
-    categoryLower.includes("stem") ||
-    categoryLower.includes("flower")
+/* A product with no photo of its own falls back to a stock shot picked by
+   category. This used to branch on `id === 1 || id === 6 || ...`, but ids are
+   UUIDs, so every comparison was false and every such product got the "Wall
+   Hangings" image regardless of what it actually was. */
+const getFallbackImage = (categoryName: string | null | undefined) => {
+  const category = (categoryName || "").toLowerCase();
+  if (category.includes("amigurumi")) return PRODUCT_MAIN.src;
+  if (category.includes("keychain")) return SPIDEY.src;
+  if (category.includes("hanging")) return PRODUCT_DETAIL.src;
+  if (
+    category.includes("bouquet") ||
+    category.includes("stem") ||
+    category.includes("flower")
   ) {
     return PRODUCT_CLOSE.src;
-  } else {
-    return SUNMOON.src;
   }
+  return SUNMOON.src;
 };
 
-const getRelatedProducts = (currentId: any) => {
-  return (rawRelated || [])
-    .filter((r) => r.id !== currentId)
-    .slice(0, 3)
-    .map((r) => {
-      const cat = r.category_name || "";
-      let fallbackImgSrc = PRODUCT_MAIN.src;
-      const categoryLower = cat.toLowerCase();
-      if (categoryLower.includes("amigurumi")) {
-        fallbackImgSrc = PRODUCT_MAIN.src;
-      } else if (categoryLower.includes("keychain")) {
-        fallbackImgSrc = SPIDEY.src;
-      } else if (categoryLower.includes("hanging")) {
-        fallbackImgSrc = PRODUCT_DETAIL.src;
-      } else if (
-        categoryLower.includes("bouquet") ||
-        categoryLower.includes("stem") ||
-        categoryLower.includes("flower")
-      ) {
-        fallbackImgSrc = PRODUCT_CLOSE.src;
-      } else {
-        fallbackImgSrc = SUNMOON.src;
-      }
+const getRelatedProducts = async (currentId: any) => {
+  const related = (rawRelated || []).filter((r) => r.id !== currentId).slice(0, 3);
+
+  return Promise.all(
+    related.map(async (r) => {
+      const fallbackImgSrc = getFallbackImage(r.category_name);
+      const optimized = r.primary_image_path ? await getGridImage(r.primary_image_path) : null;
 
       return {
         id: r.id,
@@ -151,13 +125,67 @@ const getRelatedProducts = (currentId: any) => {
         tag: r.tag || "",
         price: r.base_price,
         mrp: r.base_mrp,
-        img: r.primary_image_path
-          ? supabase.storage
-              .from("product-images")
-              .getPublicUrl(r.primary_image_path).data.publicUrl
-          : fallbackImgSrc,
+        img: optimized?.src || fallbackImgSrc,
       };
-    });
+    }),
+  );
+};
+
+async function buildGalleryImages(data: any) {
+  const rows =
+    data.product_images && data.product_images.length > 0
+      ? [...data.product_images].sort((a: any, b: any) => a.display_order - b.display_order)
+      : [];
+
+  if (rows.length === 0) {
+    return [
+      { src: getFallbackImage(data.categories?.name), alt: data.name || "", width: 0, height: 0, srcset: "" },
+    ];
+  }
+
+  return Promise.all(
+    rows.map(async (img: any) => {
+      const alt = img.alt_text || data.name || "";
+      const optimized = await getGalleryImage(img.storage_path);
+      return optimized
+        ? { src: optimized.src, alt, width: optimized.width, height: optimized.height, srcset: optimized.srcset }
+        : { src: getFallbackImage(data.categories?.name), alt, width: 0, height: 0, srcset: "" };
+    }),
+  );
+}
+
+/* ── Reviews ───────────────────────────────────────────────────────────────
+   Everything the review section shows is derived from these rows and nothing
+   else. Only approved reviews reach the storefront: RLS enforces that for the
+   anon key the build uses (supabase/sql/12_product_reviews.sql) and this
+   filter is the second lock, so an un-moderated review can never be baked
+   into a page even if a policy is later loosened by accident. */
+/* The bucket really is `review-photos`. ADMIN_DASHBOARD_PROMPT.md says
+   `review-images` and this file used to agree with it, which meant every
+   review photo resolved to a public URL in a bucket that does not exist. */
+const REVIEW_BUCKET = "review-photos";
+
+const approvedReviewsOf = (rows: any[]) =>
+  (rows || [])
+    .filter((r: any) => r.is_approved === true)
+    .sort(
+      (a: any, b: any) =>
+        new Date(b.created_at || 0).getTime() -
+        new Date(a.created_at || 0).getTime(),
+    );
+
+const reviewPhotoUrl = (storagePath: string) =>
+  supabase.storage.from(REVIEW_BUCKET).getPublicUrl(storagePath).data.publicUrl;
+
+const reviewDate = (iso: string | null) => {
+  const d = new Date(iso || "");
+  return Number.isNaN(d.getTime())
+    ? ""
+    : d.toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      });
 };
 
 const mappedProducts: Record<string, any> = {};
@@ -165,6 +193,45 @@ const mappedProducts: Record<string, any> = {};
 if (allDbProducts) {
   for (const data of allDbProducts) {
     const slug = productSlug(data.name);
+    const [images, related] = await Promise.all([
+      buildGalleryImages(data),
+      getRelatedProducts(data.id),
+    ]);
+
+    const approved = approvedReviewsOf(data.reviews);
+    const starSum = approved.reduce(
+      (total: number, r: any) => total + (Number(r.stars) || 0),
+      0,
+    );
+    /* One decimal place, the way the rest of the site quotes a rating. Zero
+       reviews means zero — not a placeholder, and not products.avg_rating,
+       which is a cached column that can lag a moderation decision. */
+    const avgRating = approved.length
+      ? Math.round((starSum / approved.length) * 10) / 10
+      : 0;
+
+    const mappedReviews = approved.map((r: any) => ({
+      id: r.id,
+      stars: Number(r.stars) || 0,
+      title: r.title || "",
+      date: reviewDate(r.created_at),
+      helpful: Number(r.helpful_count) || 0,
+      unhelpful: Number(r.unhelpful_count) || 0,
+      author: r.profiles?.full_name || r.guest_name || "A customer",
+      verified: r.is_verified === true,
+      body: r.body || "",
+      photos: (r.review_photos || [])
+        .map((ph: any) => ph?.storage_path)
+        .filter(Boolean)
+        .map(reviewPhotoUrl),
+    }));
+
+    /* The photo strip is the real photos customers attached, de-duplicated
+       and capped so one enthusiastic reviewer cannot fill the row. */
+    const customerPhotos = [
+      ...new Set(mappedReviews.flatMap((r: any) => r.photos)),
+    ].slice(0, 24);
+
     mappedProducts[slug] = {
       id: data.id,
       slug: slug,
@@ -174,8 +241,8 @@ if (allDbProducts) {
       tag: data.tag,
       tagline: data.tagline || "",
       sku: data.sku || `SFL-${data.id}`,
-      rating: data.avg_rating || 0,
-      reviewCount: (data.reviews || []).length,
+      rating: avgRating,
+      reviewCount: approved.length,
       inStock: data.in_stock,
       price: data.base_price,
       mrp: data.base_mrp,
@@ -204,31 +271,16 @@ if (allDbProducts) {
       includes: (data.product_includes || [])
         .sort((a: any, b: any) => a.display_order - b.display_order)
         .map((i: any) => i.item),
-      reviews: (data.reviews || []).map((r: any) => ({
-        id: r.id,
-        stars: r.stars,
-        title: r.title,
-        date: new Date(r.created_at).toLocaleDateString("en-GB", {
-          day: "numeric",
-          month: "short",
-          year: "numeric",
-        }),
-        helpful: r.helpful_count,
-        unhelpful: r.unhelpful_count,
-        author: r.profiles?.full_name || r.guest_name || "Anonymous",
-        verified: r.is_verified,
-        body: r.body,
-        photos: (r.review_photos || []).map(
-          (p: any) =>
-            supabase.storage.from("review-images").getPublicUrl(p.storage_path)
-              .data.publicUrl,
-        ),
-      })),
+      reviews: mappedReviews,
+      customerPhotos,
+      verifiedCount: mappedReviews.filter((r: any) => r.verified).length,
       ratingBreakdown: [5, 4, 3, 2, 1].map((star) => ({
         stars: star,
-        count: (data.reviews || []).filter((r: any) => r.stars === star).length,
+        count: approved.filter((r: any) => Number(r.stars) === star).length,
       })),
-      totalRatings: (data.reviews || []).length,
+      totalRatings: approved.length,
+      /* An insight with no options would render an empty bar, so it is
+         dropped here rather than guarded in three separate templates. */
       customerInsights: (data.customer_insights || [])
         .sort((a: any, b: any) => a.display_order - b.display_order)
         .map((ci: any) => ({
@@ -237,20 +289,13 @@ if (allDbProducts) {
             .sort((a: any, b: any) => a.display_order - b.display_order)
             .map((opt: any) => ({
               text: opt.text,
-              pct: opt.pct,
+              pct: Number(opt.pct) || 0,
             })),
-        })),
+        }))
+        .filter((ci: any) => ci.label && ci.options.length > 0),
       productCode: data.sku,
-      related: getRelatedProducts(data.id),
-      images:
-        data.product_images && data.product_images.length > 0
-          ? data.product_images
-              .sort((a: any, b: any) => a.display_order - b.display_order)
-              .map((img: any) => ({
-                src: getImageUrl(img.storage_path, "product-images"),
-                alt: img.alt_text || data.name || "",
-              }))
-          : [{ src: getFallbackImage(data.id), alt: data.name || "" }],
+      related,
+      images,
     };
   }
 }
@@ -271,9 +316,15 @@ mappedProducts["product-not-found"] = {
   colors: [],
   details: [],
   includes: [],
+  rating: 0,
+  reviewCount: 0,
   reviews: [],
+  customerPhotos: [] as string[],
+  verifiedCount: 0,
   ratingBreakdown: [] as any[],
+  totalRatings: 0,
   customerInsights: [],
+  productCode: "",
   related: [],
 };
 
@@ -283,7 +334,25 @@ const product = mappedProducts[currentSlug] || mappedProducts["product-not-found
 const images = product.images;
 const discount =
   product.mrp > 0 ? Math.round((1 - product.price / product.mrp) * 100) : 0;
-const productsJson = JSON.stringify(mappedProducts);
+/* The inline hydration script below re-renders the parts of the page that
+   were built before these routes were split per slug. The review section is
+   not one of them — it is server-rendered from the same data and left alone,
+   so the review rows (bodies, photo URLs, names) are dropped here instead of
+   being shipped for every product on every product page. */
+const productsJson = JSON.stringify(
+  Object.fromEntries(
+    Object.entries(mappedProducts).map(([key, value]: [string, any]) => {
+      const {
+        reviews: _reviews,
+        customerPhotos: _customerPhotos,
+        ratingBreakdown: _ratingBreakdown,
+        customerInsights: _customerInsights,
+        ...rest
+      } = value;
+      return [key, rest];
+    }),
+  ),
+);
 
 const site = "https://sunfloracrochet.in";
 const productUrl = `${site}/productdetail/${product.slug}`;
@@ -301,7 +370,7 @@ const productSchema = isRealProduct
       name: product.name,
       description: product.description,
       sku: product.sku,
-      image: images.map((img: any) => img.src),
+      image: images.map((img: any) => toAbsoluteUrl(img.src)),
       brand: { "@type": "Brand", name: product.brand },
       offers: {
         "@type": "Offer",
@@ -319,7 +388,27 @@ const productSchema = isRealProduct
               "@type": "AggregateRating",
               ratingValue: product.rating,
               reviewCount: product.reviewCount,
+              bestRating: 5,
+              worstRating: 1,
             },
+            /* Real, approved reviews — the newest few. Google wants the
+               individual reviews an aggregateRating is claimed from, and
+               marking up anything that is not shown on the page is what gets
+               rich results revoked. */
+            review: product.reviews
+              .slice(0, 5)
+              .map((r: any) => ({
+                "@type": "Review",
+                reviewRating: {
+                  "@type": "Rating",
+                  ratingValue: r.stars,
+                  bestRating: 5,
+                  worstRating: 1,
+                },
+                author: { "@type": "Person", name: r.author },
+                ...(r.title ? { name: r.title } : {}),
+                ...(r.body ? { reviewBody: r.body } : {}),
+              })),
           }
         : {}),
     }
@@ -460,12 +549,8 @@ const breadcrumbSchema = isRealProduct
         }
       }
 
-      // Ratings bar
-      const ratingVal = document.getElementById("rating-val");
-      if (ratingVal) ratingVal.textContent = product.rating;
-      const ratingCount = document.querySelector(".rating-count");
-      if (ratingCount)
-        ratingCount.textContent = product.reviewCount + " Ratings";
+      // Ratings bar — the rating and its count are server-rendered from the
+      // approved reviews for this slug, so only the SKU is touched here.
       const ratingSku = document.querySelector(".rating-sku");
       if (ratingSku) ratingSku.textContent = "SKU: " + product.sku;
 
@@ -594,205 +679,12 @@ const breadcrumbSchema = isRealProduct
           .join("");
       }
 
-      // 6. Reviews & ratings hydration
-      const ratingScoreNum = document.querySelector(".rating-score-num");
-      if (ratingScoreNum) ratingScoreNum.textContent = product.rating;
-
-      const ratingScoreTotal = document.getElementById("rating-score-total");
-      if (ratingScoreTotal) {
-        ratingScoreTotal.innerHTML = `${(product.totalRatings / 1000).toFixed(1)}k<br/>Verified Buyers`;
-      }
-
-      const ratingBarsContainer = document.getElementById(
-        "rating-bars-container",
-      );
-      if (ratingBarsContainer) {
-        ratingBarsContainer.innerHTML = product.ratingBreakdown
-          .map((row) => {
-            const pct = Math.round((row.count / product.totalRatings) * 100);
-            const isLow = row.stars >= 2;
-            return `
-          <div class="rating-bar-row">
-            <span class="rating-bar-label">${row.stars}</span>
-            <span class="rating-bar-star">★</span>
-            <div class="rating-bar-track">
-              <div class="rating-bar-fill${isLow ? " low" : ""}" style="width:${pct}%"></div>
-            </div>
-            <span class="rating-bar-count">${row.count.toLocaleString("en-IN")}</span>
-          </div>
-        `;
-          })
-          .join("");
-      }
-
-      const insightsContainer = document.getElementById("insights-container");
-      if (insightsContainer) {
-        insightsContainer.innerHTML = product.customerInsights
-          .map(
-            (ins) => `
-        <div class="insight-row">
-          <div class="insight-row-label">${ins.label}</div>
-          <div class="insight-bar-wrap">
-            <div class="insight-bar-track">
-              <div class="insight-bar-fill" style="width:${ins.options[0].pct}%"></div>
-            </div>
-            <span class="insight-bar-label">${ins.options[0].text} (${ins.options[0].pct}%)</span>
-          </div>
-        </div>
-      `,
-          )
-          .join("");
-      }
-
-      const dialogInsightsContainer = document.getElementById(
-        "dialog-insights-container",
-      );
-      if (dialogInsightsContainer) {
-        dialogInsightsContainer.innerHTML = product.customerInsights
-          .map(
-            (ins) => `
-        <div class="dialog-insight-group">
-          <div class="dialog-insight-label">${ins.label}</div>
-          ${ins.options
-            .map(
-              (opt, oi) => `
-            <div class="dialog-bar-row">
-              <span class="dialog-bar-name${oi === 0 ? " bold" : ""}">${opt.text} (${opt.pct}%)</span>
-              <div class="dialog-bar-track">
-                <div class="dialog-bar-fill${oi === 0 ? " primary" : ""}" style="width:${opt.pct}%"></div>
-              </div>
-            </div>
-          `,
-            )
-            .join("")}
-        </div>
-      `,
-          )
-          .join("");
-      }
-
-      const reviewsListCount = document.querySelector(".reviews-list-count");
-      if (reviewsListCount) {
-        reviewsListCount.textContent = `(${product.reviews.length * 11357} reviews)`;
-      }
-
-      const reviewsListContainer = document.getElementById(
-        "reviews-list-container",
-      );
-      if (reviewsListContainer) {
-        reviewsListContainer.innerHTML = product.reviews
-          .map((r) => {
-            const starColor =
-              r.stars >= 4 ? "" : r.stars === 3 ? " mid" : " low";
-            const words = r.body.split(" ");
-            const preview = words.slice(0, 22).join(" ");
-            const overflow = words.slice(22).join(" ");
-
-            let bodyHtml = `<span class="review-body-text">${preview}</span>`;
-            if (words.length > 22) {
-              bodyHtml += `
-            <span class="review-body-overflow hidden" id="overflow-${r.id}"> ${overflow}</span>
-            <button class="review-read-more" data-id="${r.id}" id="rm-${r.id}">... Read more</button>
-          `;
-            }
-
-            return `
-          <div class="review-card">
-            <div class="review-top">
-              <span class="review-stars-pill${starColor}">
-                ${r.stars} ★
-              </span>
-              <span class="review-title">${r.title}</span>
-            </div>
-
-            <div class="review-body-wrap">
-              ${bodyHtml}
-            </div>
-
-            ${
-              r.photos && r.photos.length > 0
-                ? `
-              <div class="review-photos">
-                ${r.photos
-                  .map(
-                    (photo, pi) => `
-                  <div class="review-photo">
-                    <img src="${photo}" alt="Review photo ${pi + 1}" loading="lazy" />
-                  </div>
-                `,
-                  )
-                  .join("")}
-              </div>
-            `
-                : ""
-            }
-
-            <div class="review-meta">
-              <span class="review-author">${r.author}</span>
-              ${
-                r.verified
-                  ? `
-                <span class="review-verified">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                  Verified Buyer
-                </span>
-              `
-                  : ""
-              }
-              <span class="review-date">${r.date}</span>
-            </div>
-            <div class="review-helpful">
-              Was this review helpful?
-              <button class="helpful-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
-                Yes (${r.helpful})
-              </button>
-              <button class="helpful-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/><path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>
-                No (${r.unhelpful || 0})
-              </button>
-            </div>
-          </div>
-        `;
-          })
-          .join("");
-
-        // Helpful buttons handlers
-        reviewsListContainer.querySelectorAll(".helpful-btn").forEach((btn) => {
-          btn.addEventListener("click", () => {
-            btn.style.borderColor = "var(--dark)";
-            btn.style.color = "var(--dark)";
-          });
-        });
-
-        // Read more handlers
-        reviewsListContainer
-          .querySelectorAll(".review-read-more")
-          .forEach((btn) => {
-            btn.addEventListener("click", () => {
-              const id = btn.dataset.id;
-              const overflow = document.getElementById("overflow-" + id);
-              if (overflow) {
-                const isHidden = overflow.classList.contains("hidden");
-                if (isHidden) {
-                  overflow.classList.remove("hidden");
-                  btn.textContent = " Read less";
-                } else {
-                  overflow.classList.add("hidden");
-                  btn.textContent = "... Read more";
-                }
-              }
-            });
-          });
-      }
-
-      const viewAllReviews = document.querySelector(".view-all-reviews");
-      if (viewAllReviews) {
-        viewAllReviews.textContent = `View all ${product.reviews.length * 11357} reviews`;
-      }
-
-      const productCodeVal = document.getElementById("product-code-val");
-      if (productCodeVal) productCodeVal.textContent = product.productCode;
+      /* The review section is server-rendered per slug from approved
+         reviews and is not re-rendered here. It used to be rebuilt with
+         innerHTML from this same blob, which both duplicated the markup
+         and meant customer-written text was injected as HTML; its own
+         behaviour (votes, read more, the form) now lives in
+         ProductReviews.astro as a bundled module. */
 
       // 7. Related grid cards
       const relatedGridContainer = document.getElementById(
@@ -838,6 +730,9 @@ const breadcrumbSchema = isRealProduct
       if (thumbStrip && mainImg) {
         mainImg.src = product.images[0]?.src || "";
         mainImg.alt = product.images[0]?.alt || product.name;
+        if (product.images[0]?.srcset) mainImg.srcset = product.images[0].srcset;
+        if (product.images[0]?.width) mainImg.width = product.images[0].width;
+        if (product.images[0]?.height) mainImg.height = product.images[0].height;
 
         thumbStrip.innerHTML = product.images
           .map(
@@ -846,9 +741,20 @@ const breadcrumbSchema = isRealProduct
           class="thumb-btn${i === 0 ? " active" : ""}"
           data-index="${i}"
           data-src="${img.src}"
+          data-srcset="${img.srcset || ""}"
+          data-width="${img.width || ""}"
+          data-height="${img.height || ""}"
           aria-label="View image ${i + 1}"
         >
-          <img src="${img.src}" alt="${img.alt || ""}" loading="lazy" />
+          <img
+            src="${img.src}"
+            srcset="${img.srcset || ""}"
+            sizes="80px"
+            width="${img.width || ""}"
+            height="${img.height || ""}"
+            alt="${img.alt || ""}"
+            loading="lazy"
+          />
         </button>
       `,
           )
@@ -861,7 +767,11 @@ const breadcrumbSchema = isRealProduct
           if (index === current) return;
           mainImg.classList.add("fading");
           setTimeout(() => {
-            mainImg.src = thumbs[index].dataset.src;
+            const thumb = thumbs[index];
+            mainImg.src = thumb.dataset.src;
+            mainImg.srcset = thumb.dataset.srcset || "";
+            if (thumb.dataset.width) mainImg.width = thumb.dataset.width;
+            if (thumb.dataset.height) mainImg.height = thumb.dataset.height;
             mainImg.classList.remove("fading");
           }, 200);
           thumbs[current].classList.remove("active");

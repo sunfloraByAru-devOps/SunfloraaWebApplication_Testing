@@ -1487,3 +1487,273 @@ footer a:hover {
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
 }
+
+/* ── REVIEWS — real data states ──────────────────────────────────────────
+   Added with the review section rewrite: the heading row with its "write a
+   review" action, the empty state, a star row that can show a fraction, the
+   folded overflow of the list, and the submission form. */
+
+.reviews-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+.reviews-head .reviews-section-title {
+  margin-bottom: 0;
+}
+
+.review-write-btn {
+  background: none;
+  border: 1.5px solid var(--dark);
+  border-radius: var(--radius);
+  padding: 0.5rem 1.1rem;
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--dark);
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+.review-write-btn:hover {
+  background: var(--dark);
+  color: #fff;
+}
+
+/* Empty state — no reviews yet, and honest about it. */
+.reviews-empty {
+  margin: 1.5rem 0;
+  padding: 2rem 1.5rem;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  background: var(--light);
+  text-align: center;
+}
+.reviews-empty-stars {
+  color: var(--border);
+  font-size: 1.4rem;
+  letter-spacing: 3px;
+}
+.reviews-empty-title {
+  margin-top: 0.6rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--dark);
+}
+.reviews-empty-text {
+  margin-top: 0.35rem;
+  font-size: 0.78rem;
+  color: var(--muted);
+  max-width: 40ch;
+  margin-inline: auto;
+  line-height: 1.6;
+}
+
+/* Fractional star row. Two copies of the same five stars; the amber one is
+   clipped to --star-fill, so 4.3 looks like 4.3 rather than 4 or 5. */
+.star-rating {
+  position: relative;
+  display: inline-block;
+  font-size: 1rem;
+  letter-spacing: 2px;
+  line-height: 1;
+  margin: 0.3rem 0;
+  white-space: nowrap;
+}
+.star-rating-base {
+  color: var(--border);
+}
+.star-rating-fill {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  width: var(--star-fill, 0%);
+  color: var(--amber);
+}
+
+/* Reviews past the first few are in the HTML but folded until asked for. */
+.review-card.is-folded {
+  display: none;
+}
+
+.helpful-btn.is-voted {
+  border-color: var(--dark);
+  color: var(--dark);
+  font-weight: 600;
+}
+.helpful-btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.helpful-note {
+  font-size: 0.68rem;
+  color: var(--muted);
+}
+
+/* "Show all reviews" is a button now that it does something. */
+button.view-all-reviews {
+  background: none;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* ── Write a review ── */
+.review-form-block {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: var(--light);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.review-form-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--dark);
+}
+.review-form-sub {
+  margin-top: 0.3rem;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+.review-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+.review-stars-field {
+  border: none;
+  padding: 0;
+}
+.review-stars-field legend {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--dark);
+  margin-bottom: 0.3rem;
+}
+.review-stars-input {
+  display: flex;
+  gap: 2px;
+}
+.review-star-btn {
+  background: none;
+  border: none;
+  padding: 0 2px;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--border);
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.review-star-btn.is-on,
+.review-star-btn:hover {
+  color: var(--amber);
+}
+.review-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+@media (max-width: 600px) {
+  .review-form-row {
+    grid-template-columns: 1fr;
+  }
+}
+.review-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--dark);
+}
+.review-field em {
+  font-weight: 400;
+  font-style: normal;
+  color: var(--muted);
+}
+.review-field input,
+.review-field textarea {
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 400;
+  color: var(--dark);
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  resize: vertical;
+}
+.review-field input:focus,
+.review-field textarea:focus {
+  outline: none;
+  border-color: var(--amber);
+}
+.review-field small {
+  font-weight: 400;
+  font-size: 0.68rem;
+  color: var(--muted);
+}
+.review-form-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.review-submit-btn {
+  background: var(--dark);
+  color: #fff;
+  border: 1.5px solid var(--dark);
+  border-radius: var(--radius);
+  padding: 0.6rem 1.5rem;
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.review-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.review-cancel-btn {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 0.72rem;
+  color: var(--muted);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.review-form-msg:empty {
+  display: none;
+}
+.review-form-msg {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.review-form-msg.is-ok {
+  color: var(--green);
+}
+.review-form-msg.is-err {
+  color: var(--red);
+}
+
+/* The rating pill and its count jump to the reviews section now that there is
+   a real one to jump to. */
+a.rating-pill,
+a.rating-count {
+  text-decoration: none;
+}
+a.rating-count:hover {
+  color: var(--dark);
+  text-decoration: underline;
+}

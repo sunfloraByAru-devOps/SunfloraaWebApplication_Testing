@@ -204,7 +204,9 @@ gospel.
 - **profiles** — `id`, `role`, `full_name`, `phone`, `avatar_url`, timestamps
 - **products_with_image** — a convenience *view* the storefront reads
   (`primary_image_path`, `category_name`, …). Read-only; write to the base tables.
-- Storage buckets: `product-images`, `review-images`, `custom-order-uploads`.
+- Storage buckets: `product-images`, `review-photos`, `gallery-images`, `site-images`,
+  `custom-order-uploads`. (This line used to say `review-images`; there is no such
+  bucket, and the storefront had copied the wrong name.)
 - **orders / order_items / order_status_history**, **addresses**,
   **custom_orders / custom_order_status_history**, **contact_messages**,
   **newsletter_subscribers** — Part B tables. Inspect these yourself before building;

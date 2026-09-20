@@ -10,7 +10,7 @@ interface Recommendation {
   rating: number;
   reviews: number;
   tag: string | null;
-  img: string;
+  image: { src: string; width: number; height: number; srcset: string };
 }
 interface Props {
   recommendations: Recommendation[];
@@ -54,7 +54,11 @@ const { recommendations } = Astro.props;
                         >
                             <div class="card-img-wrap">
                                 <img
-                                    src={p.img}
+                                    src={p.image.src}
+                                    srcset={p.image.srcset || undefined}
+                                    sizes="(max-width: 640px) 45vw, 300px"
+                                    width={p.image.width || 300}
+                                    height={p.image.height || 300}
                                     alt={p.name}
                                     class="card-img"
                                     loading="lazy"

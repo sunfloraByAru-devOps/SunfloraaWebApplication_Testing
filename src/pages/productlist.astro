@@ -13,7 +13,7 @@ import KEYCHAIN from "../assets/crochet_daisy_keychain.png";
 import BASKET from "../assets/crochet_basket.png";
 import CLIPS from "../assets/crochet_hair_clips.png";
 
-import { getImageUrl } from "../lib/images";
+import { getGridImage } from "../lib/product-images";
 import { createClient } from "@supabase/supabase-js";
 import ProductListCategoryBar from "../components/ProductListCategoryBar.astro";
 import ProductListControls from "../components/ProductListControls.astro";
@@ -81,8 +81,20 @@ const { data: products } = await supabase
     .order("name", { ascending: true });
 
 // ── All products ──────────────────────────────────────────
-const allProducts =
-    products?.map((p) => {
+async function toGridImage(primaryImagePath: string | null, name: string, category: string | null) {
+    const optimized = primaryImagePath ? await getGridImage(primaryImagePath) : null;
+    return (
+        optimized || {
+            src: getFallbackImg(name, category),
+            width: 300,
+            height: 300,
+            srcset: "",
+        }
+    );
+}
+
+const allProducts = await Promise.all(
+    (products || []).map(async (p) => {
         const rating = parseFloat(String(p.avg_rating)) || 0;
         const reviewCount = p.review_count || 0;
 
@@ -95,13 +107,12 @@ const allProducts =
             rating,
             reviews: reviewCount,
             tag: p.tag,
-            img: p.primary_image_path
-                ? getImageUrl(p.primary_image_path, "product-images")
-                : getFallbackImg(p.name, p.category_name),
+            image: await toGridImage(p.primary_image_path, p.name, p.category_name),
             isNew: p.is_new,
             inStock: p.in_stock,
         };
-    }) || [];
+    }),
+);
 
 // ── Recommendation products (shown after 8 main products) ──
 const { data: recoData } = await supabase
@@ -115,22 +126,22 @@ const { data: recoData } = await supabase
     .order("name", { ascending: true })
     .limit(4);
 
-const recommendations = (recoData || []).map((p) => {
-    const rating = parseFloat(String(p.avg_rating)) || 0;
-    return {
-        id: p.id,
-        name: p.name,
-        category: p.category_name,
-        price: p.base_price,
-        mrp: p.base_mrp,
-        rating,
-        reviews: p.review_count || 0,
-        tag: p.tag,
-        img: p.primary_image_path
-            ? getImageUrl(p.primary_image_path, "product-images")
-            : getFallbackImg(p.name, p.category_name),
-    };
-});
+const recommendations = await Promise.all(
+    (recoData || []).map(async (p) => {
+        const rating = parseFloat(String(p.avg_rating)) || 0;
+        return {
+            id: p.id,
+            name: p.name,
+            category: p.category_name,
+            price: p.base_price,
+            mrp: p.base_mrp,
+            rating,
+            reviews: p.review_count || 0,
+            tag: p.tag,
+            image: await toGridImage(p.primary_image_path, p.name, p.category_name),
+        };
+    }),
+);
 
 const { data: dbCategories } = await supabase
     .from("categories")

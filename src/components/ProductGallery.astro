@@ -7,6 +7,9 @@ interface Props {
   images: Array<{
     src: string;
     alt: string;
+    width?: number;
+    height?: number;
+    srcset?: string;
   }>;
 }
 
@@ -21,9 +24,20 @@ const { product, images } = Astro.props;
         class={`thumb-btn${i === 0 ? " active" : ""}`}
         data-index={i}
         data-src={img.src}
+        data-srcset={img.srcset || ""}
+        data-width={img.width || ""}
+        data-height={img.height || ""}
         aria-label={`View image ${i + 1}`}
       >
-        <img src={img.src} alt={img.alt} loading="lazy" />
+        <img
+          src={img.src}
+          srcset={img.srcset || undefined}
+          sizes="80px"
+          width={img.width || undefined}
+          height={img.height || undefined}
+          alt={img.alt}
+          loading="lazy"
+        />
       </button>
     ))
   }
@@ -34,6 +48,10 @@ const { product, images } = Astro.props;
   <div class="main-image-wrap" id="main-image-wrap">
     <img
       src={images[0]?.src}
+      srcset={images[0]?.srcset || undefined}
+      sizes="(max-width: 900px) 90vw, 500px"
+      width={images[0]?.width || undefined}
+      height={images[0]?.height || undefined}
       alt={images[0]?.alt || product.name}
       id="main-img"
     />

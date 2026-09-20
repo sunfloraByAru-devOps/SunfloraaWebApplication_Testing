@@ -1,242 +1,324 @@
 ---
+/* Ratings & reviews.
+ *
+ * Every number on screen is counted from the approved review rows passed in —
+ * there are no multipliers, no stock photography and no placeholder totals.
+ * A product with no reviews says so and asks for the first one.
+ *
+ * The interactive parts (helpful votes, the review form) talk to Supabase
+ * through two SECURITY DEFINER functions; see
+ * supabase/sql/12_product_reviews.sql. Anonymous visitors never get write
+ * access to the tables themselves, and a submitted review is held for the
+ * dashboard's approval before it appears here.
+ */
+
+interface Review {
+  id: string;
+  stars: number;
+  title: string;
+  body: string;
+  photos?: string[];
+  author: string;
+  verified: boolean;
+  date: string;
+  helpful: number;
+  unhelpful: number;
+}
+
 interface Props {
   product: {
+    id: string;
+    name: string;
     rating: number;
     totalRatings: number;
-    ratingBreakdown: Array<{
-      stars: number;
-      count: number;
-    }>;
+    verifiedCount?: number;
+    ratingBreakdown: Array<{ stars: number; count: number }>;
     customerInsights: Array<{
       label: string;
-      options: Array<{
-        text: string;
-        pct: number;
-      }>;
+      options: Array<{ text: string; pct: number }>;
     }>;
-    reviews: Array<{
-      id: string;
-      stars: number;
-      title: string;
-      body: string;
-      photos?: string[];
-      author: string;
-      verified: boolean;
-      date: string;
-      helpful: number;
-      unhelpful: number;
-    }>;
+    customerPhotos?: string[];
+    reviews: Review[];
     productCode: string;
   };
 }
 
 const { product } = Astro.props;
+
+const reviews = product.reviews || [];
+const total = product.totalRatings || 0;
+const hasReviews = total > 0;
+const verifiedCount = product.verifiedCount || 0;
+const photos = product.customerPhotos || [];
+const insights = (product.customerInsights || []).filter(
+  (i) => i && i.options && i.options.length > 0,
+);
+
+/* The five-star row is drawn twice and the top copy is clipped, so a 4.3
+   shows as four and a third stars rather than being rounded to something the
+   number beside it contradicts. */
+const ratingPct = Math.max(0, Math.min(100, (product.rating / 5) * 100));
+
+const nf = new Intl.NumberFormat("en-IN");
+
+/* The "product not found" route renders this component too, and there is
+   nothing there to review. */
+const canReview = typeof product.id === "string" && product.id.length > 0;
+
+/* How many reviews are visible before "Show more". The rest are in the HTML
+   (so they are indexed and findable with ctrl-F) but folded away. */
+const INITIAL_VISIBLE = 5;
+const READ_MORE_WORDS = 45;
+
+const prepared = reviews.map((r) => {
+  const words = (r.body || "").split(/\s+/).filter(Boolean);
+  const isLong = words.length > READ_MORE_WORDS;
+  return {
+    ...r,
+    preview: isLong ? words.slice(0, READ_MORE_WORDS).join(" ") : r.body || "",
+    overflow: isLong ? " " + words.slice(READ_MORE_WORDS).join(" ") : "",
+    isLong,
+    starClass: r.stars >= 4 ? "" : r.stars === 3 ? " mid" : " low",
+  };
+});
 ---
 
 <div class="reviews-wrapper">
   <section class="reviews-section" id="reviews">
-    <h2 class="reviews-section-title">Ratings &amp; Reviews</h2>
-
-    <!-- Rating overview -->
-    <div class="ratings-overview">
-      <div class="rating-score-block">
-        <span class="rating-score-num">{product.rating}</span>
-        <div class="rating-score-stars">★★★★★</div>
-        <div class="rating-score-total" id="rating-score-total">
-          {(product.totalRatings / 1000).toFixed(1)}k<br />Verified Buyers
-        </div>
-      </div>
-      <div class="rating-bars" id="rating-bars-container">
-        {
-          product.ratingBreakdown.map((row: any) => {
-            const pct = Math.round((row.count / product.totalRatings) * 100);
-            const isLow = row.stars >= 2;
-            return (
-              <div class="rating-bar-row">
-                <span class="rating-bar-label">{row.stars}</span>
-                <span class="rating-bar-star">★</span>
-                <div class="rating-bar-track">
-                  <div
-                    class={`rating-bar-fill${isLow ? " low" : ""}`}
-                    style={`width:${pct}%`}
-                  />
-                </div>
-                <span class="rating-bar-count">
-                  {row.count.toLocaleString("en-IN")}
-                </span>
-              </div>
-            );
-          })
-        }
-      </div>
-    </div>
-
-    <!-- Customer Insights — crochet-specific -->
-    <div class="insights-block">
-      <div class="insights-title">What Customers Said</div>
-      <div class="insights-rows" id="insights-container">
-        {
-          product.customerInsights.map(
-            (ins: any) => (
-              <div class="insight-row">
-                <div class="insight-row-label">{ins.label}</div>
-                <div class="insight-bar-wrap">
-                  <div class="insight-bar-track">
-                    <div
-                      class="insight-bar-fill"
-                      style={`width:${ins.options[0].pct}%`}
-                    />
-                  </div>
-                  <span class="insight-bar-label">
-                    {ins.options[0].text} ({ins.options[0].pct}%)
-                  </span>
-                </div>
-              </div>
-            ),
-          )
-        }
-      </div>
-      <button class="insights-link" id="view-details-btn">
-        View Details
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="11"
-          height="11"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          ><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg
-        >
-      </button>
-    </div>
-
-    <!-- Customer Photos strip (aggregated from all reviews) -->
-    <div class="customer-photos-section">
-      <div class="customer-photos-title">Customer Photos (7801)</div>
-      <div class="customer-photos-strip">
-        <div class="customer-photo-thumb">
-          <img
-            src="https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=200&h=200&fit=crop"
-            alt="Customer photo"
-            loading="lazy"
-          />
-        </div>
-        <div class="customer-photo-thumb">
-          <img
-            src="https://images.unsplash.com/photo-1591462584501-0a8d0c0a1d56?w=200&h=200&fit=crop"
-            alt="Customer photo"
-            loading="lazy"
-          />
-        </div>
-        <div class="customer-photo-thumb">
-          <img
-            src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=200&h=200&fit=crop"
-            alt="Customer photo"
-            loading="lazy"
-          />
-        </div>
-        <div class="customer-photo-thumb">
-          <img
-            src="https://images.unsplash.com/photo-1612198188060-c7c2a3b66eae?w=200&h=200&fit=crop"
-            alt="Customer photo"
-            loading="lazy"
-          />
-        </div>
-        <div class="customer-photo-thumb">
-          <img
-            src="https://images.unsplash.com/photo-1608501078713-8e445a709b39?w=200&h=200&fit=crop"
-            alt="Customer photo"
-            loading="lazy"
-          />
-        </div>
-        <div class="customer-photo-thumb">
-          <img
-            src="https://images.unsplash.com/photo-1617196034183-421b4040ed20?w=200&h=200&fit=crop"
-            alt="Customer photo"
-            loading="lazy"
-          />
-        </div>
-        <div class="customer-photo-thumb">
-          <img
-            src="https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=200&h=200&fit=crop"
-            alt="Customer photo"
-            loading="lazy"
-          />
-        </div>
-        <div class="customer-photo-thumb">
-          <img
-            src="https://images.unsplash.com/photo-1602173574767-37ac01994b2a?w=200&h=200&fit=crop"
-            alt="Customer photo"
-            loading="lazy"
-          />
-        </div>
-      </div>
-    </div>
-
-    <!-- Reviews list -->
-    <div class="reviews-list-header">
-      <span class="reviews-list-title">Customer Reviews</span>
-      <span class="reviews-list-count"
-        >({product.reviews.length * 11357} reviews)</span
-      >
-    </div>
-
-    <div class="reviews-list" id="reviews-list-container">
+    <div class="reviews-head">
+      <h2 class="reviews-section-title">Ratings &amp; Reviews</h2>
       {
-        product.reviews.map((r: any) => {
-          const starColor =
-            r.stars >= 4 ? "" : r.stars === 3 ? " mid" : " low";
-          const words = r.body.split(" ");
-          const preview = words.slice(0, 22).join(" ");
-          const overflow = words.slice(22).join(" ");
-          return (
-            <div class="review-card">
-              <div class="review-top">
-                <span class={`review-stars-pill${starColor}`}>
-                  {r.stars} ★
-                </span>
-                <span class="review-title">{r.title}</span>
-              </div>
+        canReview && (
+          <button class="review-write-btn" id="review-write-open" type="button">
+            Write a review
+          </button>
+        )
+      }
+    </div>
 
-              <div class="review-body-wrap">
-                <span class="review-body-text">{preview}</span>
-                <span
-                  class="review-body-overflow hidden"
-                  id={`overflow-${r.id}`}
-                >
-                  {" "}
-                  {overflow}
-                </span>
-                <button
-                  class="review-read-more"
-                  data-id={r.id}
-                  id={`rm-${r.id}`}
-                >
-                  ... Read more
-                </button>
-              </div>
+    {
+      !hasReviews && (
+        <div class="reviews-empty" id="reviews-empty">
+          <div class="reviews-empty-stars" aria-hidden="true">
+            ★★★★★
+          </div>
+          <p class="reviews-empty-title">No reviews yet</p>
+          <p class="reviews-empty-text">
+            This one hasn't been reviewed yet. If you've had it in your hands,
+            we'd love to hear what you thought.
+          </p>
+        </div>
+      )
+    }
 
-              {r.photos && r.photos.length > 0 && (
-                <div class="review-photos">
-                  {r.photos.map((photo: string, pi: number) => (
-                    <div class="review-photo">
-                      <img
-                        src={photo}
-                        alt={`Review photo ${pi + 1}`}
-                        loading="lazy"
+    {
+      hasReviews && (
+        <Fragment>
+          {/* Rating overview */}
+          <div class="ratings-overview">
+            <div class="rating-score-block">
+              <span class="rating-score-num">{product.rating.toFixed(1)}</span>
+              <span
+                class="star-rating"
+                style={`--star-fill:${ratingPct}%`}
+                role="img"
+                aria-label={`${product.rating.toFixed(1)} out of 5 stars`}
+              >
+                <span class="star-rating-base" aria-hidden="true">
+                  ★★★★★
+                </span>
+                <span class="star-rating-fill" aria-hidden="true">
+                  ★★★★★
+                </span>
+              </span>
+              <div class="rating-score-total">
+                {`${nf.format(total)} ${total === 1 ? "rating" : "ratings"}`}
+                {verifiedCount > 0 && (
+                  <Fragment>
+                    <br />
+                    {`${nf.format(verifiedCount)} from verified buyers`}
+                  </Fragment>
+                )}
+              </div>
+            </div>
+
+            <div class="rating-bars">
+              {product.ratingBreakdown.map((row) => {
+                const pct = total > 0 ? Math.round((row.count / total) * 100) : 0;
+                return (
+                  <div class="rating-bar-row">
+                    <span class="rating-bar-label">{row.stars}</span>
+                    <span class="rating-bar-star">★</span>
+                    <div
+                      class="rating-bar-track"
+                      role="img"
+                      aria-label={`${row.stars} star: ${row.count} of ${total}`}
+                    >
+                      <div
+                        class={`rating-bar-fill${row.stars <= 2 ? " low" : ""}`}
+                        style={`width:${pct}%`}
                       />
                     </div>
-                  ))}
-                </div>
-              )}
+                    <span class="rating-bar-count">{nf.format(row.count)}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
 
-              <div class="review-meta">
-                <span class="review-author">{r.author}</span>
-                {r.verified && (
-                  <span class="review-verified">
+          {/* What customers said — only when the shop has filled these in */}
+          {insights.length > 0 && (
+            <div class="insights-block">
+              <div class="insights-title">What Customers Said</div>
+              <div class="insights-rows">
+                {insights.map((ins) => (
+                  <div class="insight-row">
+                    <div class="insight-row-label">{ins.label}</div>
+                    <div class="insight-bar-wrap">
+                      <div class="insight-bar-track">
+                        <div
+                          class="insight-bar-fill"
+                          style={`width:${ins.options[0].pct}%`}
+                        />
+                      </div>
+                      <span class="insight-bar-label">
+                        {ins.options[0].text} ({ins.options[0].pct}%)
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {insights.some((i) => i.options.length > 1) && (
+                <button class="insights-link" id="view-details-btn" type="button">
+                  View Details
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="11"
+                    height="11"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M5 12h14" />
+                    <path d="M12 5l7 7-7 7" />
+                  </svg>
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Photos customers actually sent in */}
+          {photos.length > 0 && (
+            <div class="customer-photos-section">
+              <div class="customer-photos-title">
+                Customer Photos ({nf.format(photos.length)})
+              </div>
+              <div class="customer-photos-strip">
+                {photos.map((src, i) => (
+                  <div class="customer-photo-thumb">
+                    <img
+                      src={src}
+                      alt={`Photo ${i + 1} from a customer review of ${product.name}`}
+                      loading="lazy"
+                      width="72"
+                      height="72"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div class="reviews-list-header">
+            <span class="reviews-list-title">Customer Reviews</span>
+            <span class="reviews-list-count">
+              {`(${nf.format(reviews.length)} ${
+                reviews.length === 1 ? "review" : "reviews"
+              })`}
+            </span>
+          </div>
+
+          <div class="reviews-list" id="reviews-list-container">
+            {prepared.map((r, i) => (
+              <article
+                class={`review-card${i >= INITIAL_VISIBLE ? " is-folded" : ""}`}
+                data-review-card
+              >
+                <div class="review-top">
+                  <span class={`review-stars-pill${r.starClass}`}>
+                    {r.stars} ★
+                  </span>
+                  {r.title && <span class="review-title">{r.title}</span>}
+                </div>
+
+                {r.body && (
+                  <div class="review-body-wrap">
+                    <span class="review-body-text">{r.preview}</span>
+                    {r.isLong && (
+                      <Fragment>
+                        <span class="review-body-overflow hidden">
+                          {r.overflow}
+                        </span>
+                        <button
+                          class="review-read-more"
+                          type="button"
+                          aria-expanded="false"
+                        >
+                          ... Read more
+                        </button>
+                      </Fragment>
+                    )}
+                  </div>
+                )}
+
+                {r.photos && r.photos.length > 0 && (
+                  <div class="review-photos">
+                    {r.photos.map((photo, pi) => (
+                      <div class="review-photo">
+                        <img
+                          src={photo}
+                          alt={`Photo ${pi + 1} from ${r.author}'s review`}
+                          loading="lazy"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div class="review-meta">
+                  <span class="review-author">{r.author}</span>
+                  {r.verified && (
+                    <span class="review-verified">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="11"
+                        height="11"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                      Verified Buyer
+                    </span>
+                  )}
+                  {r.date && <span class="review-date">{r.date}</span>}
+                </div>
+
+                <div class="review-helpful" data-review-id={r.id}>
+                  Was this review helpful?
+                  <button
+                    class="helpful-btn"
+                    type="button"
+                    data-vote="up"
+                    aria-pressed="false"
+                  >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="11"
@@ -244,119 +326,173 @@ const { product } = Astro.props;
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
-                      stroke-width="2.5"
+                      stroke-width="2"
                       stroke-linecap="round"
                       stroke-linejoin="round"
                     >
-                      <polyline points="20 6 9 17 4 12" />
+                      <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z" />
+                      <path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" />
                     </svg>
-                    Verified Buyer
-                  </span>
-                )}
-                <span class="review-date">{r.date}</span>
-              </div>
-              <div class="review-helpful">
-                Was this review helpful?
-                <button class="helpful-btn">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="11"
-                    height="11"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                    Yes (<span data-count="up">{r.helpful}</span>)
+                  </button>
+                  <button
+                    class="helpful-btn"
+                    type="button"
+                    data-vote="down"
+                    aria-pressed="false"
                   >
-                    <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z" />
-                    <path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" />
-                  </svg>
-                  Yes ({r.helpful})
-                </button>
-                <button class="helpful-btn">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="11"
-                    height="11"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z" />
-                    <path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17" />
-                  </svg>
-                  No ({r.unhelpful})
-                </button>
-              </div>
-            </div>
-          );
-        })
-      }
-    </div>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="11"
+                      height="11"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z" />
+                      <path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17" />
+                    </svg>
+                    No (<span data-count="down">{r.unhelpful}</span>)
+                  </button>
+                  <span class="helpful-note" data-helpful-note aria-live="polite"
+                  ></span>
+                </div>
+              </article>
+            ))}
+          </div>
 
-    <a href="#reviews" class="view-all-reviews">
-      View all {product.reviews.length * 11357} reviews
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="14"
-        height="14"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        ><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg
-      >
-    </a>
+          {reviews.length > INITIAL_VISIBLE && (
+            <button class="view-all-reviews" id="reviews-show-more" type="button">
+              Show all {nf.format(reviews.length)} reviews
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M5 12h14" />
+                <path d="M12 5l7 7-7 7" />
+              </svg>
+            </button>
+          )}
+        </Fragment>
+      )
+    }
+
+    {/* ── Write a review ── */}
+    {
+      canReview && (
+      <div class="review-form-block" id="review-form-block" hidden>
+        <h3 class="review-form-title">Write a review</h3>
+        <p class="review-form-sub">
+          Reviews are read before they go up, so yours won't appear straight away.
+        </p>
+
+        <form class="review-form" id="review-form" novalidate>
+          <input type="hidden" name="product_id" value={product.id} />
+
+          <fieldset class="review-stars-field">
+            <legend>Your rating</legend>
+            <div class="review-stars-input" id="review-stars-input">
+              {[1, 2, 3, 4, 5].map((n) => (
+                <button
+                  type="button"
+                  class="review-star-btn"
+                  data-star={n}
+                  aria-pressed="false"
+                  aria-label={`${n} ${n === 1 ? "star" : "stars"}`}
+                >
+                  ★
+                </button>
+              ))}
+            </div>
+            <input type="hidden" name="stars" id="review-stars-value" value="" />
+          </fieldset>
+
+          <div class="review-form-row">
+            <label class="review-field">
+              <span>Your name</span>
+              <input name="name" type="text" maxlength="80" autocomplete="name" required />
+            </label>
+            <label class="review-field">
+              <span>Email</span>
+              <input name="email" type="email" maxlength="200" autocomplete="email" required />
+              <small>Not shown on the site. Used to check you bought this.</small>
+            </label>
+          </div>
+
+          <label class="review-field">
+            <span>Headline <em>(optional)</em></span>
+            <input name="title" type="text" maxlength="120" />
+          </label>
+
+          <label class="review-field">
+            <span>Your review</span>
+            <textarea name="body" rows="5" maxlength="4000" required></textarea>
+          </label>
+
+          <div class="review-form-actions">
+            <button type="submit" class="review-submit-btn" id="review-submit">
+              Submit review
+            </button>
+            <button type="button" class="review-cancel-btn" id="review-cancel">
+              Cancel
+            </button>
+          </div>
+        </form>
+
+        <p class="review-form-msg" id="review-form-msg" role="status" aria-live="polite"></p>
+      </div>
+      )
+    }
 
     <div class="product-code-row">
-      <span
-        >Product Code: <span id="product-code-val">{product.productCode}</span></span
-      >
-      <span
-        >Seller: <a href="#" style="color:var(--amber);text-decoration:none;"
-          >View Supplier Information</a
-        ></span
-      >
+      {product.productCode && <span>Product Code: {product.productCode}</span>}
+      <span>
+        Questions about this piece?
+        <a href="/contact" style="color:var(--amber);text-decoration:none;">
+          Talk to the maker
+        </a>
+      </span>
     </div>
   </section>
 </div>
 
-<!-- INSIGHTS DIALOG -->
-<div
-  class="insights-dialog-overlay"
-  id="insights-overlay"
-  role="dialog"
-  aria-modal="true"
-  aria-label="Customer Insights Details"
->
-  <div class="insights-dialog">
-    <div class="insights-dialog-header">
-      <span class="insights-dialog-title"
-        >What customers say about this product</span
-      >
-      <button
-        class="insights-dialog-close"
-        id="insights-close"
-        aria-label="Close">×</button
-      >
-    </div>
+{/* INSIGHTS DIALOG */}
+{
+  insights.some((i) => i.options.length > 1) && (
     <div
-      class="insights-dialog-body"
-      id="dialog-insights-container"
-      style="padding: 1rem 1.5rem 1.5rem; display: flex; flex-direction: column; gap: 1.5rem;"
+      class="insights-dialog-overlay"
+      id="insights-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Customer Insights Details"
     >
-      {
-        product.customerInsights.map(
-          (ins: any) => (
+      <div class="insights-dialog">
+        <div class="insights-dialog-header">
+          <span class="insights-dialog-title">
+            What customers say about this product
+          </span>
+          <button class="insights-dialog-close" id="insights-close" aria-label="Close">
+            ×
+          </button>
+        </div>
+        <div
+          class="insights-dialog-body"
+          style="padding: 1rem 1.5rem 1.5rem; display: flex; flex-direction: column; gap: 1.5rem;"
+        >
+          {insights.map((ins) => (
             <div class="dialog-insight-group">
               <div class="dialog-insight-label">{ins.label}</div>
-              {ins.options.map((opt: any, oi: number) => (
+              {ins.options.map((opt, oi) => (
                 <div class="dialog-bar-row">
                   <span class={`dialog-bar-name${oi === 0 ? " bold" : ""}`}>
                     {opt.text} ({opt.pct}%)
@@ -370,9 +506,267 @@ const { product } = Astro.props;
                 </div>
               ))}
             </div>
-          ),
-        )
-      }
+          ))}
+        </div>
+      </div>
     </div>
-  </div>
-</div>
+  )
+}
+
+<script>
+  import { supabase } from "../lib/supabase.ts";
+
+  /* ── helpful votes ────────────────────────────────────────────────────────
+     One vote per browser per review. The key is a random id kept in
+     localStorage; it identifies the browser to the vote table and nothing
+     else. If storage is unavailable (private mode, blocked cookies) the
+     buttons still work — the visitor simply can't take a vote back later. */
+  const VOTER_STORAGE_KEY = "sunflora.voter";
+  const VOTED_STORAGE_KEY = "sunflora.reviewVotes";
+
+  function readStore(key: string) {
+    try {
+      return window.localStorage.getItem(key);
+    } catch {
+      return null;
+    }
+  }
+  function writeStore(key: string, value: string) {
+    try {
+      window.localStorage.setItem(key, value);
+    } catch {
+      /* nothing we can do, and nothing that should stop the page */
+    }
+  }
+
+  let voterKey = readStore(VOTER_STORAGE_KEY);
+  if (!voterKey) {
+    voterKey =
+      typeof crypto !== "undefined" && crypto.randomUUID
+        ? crypto.randomUUID()
+        : String(Date.now()) + Math.random().toString(36).slice(2);
+    writeStore(VOTER_STORAGE_KEY, voterKey);
+  }
+
+  const readVotes = (): Record<string, "up" | "down"> => {
+    try {
+      return JSON.parse(readStore(VOTED_STORAGE_KEY) || "{}");
+    } catch {
+      return {};
+    }
+  };
+  const myVotes = readVotes();
+  const rememberVote = (id: string, vote: "up" | "down" | null) => {
+    if (vote) myVotes[id] = vote;
+    else delete myVotes[id];
+    writeStore(VOTED_STORAGE_KEY, JSON.stringify(myVotes));
+  };
+
+  /* Supabase surfaces our RAISE EXCEPTION text as the message. Those are
+     written for customers, so they are shown as-is; anything else (a network
+     drop, a policy problem) gets a plain sentence instead of a raw error. */
+  const friendly = (err: any, fallback: string) => {
+    const msg = String(err?.message || "");
+    if (!msg || /fetch|network|failed to|JSON|permission|policy|violates/i.test(msg)) {
+      return fallback;
+    }
+    return msg;
+  };
+
+  const list = document.getElementById("reviews-list-container");
+
+  const paintVote = (row: HTMLElement) => {
+    const id = row.dataset.reviewId || "";
+    const mine = myVotes[id];
+    row.querySelectorAll<HTMLButtonElement>(".helpful-btn").forEach((btn) => {
+      const isMine = btn.dataset.vote === mine;
+      btn.setAttribute("aria-pressed", isMine ? "true" : "false");
+      btn.classList.toggle("is-voted", isMine);
+    });
+  };
+
+  if (list) {
+    list
+      .querySelectorAll<HTMLElement>("[data-review-id]")
+      .forEach((row) => paintVote(row));
+
+    list.addEventListener("click", async (event) => {
+      const target = event.target as HTMLElement;
+
+      /* Read more / read less */
+      const readMore = target.closest<HTMLButtonElement>(".review-read-more");
+      if (readMore) {
+        const wrap = readMore.closest(".review-body-wrap");
+        const overflow = wrap?.querySelector(".review-body-overflow");
+        if (!overflow) return;
+        const opening = overflow.classList.contains("hidden");
+        overflow.classList.toggle("hidden", !opening);
+        readMore.setAttribute("aria-expanded", opening ? "true" : "false");
+        readMore.textContent = opening ? " Read less" : "... Read more";
+        return;
+      }
+
+      /* Helpful / not helpful */
+      const btn = target.closest<HTMLButtonElement>(".helpful-btn");
+      if (!btn) return;
+
+      const row = btn.closest<HTMLElement>("[data-review-id]");
+      const reviewId = row?.dataset.reviewId;
+      if (!row || !reviewId) return;
+
+      const vote = btn.dataset.vote === "up" ? "up" : "down";
+      const note = row.querySelector<HTMLElement>("[data-helpful-note]");
+      const buttons = row.querySelectorAll<HTMLButtonElement>(".helpful-btn");
+
+      buttons.forEach((b) => (b.disabled = true));
+      if (note) note.textContent = "";
+
+      try {
+        const { data, error } = await supabase.rpc("react_to_review", {
+          p_review_id: reviewId,
+          p_voter_key: voterKey,
+          p_helpful: vote === "up",
+        });
+        if (error) throw error;
+
+        const counts = Array.isArray(data) ? data[0] : data;
+        const up = row.querySelector<HTMLElement>('[data-count="up"]');
+        const down = row.querySelector<HTMLElement>('[data-count="down"]');
+        if (up && counts) up.textContent = String(counts.helpful_count ?? 0);
+        if (down && counts) down.textContent = String(counts.unhelpful_count ?? 0);
+
+        // Clicking the same button again takes the vote back, server-side.
+        rememberVote(reviewId, myVotes[reviewId] === vote ? null : vote);
+        paintVote(row);
+        if (note) {
+          note.textContent = myVotes[reviewId] ? "Thanks" : "";
+        }
+      } catch (err) {
+        if (note) note.textContent = friendly(err, "That didn't save — try again.");
+      } finally {
+        buttons.forEach((b) => (b.disabled = false));
+      }
+    });
+  }
+
+  /* ── show all reviews ─────────────────────────────────────────────────── */
+  const showMore = document.getElementById("reviews-show-more");
+  showMore?.addEventListener("click", () => {
+    document
+      .querySelectorAll(".review-card.is-folded")
+      .forEach((card) => card.classList.remove("is-folded"));
+    showMore.remove();
+  });
+
+  /* ── the review form ──────────────────────────────────────────────────── */
+  const formBlock = document.getElementById("review-form-block");
+  const form = document.getElementById("review-form") as HTMLFormElement | null;
+  const openBtn = document.getElementById("review-write-open");
+  const cancelBtn = document.getElementById("review-cancel");
+  const submitBtn = document.getElementById("review-submit") as HTMLButtonElement | null;
+  const msg = document.getElementById("review-form-msg");
+  const starsValue = document.getElementById("review-stars-value") as HTMLInputElement | null;
+  const starsInput = document.getElementById("review-stars-input");
+
+  const setMessage = (text: string, kind: "" | "ok" | "err" = "") => {
+    if (!msg) return;
+    msg.textContent = text;
+    msg.className = "review-form-msg" + (kind ? " is-" + kind : "");
+  };
+
+  openBtn?.addEventListener("click", () => {
+    if (!formBlock) return;
+    formBlock.hidden = false;
+    formBlock.scrollIntoView({ behavior: "smooth", block: "center" });
+    form?.querySelector<HTMLInputElement>('input[name="name"]')?.focus();
+  });
+
+  cancelBtn?.addEventListener("click", () => {
+    if (!formBlock) return;
+    formBlock.hidden = true;
+    setMessage("");
+  });
+
+  starsInput?.addEventListener("click", (event) => {
+    const btn = (event.target as HTMLElement).closest<HTMLButtonElement>(".review-star-btn");
+    if (!btn || !starsValue) return;
+    const chosen = Number(btn.dataset.star) || 0;
+    starsValue.value = String(chosen);
+    starsInput
+      .querySelectorAll<HTMLButtonElement>(".review-star-btn")
+      .forEach((s) => {
+        const on = Number(s.dataset.star) <= chosen;
+        s.classList.toggle("is-on", on);
+        s.setAttribute("aria-pressed", Number(s.dataset.star) === chosen ? "true" : "false");
+      });
+  });
+
+  form?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!form || !submitBtn) return;
+
+    const data = new FormData(form);
+    const stars = Number(data.get("stars"));
+    const name = String(data.get("name") || "").trim();
+    const email = String(data.get("email") || "").trim();
+    const body = String(data.get("body") || "").trim();
+
+    if (!stars) return setMessage("Please choose a star rating.", "err");
+    if (!name) return setMessage("Please tell us your name.", "err");
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      return setMessage("Please check that email address.", "err");
+    }
+    if (body.length < 10) {
+      return setMessage("Please write a little more about what you thought.", "err");
+    }
+
+    submitBtn.disabled = true;
+    const label = submitBtn.textContent || "Submit review";
+    submitBtn.textContent = "Sending…";
+    setMessage("");
+
+    try {
+      const { error } = await supabase.rpc("submit_product_review", {
+        p_product_id: String(data.get("product_id") || ""),
+        p_stars: stars,
+        p_name: name,
+        p_email: email,
+        p_title: String(data.get("title") || "").trim(),
+        p_body: body,
+      });
+      if (error) throw error;
+
+      form.hidden = true;
+      setMessage(
+        "Thank you — your review has been sent. It will appear here once it has been read.",
+        "ok",
+      );
+    } catch (err) {
+      setMessage(friendly(err, "That didn't send. Please try again in a moment."), "err");
+      submitBtn.disabled = false;
+      submitBtn.textContent = label;
+    }
+  });
+
+  /* ── insights dialog ──────────────────────────────────────────────────── */
+  const overlay = document.getElementById("insights-overlay");
+  const viewDetailsBtn = document.getElementById("view-details-btn");
+  const closeBtn = document.getElementById("insights-close");
+
+  const closeOverlay = () => {
+    overlay?.classList.remove("open");
+    document.body.style.overflow = "";
+  };
+
+  viewDetailsBtn?.addEventListener("click", () => {
+    overlay?.classList.add("open");
+    document.body.style.overflow = "hidden";
+  });
+  closeBtn?.addEventListener("click", closeOverlay);
+  overlay?.addEventListener("click", (event) => {
+    if (event.target === overlay) closeOverlay();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && overlay?.classList.contains("open")) closeOverlay();
+  });
+</script>

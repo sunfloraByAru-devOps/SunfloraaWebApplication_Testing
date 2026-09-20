@@ -3,17 +3,15 @@
 // NOT the dark-background ChatGPT photo — the transparent bg blends into the beige section
 import CrochetCatHero from '../assets/crochet-cat-hero.png';
 import Cat1 from '../assets/cat-1.png';
-import { getImageUrl } from '../lib/images';
+import { getGalleryImage } from '../lib/product-images';
 
 const customSectionCatPath = null; // 'site/custom-section-cat.png'
-const catHeroUrl = customSectionCatPath
-  ? getImageUrl(customSectionCatPath)
-  : CrochetCatHero.src;
+const catHero = customSectionCatPath ? await getGalleryImage(customSectionCatPath) : null;
+const catHeroUrl = catHero?.src ?? CrochetCatHero.src;
 
 const sizeGuideCatPath = null; // 'site/size-guide-cat.png'
-const catSizeUrl = sizeGuideCatPath
-  ? getImageUrl(sizeGuideCatPath)
-  : Cat1.src;
+const catSize = sizeGuideCatPath ? await getGalleryImage(sizeGuideCatPath) : null;
+const catSizeUrl = catSize?.src ?? Cat1.src;
 
 const sizes = [
   {

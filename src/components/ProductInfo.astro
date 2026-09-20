@@ -1,5 +1,6 @@
 ---
 import { getContactLinks } from "../lib/site-content";
+import { toAbsoluteUrl } from "../lib/product-images";
 
 /* Contact details come from the dashboard's "Shop details" screen rather
    than being hardcoded here — that is how the site ended up with several
@@ -46,26 +47,41 @@ const { product, discount } = Astro.props;
   data-product-id={product.id}
   data-product-sku={product.sku}
   data-product-name={product.name}
-  data-product-image={product.images?.[0]?.src || ""}
+  data-product-image={toAbsoluteUrl(product.images?.[0]?.src || "")}
 >
   <p class="prod-brand">{product.brand}</p>
   <h1 class="prod-title">{product.name}</h1>
 
   <div class="rating-bar">
-    <span class="rating-pill">
-      <span id="rating-val">{product.rating}</span>
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="10"
-        height="10"
-        viewBox="0 0 24 24"
-        fill="currentColor"
-        ><polygon
-          points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
-        ></polygon></svg
-      >
-    </span>
-    <span class="rating-count">{product.reviewCount} Ratings</span>
+    {
+      /* A product nobody has reviewed yet says so, rather than wearing a
+         0-star pill that reads as a bad rating. */
+      product.reviewCount > 0 ? (
+        <Fragment>
+          <a href="#reviews" class="rating-pill">
+            <span id="rating-val">{product.rating.toFixed(1)}</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="10"
+              height="10"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+            </svg>
+          </a>
+          <a href="#reviews" class="rating-count">
+            {`${product.reviewCount} ${
+              product.reviewCount === 1 ? "Rating" : "Ratings"
+            }`}
+          </a>
+        </Fragment>
+      ) : (
+        <a href="#reviews" class="rating-count">
+          No reviews yet — be the first
+        </a>
+      )
+    }
     <span class="rating-sep">|</span>
     <span class="rating-sku">SKU: {product.sku}</span>
   </div>
