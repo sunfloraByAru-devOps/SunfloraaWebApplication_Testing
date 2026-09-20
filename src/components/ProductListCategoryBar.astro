@@ -1,19 +1,12 @@
 ---
+/* `name` is what the filter and the ?category= link match on; `label` is only
+   what the pill reads. The mapping between them used to be hardcoded here and
+   again in productlist.astro, so the home page could call a category one thing
+   while this bar called it another. It now comes from categories.display_label. */
 interface Props {
-  categories: string[];
+  categories: { name: string; label: string }[];
 }
 const { categories } = Astro.props;
-
-// Map category names to user-friendly titles matching the mockup if possible
-function getCatDisplayLabel(cat: string): string {
-  if (cat.toLowerCase() === "all") return "All Products";
-  if (cat.toLowerCase() === "amigurumi") return "Soft Toys";
-  if (cat.toLowerCase() === "bouquets") return "Flower Bouquets";
-  if (cat.toLowerCase() === "flower stems") return "Flower Stems";
-  if (cat.toLowerCase() === "wall hangings") return "Home Decor";
-  if (cat.toLowerCase() === "keychains") return "Accessories";
-  return cat;
-}
 ---
 
 <div class="category-bar-wrap" id="category-bar-wrap">
@@ -29,11 +22,11 @@ function getCatDisplayLabel(cat: string): string {
         categories.map((cat, i) => (
           <button
             class={`cat-pill-btn${i === 0 ? " active" : ""}`}
-            data-cat={cat}
+            data-cat={cat.name}
             role="tab"
             aria-selected={i === 0 ? "true" : "false"}
           >
-            {getCatDisplayLabel(cat)}
+            {cat.label}
           </button>
         ))
       }

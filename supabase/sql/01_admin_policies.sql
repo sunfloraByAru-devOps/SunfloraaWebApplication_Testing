@@ -5,7 +5,17 @@
 -- OR-ed together, nothing anon can do today changes. The storefront's
 -- anonymous read access is untouched.
 --
--- Safe to re-run.
+-- Safe to re-run, BUT NOT ON ITS OWN. Re-running this file re-executes the
+-- `revoke execute on function public.is_admin() from public, anon` below, which
+-- takes the public storefront down with "permission denied for function
+-- is_admin" on every anonymous read. 03_fix_is_admin_grant.sql exists solely to
+-- undo that, and its grant is silently reverted here.
+--
+--   ALWAYS RUN 03_fix_is_admin_grant.sql IMMEDIATELY AFTER THIS FILE.
+--
+-- Verify before walking away — this must return JSON, not an error:
+--   curl "$PUBLIC_SUPABASE_URL/rest/v1/faqs?select=id&limit=1" \
+--        -H "apikey: $PUBLIC_SUPABASE_KEY"
 
 begin;
 
@@ -40,7 +50,8 @@ begin
     'products','product_images','product_sizes','product_colors',
     'product_details','product_includes','categories','reviews','review_photos',
     'customer_insights','customer_insight_options',
-    'faqs','testimonials','gallery_items','site_settings'
+    'faqs','testimonials','gallery_items','site_settings',
+    'site_images','site_image_groups'
   ] loop
     if to_regclass('public.' || t) is null then
       raise notice 'skipping %, table not present', t; continue;

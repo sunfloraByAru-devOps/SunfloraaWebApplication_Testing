@@ -90,6 +90,14 @@
   font-size: .85rem; font-weight: 600;
 }
 .a-publish__when { font-weight: 400; opacity: .85; }
+/* The bar used to state a problem and offer nothing to do about it. */
+.a-publish__action {
+  margin-left: auto;
+  padding: 4px 12px; border-radius: 999px;
+  background: var(--a-gold); color: #fff;
+  text-decoration: none; font-weight: 600; white-space: nowrap;
+}
+.a-publish__action:hover { filter: brightness(1.08); }
 
 .a-nav {
   display: flex; gap: 4px; overflow-x: auto;

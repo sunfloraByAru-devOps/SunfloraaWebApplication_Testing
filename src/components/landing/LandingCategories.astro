@@ -1,30 +1,15 @@
 ---
-const categories = [
-  {
-    name: "Flower Bouquets",
-    img: "/images/landing/lify-bouquet.PNG",
-    price: "₹999",
-    link: "/productlist?category=Bouquets",
-  },
-  {
-    name: "Soft Toys",
-    img: "/images/landing/hanuman.PNG",
-    price: "₹499",
-    link: "/productlist?category=Amigurumi",
-  },
-  {
-    name: "Flower Pots",
-    img: "/images/landing/flower_pot.PNG",
-    price: "₹399",
-    link: "/productlist?category=Wall Hangings",
-  },
-  {
-    name: "Cushions",
-    img: "/images/landing/cushion.PNG",
-    price: "₹249",
-    link: "/productlist?category=Keychains",
-  },
-];
+/* The four cards under "Browse Our Collection".
+   These used to be a hardcoded array in which the name, the picture and the
+   link were three unrelated string literals — which is how "Flower Pots" came
+   to open the Wall Hangings shelf and "Cushions" the Keychains one. They now
+   come from one categories row each, so the label and the link cannot disagree.
+   getHomeCategories() also drops any category with nothing live in it, rather
+   than advertising a shelf that opens empty. */
+import { Image } from "astro:assets";
+import { getHomeCategories } from "../../lib/site-content";
+
+const categories = await getHomeCategories();
 ---
 
 <section id="categories" class="kn-section cat-section">
@@ -43,25 +28,37 @@ const categories = [
       {
         categories.map((cat, i) => (
           <a
-            href={cat.link}
+            href={cat.href}
             class={`cat-card kn-fade-up`}
             style={`transition-delay: ${i * 0.1}s`}
           >
             <div class="cat-img-wrap">
-              <img
-                src={cat.img}
-                alt={cat.name}
+              {/* Lazy on purpose: the hero photo above is this page's LCP
+                  element, and eager-loading four cards below the fold would
+                  only compete with it for bandwidth. The explicit width and
+                  height are what stop the row from shifting as they arrive. */}
+              <Image
+                src={cat.src}
+                alt={cat.alt}
+                width={cat.width}
+                height={cat.height}
+                widths={[400, 800]}
+                sizes="(max-width: 640px) 50vw, 25vw"
+                format="webp"
                 loading="lazy"
+                decoding="async"
                 class="cat-img"
               />
               <div class="cat-overlay">
-                <h3 class="cat-name">{cat.name}</h3>
-                <p class="cat-price-row">
-                  <span class="cat-price">
-                    From <strong>{cat.price}</strong>
-                  </span>
-                  <span class="cat-arrow" aria-hidden="true">→</span>
-                </p>
+                <h3 class="cat-name">{cat.label}</h3>
+                {cat.priceFrom && (
+                  <p class="cat-price-row">
+                    <span class="cat-price">
+                      From <strong>{cat.priceFrom}</strong>
+                    </span>
+                    <span class="cat-arrow" aria-hidden="true">→</span>
+                  </p>
+                )}
               </div>
             </div>
           </a>

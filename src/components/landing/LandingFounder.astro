@@ -1,47 +1,37 @@
 ---
 /* ============================================================
    Community Wall + Founder's Note
-   Real customer/maker photos from src/assets, copied into
-   public/images/community/ so they can be referenced the same
-   way every other landing section references images.
-   ============================================================ */
 
-const galleryItems = [
-  {
-    img: "/images/community/yellow_rose_bouquet.jpg",
-    review:
-      "Wrapped this one at midnight — the detail on the petals is unreal.",
-  },
-  {
-    img: "/images/community/crochet_hair_clips.png",
-    review: "So soft and well made, exactly like the photos. Ordering more!",
-  },
-  {
-    img: "/images/community/sun_and_moon.jpg",
-    review: "My Sunny came home today! Even better in person.",
-  },
-  {
-    img: "/images/community/Sunflower_Pot_1.png",
-    review: "Perfect little desk companion. Great quality for the price.",
-  },
-  {
-    img: "/images/community/Yello_orchid_(1).jpg",
-    review: "Best unboxing moment — the packaging alone felt like a gift.",
-  },
-  {
-    img: "/images/community/sun_on_desk.png",
-    review: "Found the perfect little spot for it. Love the craftsmanship.",
-  },
-  {
-    img: "/images/community/sunflower_rosebig_.jpg",
-    review: "Bigger and cozier than I expected. Worth every rupee.",
-  },
-  {
-    img: "/images/community/sun_on_couch.jpg",
-    review:
-      "Settling into his new home. Already my favorite thing on the couch.",
-  },
-];
+   The eight wall photos and their quotes used to be a hardcoded array here,
+   duplicated into public/images/community/ from src/assets/. Aru's own
+   portrait was worse: a hot-linked WhatsApp CDN URL carrying a signed expiry
+   parameter, which would have 404'd on its own with nobody able to replace it.
+   Both now come from site_images and are managed in the dashboard.
+   ============================================================ */
+import { Image, getImage } from "astro:assets";
+import { getSiteImages, getSiteImage } from "../../lib/site-content";
+
+const wall = await getSiteImages("community_wall");
+const portrait = await getSiteImage("founder_portrait");
+
+/* The marquee renders the list twice to loop seamlessly. Optimizing inside
+   that loop would process every photo twice and emit two different URLs for
+   the same picture, so the browser would download each one twice. Do it once
+   here, then both halves reference the identical asset. */
+const wallCards = await Promise.all(
+  wall.map(async (item) => ({
+    item,
+    img: await getImage({
+      src: item.src,
+      width: item.width,
+      height: item.height,
+      widths: [260, 520],
+      sizes: "260px",
+      format: "webp",
+      alt: item.alt,
+    }),
+  })),
+);
 
 const founderPromises = [
   { label: "Made with", accent: "Love & Care" },
@@ -99,10 +89,16 @@ const founderPromises = [
     <div class="founder-visual kn-fade-up">
       <div class="polaroid founder-polaroid">
         <span class="tape" aria-hidden="true"></span>
-        <img
-          src="https://media-bom2-3.cdn.whatsapp.net/v/t61.24694-24/534427929_1711673370153043_7618938782520873671_n.jpg?ccb=11-4&oh=01_Q5Aa5AGtTgX6sU02LCeI4dU91viSTqL8RYrKJsqrDrdgP4BQ9g&oe=6A5A85D3&_nc_sid=5e03e0&_nc_cat=111"
-          alt="Founder of Sunflora"
+        <Image
+          src={portrait.src}
+          alt={portrait.alt}
+          width={portrait.width}
+          height={portrait.height}
+          widths={[420, 840]}
+          sizes="(max-width: 900px) 80vw, 420px"
+          format="webp"
           loading="lazy"
+          decoding="async"
         />
       </div>
       <div class="hang-tag">
@@ -241,20 +237,25 @@ const founderPromises = [
     <div class="wall-marquee-viewport">
       <div class="wall-gallery">
         {
-          [...galleryItems, ...galleryItems].map((item) => (
+          [...wallCards, ...wallCards].map(({ item, img }) => (
             <div class="review-card">
               <img
                 class="review-card-img"
-                src={item.img}
-                alt="Sunflora customer moment"
+                src={img.src}
+                srcset={img.srcSet.attribute}
+                sizes="260px"
+                width={item.width}
+                height={item.height}
+                alt={item.alt}
                 loading="lazy"
+                decoding="async"
               />
               <div class="review-card-stars">
                 {"★★★★★".split("").map((s) => (
                   <span>{s}</span>
                 ))}
               </div>
-              <p class="review-card-text">{item.review}</p>
+              <p class="review-card-text">{item.caption}</p>
             </div>
           ))
         }

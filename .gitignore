@@ -1,3 +1,9 @@
 node_modules
 .env
 env
+
+# Build output. Cloudflare Workers Builds produces this from source on every
+# publish, so a committed copy would either churn on every deploy or go stale
+# and mislead. Build locally with `npm run build` before `npm run deploy`.
+dist/
+.astro/

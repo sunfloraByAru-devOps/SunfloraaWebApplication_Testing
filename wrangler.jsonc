@@ -1,14 +1,24 @@
-
 {
-  "name": "sunflora",
+  // The Worker that actually serves sunfloracrochet.in.
+  //
+  // This said "sunflora" until 2026-09-20, which is a different, stale Worker
+  // on the same account (last touched 2026-05-30, no custom domain attached).
+  // `wrangler deploy` was therefore uploading to a Worker nothing points at —
+  // a deploy that reports success and changes nothing on the live site. The
+  // custom domain mapping is the source of truth here:
+  //   sunfloracrochet.in -> sunfloraaweb (production)
+  "name": "sunfloraaweb",
+
   "compatibility_date": "2026-05-29",
   "assets": {
     "directory": "./dist"
-  },
-  "kv_namespaces": [
-    {
-      "binding": "SESSION",
-      "id": "4452b63379334ad8843a4a5ae5b236e9"
-    }
-  ]
+  }
+
+  // No bindings, deliberately. A SESSION KV namespace was declared here and
+  // referenced by nothing in src/; the live Worker has an empty binding list,
+  // and the namespace id belonged to a different account. Declaring a binding
+  // whose namespace does not exist fails the deploy, which — now that a build
+  // is triggered from the dashboard — would have surfaced as "Publish is
+  // broken" rather than as a config error. Add bindings back only alongside
+  // code that uses them.
 }

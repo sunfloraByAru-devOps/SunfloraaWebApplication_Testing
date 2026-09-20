@@ -42,6 +42,10 @@ const SECTIONS: Section[] = [
     { href: "#/reviews", label: "Reviews", badge: "pendingReviews" },
   ]},
   { key: "site", label: "Site", items: [
+    // Publish first: it is the one thing on this screen that is an action
+    // rather than a setting, and it is what makes everything else visible.
+    { href: "#/publish", label: "Publish" },
+    { href: "#/site-images", label: "Photos on the home page" },
     { href: "#/content", label: "Questions & quotes" },
     { href: "#/settings", label: "Shop details" },
   ]},
@@ -231,17 +235,34 @@ export async function refreshBadges() {
   } catch { /* badges are a nicety; never block the page */ }
 }
 
-/** Nothing Aru changes is on the live shop until the site is rebuilt. Say so. */
+/* Nothing Aru changes is on the live shop until the site is rebuilt. Say so -
+   and, now that there is a button, say what to do about it. A bar that states
+   a problem with no way to act on it just teaches people to ignore the bar. */
 export async function refreshPublishState() {
   try {
     const state = await getPublishState(builtAt);
     clear(publishBar);
+
+    if (state.inFlight) {
+      publishBar.hidden = false;
+      publishBar.className = "a-publish";
+      publishBar.appendChild(h("span", { text: "Publishing your changes…" }));
+      publishBar.appendChild(h("a", { class: "a-publish__action", href: "#/publish",
+        text: "See progress" }));
+      return;
+    }
+
     publishBar.hidden = !state.pending;
     if (!state.pending) return;
+
     publishBar.className = "a-publish";
     publishBar.appendChild(h("span", { text: "Your changes aren't on the live shop yet." }));
-    publishBar.appendChild(h("span", { class: "a-publish__when",
-      text: `Last published ${relativeDay(state.builtAt).toLowerCase()}.` }));
+    if (state.publishedAt) {
+      publishBar.appendChild(h("span", { class: "a-publish__when",
+        text: `Last published ${relativeDay(state.publishedAt).toLowerCase()}.` }));
+    }
+    publishBar.appendChild(h("a", { class: "a-publish__action", href: "#/publish",
+      text: "Publish now" }));
   } catch { publishBar.hidden = true; }
 }
 

@@ -1,1 +1,0 @@
-import{supabase as t}from"./supabase.D2dx7TGg.js";async function o(s,n,a){return t.auth.signInWithOtp({email:s,options:{data:n?{full_name:n}:void 0,shouldCreateUser:!0,emailRedirectTo:a||window.location.href}})}async function r(s,n){return t.auth.signInWithPassword({email:s,password:n})}export{r as a,o as s};

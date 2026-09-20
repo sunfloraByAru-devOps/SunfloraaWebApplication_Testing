@@ -3,9 +3,13 @@
 
 import { supabase } from "../supabase";
 import { getImageUrl } from "../images";
-import { uploadPhoto, removePhotoObjects, suggestAltText } from "./images";
+import {
+  uploadPhoto, uploadImage, removePhotoObjects, suggestAltText,
+  SITE_TARGET, SITE_BUCKET,
+} from "./images";
 
 export const PRODUCT_BUCKET = "product-images";
+export { SITE_BUCKET };
 
 /* ---------- session / admin check ---------- */
 
@@ -34,16 +38,28 @@ export async function signOut() { await supabase.auth.signOut(); }
 export type Category = {
   id: string; name: string; slug: string; description: string | null;
   is_active: boolean; display_order: number | null;
+  /* The home page card. `name` stays the identity used by links and the shop
+     filter; `display_label` is only what customers read, which is why renaming
+     one cannot break the other. */
+  image_path: string | null; image_width: number | null;
+  image_height: number | null; image_alt: string | null;
+  show_on_home: boolean; home_order: number | null;
+  display_label: string | null; home_price_note: string | null;
 };
+
+const CATEGORY_COLS =
+  "id, name, slug, description, is_active, display_order," +
+  " image_path, image_width, image_height, image_alt," +
+  " show_on_home, home_order, display_label, home_price_note";
 
 export async function listCategories(): Promise<Category[]> {
   const { data, error } = await supabase
     .from("categories")
-    .select("id, name, slug, description, is_active, display_order")
+    .select(CATEGORY_COLS)
     .order("display_order", { ascending: true, nullsFirst: false })
     .order("name");
   if (error) throw error;
-  return data ?? [];
+  return (data ?? []) as unknown as Category[];
 }
 
 export async function saveCategory(id: string | null, patch: Partial<Category>) {
@@ -159,6 +175,11 @@ export async function addPhoto(
       display_order: order,
       is_primary: makePrimary,
       alt_text: suggestAltText(productName, order),
+      // The curated home page cards render through <Image>, which cannot size a
+      // remote image by itself. Recorded here so no separate backfill is needed
+      // for anything uploaded from now on.
+      width: uploaded.width,
+      height: uploaded.height,
     })
     .select("id, storage_path, alt_text, display_order, is_primary")
     .single();
@@ -651,4 +672,283 @@ export async function getPhotoOverview(): Promise<PhotoOverview> {
     .map((p: any) => ({ id: p.id, name: p.name, is_active: p.is_active }));
 
   return { photos, productsWithNone };
+}
+
+/* ---------- site images (the home page's own pictures) ----------
+   The community wall and Aru's portrait used to be hardcoded arrays in
+   LandingFounder.astro, with her photo hot-linked from a WhatsApp CDN URL that
+   carries an expiry signature. Both now live in site_images, grouped by key.
+
+   A group with is_singleton set holds one picture at a time; uploading a
+   replacement retires the previous row rather than overwriting its object, so
+   nothing is ever served stale from a cached key. */
+
+export type SiteImageGroup = {
+  key: string; label: string; blurb: string | null;
+  is_singleton: boolean; max_items: number | null;
+  wants_caption: boolean; aspect_hint: string;
+};
+
+export type SiteImage = {
+  id: string; key: string; storage_path: string;
+  alt: string; caption: string | null;
+  width: number | null; height: number | null;
+  display_order: number; is_active: boolean;
+};
+
+const SITE_IMAGE_COLS =
+  "id, key, storage_path, alt, caption, width, height, display_order, is_active";
+
+export async function listSiteImageGroups(): Promise<SiteImageGroup[]> {
+  const { data, error } = await supabase
+    .from("site_image_groups")
+    .select("key, label, blurb, is_singleton, max_items, wants_caption, aspect_hint")
+    .order("is_singleton", { ascending: true })
+    .order("label");
+  if (error) throw error;
+  return (data ?? []) as unknown as SiteImageGroup[];
+}
+
+/** Every picture in a group, retired ones included - the admin shows active
+ *  first but must be able to bring an old portrait back. */
+export async function listSiteImages(key: string): Promise<SiteImage[]> {
+  const { data, error } = await supabase
+    .from("site_images")
+    .select(SITE_IMAGE_COLS)
+    .eq("key", key)
+    .order("is_active", { ascending: false })
+    .order("display_order", { ascending: true });
+  if (error) throw error;
+  return (data ?? []) as unknown as SiteImage[];
+}
+
+export function siteImageUrl(path: string | null | undefined) {
+  return getImageUrl(path, SITE_BUCKET);
+}
+
+/** Upload, then record. If the row cannot be written, take the objects back
+ *  out - a stray file is harmless, a row pointing at nothing is not. */
+export async function addSiteImage(
+  key: string, file: File, order: number, alt: string, caption: string | null = null,
+): Promise<SiteImage & { savedBytes: number }> {
+  const uploaded = await uploadImage(SITE_TARGET, key, file);
+
+  const { data, error } = await supabase
+    .from("site_images")
+    .insert({
+      key,
+      storage_path: uploaded.key,
+      alt: alt.trim(),
+      caption,
+      width: uploaded.width,
+      height: uploaded.height,
+      display_order: order,
+      is_active: true,
+    })
+    .select(SITE_IMAGE_COLS)
+    .single();
+
+  if (error) {
+    await removePhotoObjects(uploaded.key, SITE_BUCKET);
+    throw error;
+  }
+  return {
+    ...(data as unknown as SiteImage),
+    savedBytes: uploaded.originalBytes - uploaded.bytes,
+  };
+}
+
+export async function updateSiteImage(id: string, patch: Partial<SiteImage>) {
+  const { error } = await supabase.from("site_images").update(patch).eq("id", id);
+  if (error) throw error;
+}
+
+export async function deleteSiteImage(img: SiteImage) {
+  const { error } = await supabase.from("site_images").delete().eq("id", img.id);
+  if (error) throw error;
+  await removePhotoObjects(img.storage_path, SITE_BUCKET);
+}
+
+export async function saveSiteImageOrder(imgs: SiteImage[]) {
+  for (let i = 0; i < imgs.length; i++) {
+    if (imgs[i].display_order === i) continue;
+    const { error } = await supabase
+      .from("site_images").update({ display_order: i }).eq("id", imgs[i].id);
+    if (error) throw error;
+    imgs[i].display_order = i;
+  }
+}
+
+/* ---------- category card image ----------
+   Kept on the category row rather than in site_images: the picture is one per
+   category, and a shared table keyed by a hand-typed string is the same class
+   of drift that put "Cushions" on the Keychains shelf in the first place. */
+
+export async function setCategoryImage(
+  categoryId: string, file: File, alt: string,
+): Promise<Pick<Category, "image_path" | "image_width" | "image_height" | "image_alt">> {
+  const uploaded = await uploadImage(SITE_TARGET, "categories", file);
+
+  const patch = {
+    image_path: uploaded.key,
+    image_width: uploaded.width,
+    image_height: uploaded.height,
+    image_alt: alt.trim(),
+  };
+  const { error } = await supabase.from("categories").update(patch).eq("id", categoryId);
+  if (error) {
+    await removePhotoObjects(uploaded.key, SITE_BUCKET);
+    throw error;
+  }
+  return patch;
+}
+
+/* ---------- home page product picks ----------
+   "Most Loved" and "Latest Collection" used to list ten products that were not
+   in this database, at prices nobody would honour. They now render real rows,
+   chosen here. */
+
+export type HomeSection = "best_sellers" | "new_arrivals";
+
+export const HOME_SECTION_LABELS: Record<HomeSection, string> = {
+  best_sellers: "Most Loved",
+  new_arrivals: "Latest Collection",
+};
+
+export type HomePickRow = {
+  id: string; name: string; home_section: HomeSection | null;
+  home_order: number | null; is_active: boolean;
+  primary_image_path: string | null;
+};
+
+/* Read straight from `products`, never through products_with_image.
+   That view is defined only in the production database - nothing in
+   supabase/sql/ creates it - so there is no way to tell from this repo whether
+   it enumerates its columns. If it does, home_section simply would not be
+   there, and every picker on this screen would read undefined with no error
+   anywhere to explain why. */
+export async function listHomePickMap(): Promise<Map<string, { section: HomeSection; order: number | null }>> {
+  const { data, error } = await supabase
+    .from("products")
+    .select("id, home_section, home_order")
+    .not("home_section", "is", null);
+  if (error) throw error;
+  const map = new Map<string, { section: HomeSection; order: number | null }>();
+  for (const r of (data ?? []) as any[]) {
+    map.set(r.id, { section: r.home_section, order: r.home_order });
+  }
+  return map;
+}
+
+export async function listHomePicks(section: HomeSection): Promise<HomePickRow[]> {
+  const { data, error } = await supabase
+    .from("products")
+    .select("id, name, home_section, home_order, is_active," +
+            " product_images(storage_path, is_primary, display_order)")
+    .eq("home_section", section)
+    .order("home_order", { ascending: true, nullsFirst: false })
+    .order("name");
+  if (error) throw error;
+
+  return (data ?? []).map((r: any) => ({
+    id: r.id, name: r.name, home_section: r.home_section,
+    home_order: r.home_order, is_active: r.is_active,
+    primary_image_path: pickPrimaryPath(r.product_images),
+  }));
+}
+
+/** The photo the storefront would show: the one marked primary, else the first
+ *  by display order. Same rule the product pages use. */
+export function pickPrimaryPath(images: any[] | null | undefined): string | null {
+  const list = images ?? [];
+  if (!list.length) return null;
+  const primary = list.find((i) => i.is_primary);
+  if (primary) return primary.storage_path ?? null;
+  const sorted = [...list].sort(
+    (a, b) => (a.display_order ?? 0) - (b.display_order ?? 0),
+  );
+  return sorted[0]?.storage_path ?? null;
+}
+
+export async function setHomePick(
+  productId: string, section: HomeSection | null, order: number | null,
+) {
+  const { error } = await supabase
+    .from("products")
+    .update({ home_section: section, home_order: section ? order : null })
+    .eq("id", productId);
+  if (error) throw error;
+}
+
+export async function saveHomePickOrder(picks: HomePickRow[]) {
+  for (let i = 0; i < picks.length; i++) {
+    if (picks[i].home_order === i) continue;
+    const { error } = await supabase
+      .from("products").update({ home_order: i }).eq("id", picks[i].id);
+    if (error) throw error;
+    picks[i].home_order = i;
+  }
+}
+
+/* ---------- publish ----------
+   The storefront is a build-time snapshot, so nothing Aru changes is live until
+   the site is rebuilt. The Cloudflare deploy hook that starts that rebuild is a
+   bare URL with no auth header - the URL *is* the credential - so it can never
+   be in this bundle. The publish-site edge function holds it, checks that the
+   caller is an admin, and writes publish_runs with the service role. */
+
+export type PublishRun = {
+  id: string;
+  requested_at: string;
+  status: "queued" | "building" | "success" | "failed" | "unknown" | "canceled";
+  build_uuid: string | null;
+  branch: string | null;
+  already_existed: boolean;
+  finished_at: string | null;
+  error: string | null;
+  /** Set by the function when it attached to a run that was already going. */
+  reused?: boolean;
+};
+
+const PUBLISH_RUN_COLS =
+  "id, requested_at, status, build_uuid, branch, already_existed, finished_at, error";
+
+async function invokePublish(body: Record<string, unknown>): Promise<PublishRun> {
+  // invoke() attaches the signed-in user's JWT, which is what the function
+  // checks is_admin against.
+  const { data, error } = await supabase.functions.invoke("publish-site", { body });
+  if (error) throw error;
+  if (data?.error) throw new Error(data.error);
+  return data.run as PublishRun;
+}
+
+export async function startPublish(): Promise<PublishRun> {
+  return invokePublish({ action: "start" });
+}
+
+export async function getPublishRun(id: string): Promise<PublishRun> {
+  return invokePublish({ action: "status", id });
+}
+
+/** Read straight from the table - this runs on every page load, and a function
+ *  invocation per load would be a cold start for no reason. */
+export async function latestPublishRun(): Promise<PublishRun | null> {
+  const { data, error } = await supabase
+    .from("publish_runs")
+    .select(PUBLISH_RUN_COLS)
+    .order("requested_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw error;
+  return (data as unknown as PublishRun) ?? null;
+}
+
+export async function recentPublishRuns(limit = 10): Promise<PublishRun[]> {
+  const { data, error } = await supabase
+    .from("publish_runs")
+    .select(PUBLISH_RUN_COLS)
+    .order("requested_at", { ascending: false })
+    .limit(limit);
+  if (error) throw error;
+  return (data ?? []) as unknown as PublishRun[];
 }

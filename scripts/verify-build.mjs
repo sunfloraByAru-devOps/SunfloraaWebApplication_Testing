@@ -16,6 +16,11 @@
  *
  * Options:
  *   --ref <git-ref>   compare against this ref        (default: HEAD)
+ *   --baseline-dir <dir>
+ *                     compare against a directory of "before" files instead
+ *                     of git. `dist/` is no longer tracked, so this is the
+ *                     normal mode: build, copy dist somewhere, make the
+ *                     change, rebuild, then point this at the copy.
  *   --dist <dir>      directory to walk               (default: dist)
  *   --exclude <glob>  skip matching paths, repeatable (default: dist/admin/**)
  *   --context <n>     differing lines to print per page (default: 3)
@@ -27,8 +32,10 @@
  * Exit codes: 0 = clean, 1 = unexpected differences, 2 = usage/setup error.
  *
  * Examples:
- *   node scripts/verify-build.mjs dist/productlist/index.html dist/faq/index.html
- *   node scripts/verify-build.mjs --ref origin/main --json
+ *   npm run build && cp -r dist /tmp/before
+ *   # ...make a change...
+ *   npm run build
+ *   node scripts/verify-build.mjs --baseline-dir /tmp/before dist/index.html
  */
 
 import fs from "node:fs";
@@ -48,6 +55,7 @@ const toPosix = (p) => p.split(path.sep).join("/").replace(/^\.\//, "");
 function parseArgs(argv) {
   const opts = {
     ref: "HEAD",
+    baselineDir: null,
     dist: "dist",
     exclude: [],
     context: 3,
@@ -65,6 +73,7 @@ function parseArgs(argv) {
     };
     if (a === "-h" || a === "--help") opts.help = true;
     else if (a === "--ref") opts.ref = need("--ref");
+    else if (a === "--baseline-dir") opts.baselineDir = need("--baseline-dir");
     else if (a === "--dist") opts.dist = need("--dist");
     else if (a === "--exclude") opts.exclude.push(need("--exclude"));
     else if (a === "--context") opts.context = Number(need("--context")) || 0;
@@ -155,12 +164,70 @@ function repoRoot() {
 function listRefFiles(ref, dist) {
   const r = git(["ls-tree", "-r", "--name-only", `${ref}`, "--", dist]);
   if (r.status !== 0) fail(`cannot read ref "${ref}": ${r.stderr.trim()}`);
-  return new Set(
+  const set = new Set(
     r.stdout
       .split("\n")
       .map((s) => s.trim())
       .filter((s) => s.endsWith(".html")),
   );
+  /* An empty set is never a legitimate baseline, and silently accepting one is
+     worse than crashing: every page would land in `new`, nothing in `real`, and
+     the script would print "OK — no unexpected content differences." A
+     verification tool that passes because it compared against nothing is a trap.
+     `dist/` is untracked as of the Publish work, so this is now the common case. */
+  if (!set.size)
+    fail(
+      `ref "${ref}" contains no ${dist}/ files — dist is not tracked in git. ` +
+        `Use --baseline-dir <dir> with a copy of a previous build instead.`,
+    );
+  return set;
+}
+
+/* ── baseline source ────────────────────────────────────────────────────────
+   "Before" bytes come either from a git ref or from a directory on disk. Both
+   answer the same two questions, so the comparison in main() does not care
+   which one it is talking to. */
+
+function makeBaseline(opts) {
+  if (!opts.baselineDir) {
+    return {
+      label: opts.ref,
+      list: () => listRefFiles(opts.ref, opts.dist),
+      read: (file) => showFromRef(opts.ref, file),
+    };
+  }
+
+  const base = opts.baselineDir.replace(/\/+$/, "");
+  if (!fs.existsSync(base) || !fs.statSync(base).isDirectory())
+    fail(`--baseline-dir "${base}" is not a directory`);
+
+  /* The copy may be either the dist directory itself (`cp -r dist /tmp/before`)
+     or a parent holding one (`/tmp/before/dist`). Walk whichever exists, then
+     re-express each path as `dist/...` so it lines up with the working tree. */
+  const inner = path.join(base, opts.dist);
+  const root = fs.existsSync(inner) ? inner : base;
+  const rootPosix = toPosix(root);
+
+  const rel = (full) => {
+    const p = toPosix(full);
+    return `${opts.dist}/${p.slice(rootPosix.length).replace(/^\/+/, "")}`;
+  };
+
+  const files = walkHtml(root, []).map(rel);
+  if (!files.length) fail(`--baseline-dir "${base}" contains no .html files`);
+
+  return {
+    label: base,
+    list: () => new Set(files),
+    read: (file) => {
+      const full = path.join(root, file.replace(new RegExp(`^${opts.dist}/`), ""));
+      try {
+        return fs.readFileSync(full, "utf8");
+      } catch {
+        return null;
+      }
+    },
+  };
 }
 
 function showFromRef(ref, file) {
@@ -255,7 +322,8 @@ function main() {
   const files = walkHtml(opts.dist, excludeRes);
   if (!files.length) fail(`no .html files found under "${opts.dist}"`);
 
-  const refFiles = listRefFiles(opts.ref, opts.dist);
+  const baseline = makeBaseline(opts);
+  const refFiles = baseline.list();
   const allow = makeMatcher(opts.allow, opts.dist);
 
   const groups = {
@@ -268,7 +336,7 @@ function main() {
 
   for (const file of files) {
     const current = fs.readFileSync(file, "utf8");
-    const committed = refFiles.has(file) ? showFromRef(opts.ref, file) : null;
+    const committed = refFiles.has(file) ? baseline.read(file) : null;
 
     if (committed === null) {
       groups.new.push({ file, allowed: allow.match(file) });
@@ -315,6 +383,7 @@ function main() {
     process.stdout.write(
       JSON.stringify(
         {
+          baseline: baseline.label,
           ref: opts.ref,
           dist: opts.dist,
           allowlist: opts.allow,
@@ -339,7 +408,7 @@ function main() {
       log(`${mark}${r.file}${r.allowed ? "  (expected)" : ""}`),
     );
 
-  log(`Comparing ${opts.dist}/**/*.html against ${opts.ref}`);
+  log(`Comparing ${opts.dist}/**/*.html against ${baseline.label}`);
   log(
     `  ${files.length} page(s) walked, ${opts.exclude.length} exclude pattern(s), ` +
       `${opts.allow.length} allowlisted path(s)`,
@@ -369,12 +438,12 @@ function main() {
   log();
 
   if (groups.new.length) {
-    log(`new pages (absent from ${opts.ref}) (${groups.new.length}):`);
+    log(`new pages (absent from ${baseline.label}) (${groups.new.length}):`);
     list(groups.new);
     log();
   }
   if (groups.missing.length) {
-    log(`missing from build (present in ${opts.ref}) (${groups.missing.length}):`);
+    log(`missing from build (present in ${baseline.label}) (${groups.missing.length}):`);
     list(groups.missing);
     log();
   }

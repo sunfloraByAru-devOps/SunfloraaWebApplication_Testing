@@ -48,7 +48,8 @@ begin
   foreach t in array array[
     'products', 'product_images', 'product_sizes', 'product_colors',
     'product_details', 'product_includes', 'categories', 'reviews',
-    'faqs', 'testimonials', 'gallery_items', 'site_settings'
+    'faqs', 'testimonials', 'gallery_items', 'site_settings',
+    'site_images'
   ] loop
     if to_regclass('public.' || t) is null then continue; end if;
     execute format('drop trigger if exists touch_content_changed on public.%I', t);

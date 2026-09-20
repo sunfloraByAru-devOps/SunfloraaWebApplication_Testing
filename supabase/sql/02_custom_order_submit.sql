@@ -84,7 +84,8 @@ update storage.buckets
 do $$
 declare b text;
 begin
-  foreach b in array array['product-images','review-photos','gallery-images'] loop
+  foreach b in array array['product-images','review-photos','gallery-images',
+                           'site-images'] loop
     execute format('drop policy if exists admin_manage_%s on storage.objects',
                    replace(b, '-', '_'));
     execute format(

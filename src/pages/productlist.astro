@@ -134,7 +134,7 @@ const recommendations = (recoData || []).map((p) => {
 
 const { data: dbCategories } = await supabase
     .from("categories")
-    .select("name")
+    .select("name, display_label")
     .eq("is_active", true)
     .order("display_order", { ascending: true, nullsFirst: false })
     .order("name", { ascending: true });
@@ -144,12 +144,17 @@ const uniqueCategories = [
     ...new Set(products?.map((p) => p.category_name).filter(Boolean)),
 ];
 
-const categories = [
-    "All",
+/* A pill carries two different strings and they must not be confused: `name`
+   is the identity the filter and the ?category= link compare on, `label` is
+   only what a customer reads. They used to be related by a hardcoded map kept
+   in two files, which meant the home page's cards and this bar could disagree
+   about what the same category is called. The label now travels with the row. */
+const categories: { name: string; label: string }[] = [
+    { name: "All", label: "All Products" },
     ...(dbCategories && dbCategories.length > 0
-        ? dbCategories.map((c) => c.name)
+        ? dbCategories.map((c) => ({ name: c.name, label: c.display_label || c.name }))
         : uniqueCategories.length > 0
-          ? uniqueCategories
+          ? uniqueCategories.map((c) => ({ name: c as string, label: c as string }))
           : [
                 "Amigurumi",
                 "Keychains",
@@ -157,7 +162,7 @@ const categories = [
                 "Wall Hangings",
                 "Bouquets",
                 "Customs",
-            ]),
+            ].map((c) => ({ name: c, label: c }))),
 ];
 ---
 
@@ -216,14 +221,13 @@ const categories = [
 
         let activeCategory = "All";
 
+        // The pill already holds the label the database gave it, so read it
+        // from there rather than keeping a second copy of the mapping here.
         function getCatDisplayLabel(cat) {
-            if (cat.toLowerCase() === "all") return "All Products";
-            if (cat.toLowerCase() === "amigurumi") return "Soft Toys";
-            if (cat.toLowerCase() === "bouquets") return "Flower Bouquets";
-            if (cat.toLowerCase() === "flower stems") return "Flower Stems";
-            if (cat.toLowerCase() === "wall hangings") return "Home Decor";
-            if (cat.toLowerCase() === "keychains") return "Accessories";
-            return cat;
+            const btn = Array.from(catBtns).find(
+                (b) => b.dataset.cat.toLowerCase() === String(cat).toLowerCase(),
+            );
+            return btn ? btn.textContent.trim() : cat;
         }
 
         // Parse query parameter to pre-filter
