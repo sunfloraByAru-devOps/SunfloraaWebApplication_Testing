@@ -26,15 +26,23 @@
     <div id="login-gate-sent" class="hidden bg-green-50 text-green-700 text-xs p-2 rounded-lg mb-3"></div>
 
     <form id="login-gate-form" class="flex flex-col gap-3">
+      <!-- Deliberately NOT name="name" / name="email". This component renders
+           before <main> on /checkout and /cart, which also carry a form with
+           those exact field names. Two same-named pairs on one page means
+           browser autofill and password managers can fill or save the wrong
+           one, and any document-wide [name="email"] lookup silently resolves
+           to this gate instead of the real form. -->
       <input
-        name="name"
+        name="gate_name"
+        autocomplete="name"
         placeholder="Your name"
         class="border border-[#E8D5C4] rounded-lg px-3 py-2 text-sm"
       />
       <input
-        name="email"
+        name="gate_email"
         type="email"
         required
+        autocomplete="email"
         placeholder="you@example.com"
         class="border border-[#E8D5C4] rounded-lg px-3 py-2 text-sm"
       />
@@ -75,6 +83,20 @@
       return;
     }
 
+    /* The session lookup above is a network round-trip, so by the time we get
+       here the shopper may already be part-way through the checkout form.
+       Throwing a full-screen overlay over someone mid-form is the one moment
+       this nudge is not welcome, so in that case skip it for the session. */
+    const alreadyTyping = Array.from(
+      document.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>(
+        "#checkout-form input, #checkout-form textarea",
+      ),
+    ).some((el) => el.value.trim() !== "");
+    if (alreadyTyping) {
+      sessionStorage.setItem(DISMISS_KEY, "1");
+      return;
+    }
+
     overlay.classList.remove("hidden");
 
     const close = () => {
@@ -97,8 +119,8 @@
 
         try {
           const { error } = await sendMagicLink(
-            String(fd.get("email")),
-            String(fd.get("name") || ""),
+            String(fd.get("gate_email")),
+            String(fd.get("gate_name") || ""),
           );
 
           if (error) {

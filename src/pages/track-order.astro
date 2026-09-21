@@ -45,6 +45,7 @@ import LandingNav from "../components/landing/LandingNav.astro";
 
   <script>
     import { supabase } from "../lib/supabase.ts";
+    import { payForOrder } from "../lib/razorpay.ts";
 
     const params = new URLSearchParams(window.location.search);
     if (params.get("order")) document.getElementById("order-number-input").value = params.get("order");
@@ -70,10 +71,19 @@ import LandingNav from "../components/landing/LandingNav.astro";
         )
         .join("");
 
-      const retryBtn =
-        data.type === "order" && data.payment_status === "failed"
-          ? `<button id="retry-payment-btn" class="bg-[#D4708F] text-white px-5 py-2 rounded-lg text-sm mt-2">Retry Payment</button>`
-          : "";
+      // Any unpaid, uncancelled order can be paid from here. This used to be
+      // limited to payment_status === "failed", which stranded every order the
+      // shopper simply walked away from — those stay "pending", not "failed".
+      const isPayable =
+        data.type === "order" &&
+        (data.payment_status === "failed" || data.payment_status === "pending") &&
+        data.status !== "cancelled";
+      const retryBtn = isPayable
+        ? `<button id="retry-payment-btn" class="bg-[#D4708F] text-white px-5 py-2 rounded-lg text-sm mt-2">${
+            data.payment_status === "failed" ? "Retry Payment" : "Pay Now"
+          }</button>
+           <p id="retry-payment-msg" class="hidden text-sm mt-2"></p>`
+        : "";
 
       el.innerHTML = `
         <div class="border border-[#E8D5C4] rounded-xl p-6 bg-[#FFF8F0]">
@@ -119,29 +129,47 @@ import LandingNav from "../components/landing/LandingNav.astro";
       `;
 
       document.getElementById("retry-payment-btn")?.addEventListener("click", async (e) => {
-        e.target.disabled = true;
-        e.target.textContent = "Redirecting...";
-        const { data: paytmResult, error } = await supabase.functions.invoke("paytm-initiate", {
-          body: { order_id: data.order_id },
-        });
-        if (error || paytmResult?.error) {
-          alert(paytmResult?.error || "Could not start payment. Please try again.");
-          e.target.disabled = false;
-          e.target.textContent = "Retry Payment";
-          return;
+        const btn = e.target;
+        const msg = document.getElementById("retry-payment-msg");
+        const label = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = "Opening payment...";
+        if (msg) msg.classList.add("hidden");
+
+        const show = (text, tone) => {
+          if (!msg) return;
+          msg.textContent = text;
+          msg.className = `text-sm mt-2 ${tone === "error" ? "text-red-700" : "text-[#5C3D2E]"}`;
+        };
+
+        try {
+          const outcome = await payForOrder(data.order_id, {
+            onVerifying: () => {
+              btn.textContent = "Confirming payment...";
+            },
+          });
+
+          if (outcome.status === "paid") {
+            window.location.href =
+              "/order-confirmation?order=" +
+              encodeURIComponent(data.order_number) +
+              "&email=" +
+              encodeURIComponent(document.getElementById("email-input").value.trim()) +
+              "&status=success";
+            return;
+          }
+
+          if (outcome.status === "dismissed") {
+            show("Payment window closed — nothing has been charged. You can pay whenever you're ready.");
+          } else {
+            show(outcome.message, "error");
+          }
+        } catch (err) {
+          show(err?.message || "Could not start payment. Please try again.", "error");
         }
-        const form = document.createElement("form");
-        form.method = "POST";
-        form.action = paytmResult.action_url;
-        Object.entries(paytmResult.params).forEach(([k, v]) => {
-          const input = document.createElement("input");
-          input.type = "hidden";
-          input.name = k;
-          input.value = String(v);
-          form.appendChild(input);
-        });
-        document.body.appendChild(form);
-        form.submit();
+
+        btn.disabled = false;
+        btn.textContent = label;
       });
     }
 

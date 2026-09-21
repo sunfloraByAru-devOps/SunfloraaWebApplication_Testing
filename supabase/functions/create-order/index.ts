@@ -1,6 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { corsHeaders, handlePreflight, json } from "./_shared/cors.ts";
-import { supabaseAdmin, getUserFromAuthHeader } from "./_shared/supabaseAdmin.ts";
+import { corsHeaders, handlePreflight, json } from "../_shared/cors.ts";
+import { supabaseAdmin, getUserFromAuthHeader } from "../_shared/supabaseAdmin.ts";
 
 interface CartItem {
   product_id: string;
@@ -177,7 +177,7 @@ Deno.serve(async (req: Request) => {
       total,
       status: "pending",
       payment_status: "pending",
-      payment_method: "paytm",
+      payment_method: "razorpay",
       notes: payload.notes || null,
     })
     .select()

@@ -143,7 +143,8 @@ import LoginGate from "../components/LoginGate.astro";
           Place Order
         </button>
         <p class="text-xs text-[#9a8b7a] text-center">
-          You'll be redirected to Paytm's secure payment page.
+          Payments are processed securely by Razorpay. You'll pay without
+          leaving this page.
         </p>
       </form>
     </section>
@@ -169,12 +170,10 @@ import LoginGate from "../components/LoginGate.astro";
     </aside>
   </main>
 
-  <!-- Hidden form auto-submitted to Paytm's hosted checkout page -->
-  <form id="paytm-form" method="POST" style="display:none;"></form>
-
   <script>
     import { getCart, cartSubtotal } from "../lib/cart.ts";
     import { supabase } from "../lib/supabase.ts";
+    import { payForOrder } from "../lib/razorpay.ts";
 
     const FREE_SHIPPING_THRESHOLD = 0; // every order qualifies
     const FLAT_SHIPPING_FEE = 0; // Shipping is free on every order
@@ -370,62 +369,68 @@ import LoginGate from "../components/LoginGate.astro";
             );
           }
 
-          // Step 2 — Initiate payment with the gateway.
-          payBtn.textContent = "Starting payment...";
-          const { data: paytmResult, error: paytmErr } =
-            await supabase.functions.invoke("paytm-initiate", {
-              body: { order_id: orderResult.order_id },
-            });
-          if (paytmErr || paytmResult?.error) {
-            // Order was created but payment could not start.
-            // Direct the user to the tracking page to retry payment.
-            showError(
-              (paytmResult?.error || paytmErr?.message || "Could not start payment") +
-              " Your order " + (orderResult.order_number || "") +
-              " has been saved — you can retry payment from the Track Order page."
-            );
-            // @ts-ignore
-            payBtn.disabled = false;
-            payBtn.textContent = "Place Order";
-            return;
-          }
-
-          // Require a real payment gateway response with action_url + params.
-          if (!paytmResult.action_url || !paytmResult.params) {
-            showError(
-              "Payment gateway is not available right now. " +
-              "Your order " + (orderResult.order_number || "") +
-              " has been saved — you can retry payment from the Track Order page."
-            );
-            // @ts-ignore
-            payBtn.disabled = false;
-            payBtn.textContent = "Place Order";
-            return;
-          }
-
-          // Step 3 — Everything is ready. Save order reference ONLY now,
-          // right before we redirect to the payment page.
+          // Step 2 — Save the order reference before the payment window opens.
+          // Razorpay's modal keeps the shopper on this page, but a UPI app can
+          // still take the tab away and bring it back, so this has to be
+          // written before rather than after.
           sessionStorage.setItem(
             "sunflora_last_order",
             JSON.stringify({
               order_number: orderResult.order_number,
               email: orderResult.email,
-              payment_pending: true,   // flag: NOT confirmed until callback
+              payment_pending: true,   // flag: NOT confirmed until verified
             }),
           );
 
-          // Redirect to Paytm's hosted checkout via form POST.
-          payBtn.textContent = "Redirecting to payment...";
-          const paytmForm = /** @type {HTMLFormElement} */ (document.getElementById("paytm-form"));
-          if (!paytmForm) throw new Error("Payment form not found. Please refresh and try again.");
-          paytmForm.action = paytmResult.action_url;
-          paytmForm.innerHTML = Object.entries(paytmResult.params)
-            .map(
-              ([k, v]) =>
-                `<input type="hidden" name="${k}" value="${String(v).replace(/"/g, "&quot;")}" />`,
-            )
-            .join("");
-          paytmForm.submit();
+          // Step 3 — Open Razorpay Checkout and wait for the shopper.
+          payBtn.textContent = "Opening payment...";
+          const outcome = await payForOrder(orderResult.order_id, {
+            onVerifying: () => {
+              payBtn.textContent = "Confirming payment...";
+            },
+          });
+
+          const trackUrl =
+            "/track-order?order=" +
+            encodeURIComponent(orderResult.order_number || "") +
+            "&email=" +
+            encodeURIComponent(orderResult.email || "");
+
+          if (outcome.status === "paid") {
+            // The cart is cleared by order-confirmation, but only after it has
+            // re-checked the payment status with the server.
+            window.location.href =
+              "/order-confirmation?order=" +
+              encodeURIComponent(outcome.orderNumber || orderResult.order_number || "") +
+              "&email=" +
+              encodeURIComponent(outcome.email || orderResult.email || "") +
+              "&status=success";
+            return;
+          }
+
+          if (outcome.status === "dismissed") {
+            showError(
+              "Payment window closed. Your order " +
+                (orderResult.order_number || "") +
+                " has been saved — you can pay for it any time from the Track Order page.",
+            );
+          } else {
+            showError(
+              outcome.message +
+                " Your order " +
+                (orderResult.order_number || "") +
+                " has been saved — you can retry payment from the Track Order page.",
+            );
+          }
+          const errEl = document.getElementById("checkout-error");
+          if (errEl) {
+            errEl.innerHTML +=
+              ' <a href="' + trackUrl + '" class="underline">Track this order</a>';
+          }
+          // @ts-ignore
+          payBtn.disabled = false;
+          payBtn.textContent = "Place Order";
+          return;
         } catch (e) {
           const err = /** @type {Error} */ (e);
           showError(err.message || "Something went wrong. Please try again.");
