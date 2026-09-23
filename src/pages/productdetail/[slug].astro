@@ -12,7 +12,8 @@ import PRODUCT_LIFE from "../../assets/spiderman.jpg";
 import DINO from "../../assets/green-dino.jpg";
 import SUNMOON from "../../assets/sun_and_moon.jpg";
 import { getGalleryImage, getGridImage, toAbsoluteUrl } from "../../lib/product-images";
-import { productSlug } from "../../lib/slug";
+import { productSlug, categorySlug } from "../../lib/slug";
+import { BRAND, productH1, productTitle, productMeta } from "../../lib/seo";
 
 import { createClient } from "@supabase/supabase-js";
 import ProductBreadcrumb from "../../components/ProductBreadcrumb.astro";
@@ -97,7 +98,17 @@ const { data: rawRelated } = await supabase
    Hangings" image regardless of what it actually was. */
 const getFallbackImage = (categoryName: string | null | undefined) => {
   const category = (categoryName || "").toLowerCase();
-  if (category.includes("amigurumi")) return PRODUCT_MAIN.src;
+  /* "amigurumi" alone breaks the moment the category is renamed to something
+     search-friendly like "Crochet Soft Toys" — the check would go silently
+     false and every photoless soft toy would fall through to the SUNMOON
+     default. "soft"/"toy" survive that rename; keep "amigurumi" too so a
+     category still named that way (or containing it) still matches. */
+  if (
+    category.includes("amigurumi") ||
+    category.includes("soft") ||
+    category.includes("toy")
+  )
+    return PRODUCT_MAIN.src;
   if (category.includes("keychain")) return SPIDEY.src;
   if (category.includes("hanging")) return PRODUCT_DETAIL.src;
   if (
@@ -232,12 +243,25 @@ if (allDbProducts) {
       ...new Set(mappedReviews.flatMap((r: any) => r.photos)),
     ].slice(0, 24);
 
+    const categoryName: string | null = data.categories?.name ?? null;
+
     mappedProducts[slug] = {
       id: data.id,
       slug: slug,
       num: String(data.id).padStart(2, "0"),
       name: data.name,
-      brand: "Sunflora Studio",
+      h1: productH1(data.name),
+      categoryName,
+      categoryHref: categoryName ? `/${categorySlug(categoryName)}/` : "/productlist",
+      metaTitle: productTitle(data.name, categoryName),
+      metaDescription: productMeta({
+        name: data.name,
+        tagline: data.tagline,
+        description: data.description,
+        price: data.base_price,
+        categoryName,
+      }).description,
+      brand: BRAND,
       tag: data.tag,
       tagline: data.tagline || "",
       sku: data.sku || `SFL-${data.id}`,
@@ -307,7 +331,12 @@ mappedProducts["product-not-found"] = {
   id: 0,
   slug: "product-not-found",
   name: "Product Not Found",
-  brand: "Sunflora Studio",
+  h1: "Product Not Found",
+  categoryName: null,
+  categoryHref: "/productlist",
+  metaTitle: `Product Not Found | ${BRAND}`,
+  metaDescription: "This product could not be found or has no approved reviews.",
+  brand: BRAND,
   description: "This product could not be found or has no approved reviews.",
   price: 0,
   mrp: 0,
@@ -420,12 +449,23 @@ const breadcrumbSchema = isRealProduct
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Home", item: `${site}/` },
-        {
-          "@type": "ListItem",
-          position: 2,
-          name: "Shop",
-          item: `${site}/productlist`,
-        },
+        ...(product.categoryName
+          ? [
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: product.categoryName,
+                item: `${site}/${categorySlug(product.categoryName)}/`,
+              },
+            ]
+          : [
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: "Shop",
+                item: `${site}/productlist`,
+              },
+            ]),
         { "@type": "ListItem", position: 3, name: product.name, item: productUrl },
       ],
     }
@@ -433,8 +473,11 @@ const breadcrumbSchema = isRealProduct
 ---
 
 <Layout
-  title={`${product.name} — ${product.brand}`}
-  description={product.description}
+  title={product.metaTitle}
+  description={product.metaDescription}
+  image={isRealProduct && images[0] ? toAbsoluteUrl(images[0].src) : undefined}
+  imageAlt={product.name}
+  ogType="product"
   robots={isRealProduct ? undefined : "noindex, follow"}
 >
   {
@@ -455,7 +498,11 @@ const breadcrumbSchema = isRealProduct
   }
   <LandingNav />
   <div style="height: 72px; background-color: #fff8f0;"></div>
-  <ProductBreadcrumb product={product} />
+  <ProductBreadcrumb
+    product={product}
+    categoryName={product.categoryName}
+    categoryHref={product.categoryName ? `/${categorySlug(product.categoryName)}/` : "/productlist"}
+  />
 
   <!-- MAIN PDP LAYOUT — white background -->
   <div class="pdp-wrapper">
@@ -471,9 +518,9 @@ const breadcrumbSchema = isRealProduct
   <!-- FOOTER -->
   <footer>
     <span
-      >© {new Date().getFullYear()} Sunflora Studio — Handmade with care.</span
+      >© {new Date().getFullYear()} Sunflora — Handmade with care.</span
     >
-    <span>Hooked in India · Shipped worldwide</span>
+    <span>Hooked in India · Shipped across India</span>
     <a href={contact.mailto}>{contact.email}</a>
   </footer>
 
@@ -502,43 +549,43 @@ const breadcrumbSchema = isRealProduct
 
     // 2. Hydration Function
     function hydratePDP(product) {
-      // Page metadata & titles
-      document.title = `${product.name} — ${product.brand}`;
+      // Page metadata & titles — the server already rendered these from the
+      // same productTitle()/productH1() functions (src/lib/seo.ts), via
+      // metaTitle/h1/metaDescription on this same product object. This just
+      // has to not overwrite them with the raw name/brand, which is what
+      // silently reverted every server-side SEO fix here before: a search
+      // engine that renders JS (Googlebot does) would see the plain
+      // `${name} — ${brand}` title, not the keyworded one.
+      document.title = product.metaTitle || `${product.name} — ${product.brand}`;
       const metaDesc = document.querySelector('meta[name="description"]');
-      if (metaDesc) metaDesc.setAttribute("content", product.description);
+      if (metaDesc)
+        metaDesc.setAttribute("content", product.metaDescription || product.description);
 
       const breadcrumbCurrent = document.querySelector(".breadcrumb-current");
       if (breadcrumbCurrent) breadcrumbCurrent.textContent = product.name;
 
+      // This targets the 2nd <a> in ProductBreadcrumb.astro's markup — the
+      // category link. It used to be product.category (a field that has
+      // never existed on this object) falling through to a UUID-vs-"01"
+      // comparison that could never match, which is why this always
+      // rewrote to the literal word "Amigurumi" for every product in every
+      // category. product.categoryName is the real field.
       const breadcrumbParent = document.querySelector(
         ".breadcrumb a:nth-of-type(2)",
       );
-      if (breadcrumbParent) {
-        const cat =
-          product.category ||
-          (product.num === "01" ||
-          product.num === "06" ||
-          product.num === "07" ||
-          product.num === "12"
-            ? "Amigurumi"
-            : product.num === "02" ||
-                product.num === "04" ||
-                product.num === "11"
-              ? "Keychains"
-              : product.num === "03" || product.num === "08"
-                ? "Flower Stems"
-                : product.num === "09"
-                  ? "Bouquets"
-                  : "Wall Hangings");
-        breadcrumbParent.textContent = cat;
-        breadcrumbParent.href =
-          "/productlist?category=" + encodeURIComponent(cat);
+      if (breadcrumbParent && product.categoryName) {
+        breadcrumbParent.textContent = product.categoryName;
+        // Precomputed server-side (categorySlug, src/lib/seo.ts) rather than
+        // re-derived here — this script is is:inline with no module system,
+        // so it can't import the slugify function; slugifying a third time
+        // by hand is exactly how the old "Amigurumi" literal happened.
+        breadcrumbParent.href = product.categoryHref;
       }
 
       const prodBrand = document.querySelector(".prod-brand");
       if (prodBrand) prodBrand.textContent = product.brand;
       const prodTitle = document.querySelector(".prod-title");
-      if (prodTitle) prodTitle.textContent = product.name;
+      if (prodTitle) prodTitle.textContent = product.h1 || product.name;
 
       const imgTag = document.getElementById("img-tag");
       if (imgTag) {
@@ -703,7 +750,7 @@ const breadcrumbSchema = isRealProduct
               ${o.tag ? `<span class="related-badge">${o.tag}</span>` : ""}
             </div>
             <div class="related-body">
-              <span class="related-brand">Sunflora Studio</span>
+              <span class="related-brand">Sunflora</span>
               <span class="related-name">${o.name}</span>
               <div class="related-price-row">
                 <span class="related-price">₹ ${o.price}</span>

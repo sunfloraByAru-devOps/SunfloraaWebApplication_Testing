@@ -14,6 +14,7 @@ import BASKET from "../assets/crochet_basket.png";
 import CLIPS from "../assets/crochet_hair_clips.png";
 
 import { getGridImage } from "../lib/product-images";
+import { pageMeta } from "../lib/seo";
 import { createClient } from "@supabase/supabase-js";
 import ProductListCategoryBar from "../components/ProductListCategoryBar.astro";
 import ProductListControls from "../components/ProductListControls.astro";
@@ -153,34 +154,40 @@ const { data: dbCategories } = await supabase
 // Extract unique categories directly from products as a reliable fallback
 const uniqueCategories = [
     ...new Set(products?.map((p) => p.category_name).filter(Boolean)),
-];
+] as string[];
 
 /* A pill carries two different strings and they must not be confused: `name`
    is the identity the filter and the ?category= link compare on, `label` is
    only what a customer reads. They used to be related by a hardcoded map kept
    in two files, which meant the home page's cards and this bar could disagree
-   about what the same category is called. The label now travels with the row. */
+   about what the same category is called. The label now travels with the row.
+
+   A category with zero active products used to still get a pill — the two
+   worst offenders were "Home Decor" (mapped to a DB category actually named
+   "Wall Hangings") and "Customs", neither of which had a single product, so
+   clicking either always landed on "Nothing here yet — try another
+   category." Filtering against uniqueCategories (derived from the products
+   actually on this page) means a pill only exists when it can show
+   something, and it self-corrects the moment a product is assigned or
+   unassigned — no separate list to keep in sync. */
+const activeCategoryNames = new Set(uniqueCategories);
+
 const categories: { name: string; label: string }[] = [
     { name: "All", label: "All Products" },
     ...(dbCategories && dbCategories.length > 0
-        ? dbCategories.map((c) => ({ name: c.name, label: c.display_label || c.name }))
-        : uniqueCategories.length > 0
-          ? uniqueCategories.map((c) => ({ name: c as string, label: c as string }))
-          : [
-                "Amigurumi",
-                "Keychains",
-                "Flower Stems",
-                "Wall Hangings",
-                "Bouquets",
-                "Customs",
-            ].map((c) => ({ name: c, label: c }))),
+        ? dbCategories
+              .filter((c) => activeCategoryNames.has(c.name))
+              .map((c) => ({ name: c.name, label: c.display_label || c.name }))
+        : uniqueCategories.map((c) => ({ name: c, label: c }))),
 ];
+
+const shopMeta = pageMeta(
+    "Shop All Handmade Crochet Gifts Online",
+    "Browse our full collection of handmade crochet pieces — soft toys, keychains, flower bouquets and custom orders, made to order in India.",
+);
 ---
 
-<Layout
-    title="Shop — Sunflora Handmade Crochet"
-    description="Browse our full collection of handmade crochet pieces — amigurumi, keychains, florals and custom orders."
->
+<Layout {...shopMeta}>
     <!-- ── NAV ── -->
     <LandingNav />
 

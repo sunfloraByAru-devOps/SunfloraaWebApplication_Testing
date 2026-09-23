@@ -29,9 +29,6 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-/* ── SHOP HERO SECTION ── */
-/* Handled by component ProductListHeader.astro */
-
 /* ── STICKY CATEGORY BAR ── */
 /* Handled by component ProductListCategoryBar.astro */
 

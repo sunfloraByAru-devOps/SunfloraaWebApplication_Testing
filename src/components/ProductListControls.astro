@@ -5,10 +5,19 @@ interface Props {
 const { productCount } = Astro.props;
 ---
 <div class="category-heading-section">
-  <!-- Dynamic Category Title with ornaments -->
+  <!-- Dynamic Category Title with ornaments.
+       The id stays on the inner span, not the h1 itself: the filter script
+       (productlist.astro) does document.getElementById("category-heading-title")
+       .textContent = <category label> on every filter change, and it must
+       keep landing on exactly the text that changes. The kicker is a sibling
+       span so it survives every one of those rewrites untouched — it is the
+       one place on this page that always says "crochet", regardless of
+       which category pill is active. -->
   <div class="heading-ornament-wrap">
     <span class="heading-leaf-left">❀</span>
-    <h2 class="category-heading-title" id="category-heading-title">All Products</h2>
+    <h1 class="category-heading-title">
+      <span id="category-heading-title">All Products</span><span class="category-heading-kicker"> — Handmade Crochet Gifts in India</span>
+    </h1>
     <span class="heading-leaf-right">❀</span>
   </div>
   <p class="category-heading-subtitle">Lovingly handmade for you and your little moments. ♡</p>
@@ -43,6 +52,24 @@ const { productCount } = Astro.props;
     color: #5C3D2E;
     letter-spacing: -0.01em;
     line-height: 1.2;
+    margin: 0;
+  }
+
+  .category-heading-kicker {
+    font-size: 0.45em;
+    font-weight: 400;
+    color: #9C8B7E;
+    letter-spacing: 0.01em;
+  }
+
+  @media (max-width: 600px) {
+    /* The full kicker reads as clutter once the h1 wraps to two lines on a
+       phone-width filtered view ("Bouquets — Handmade Crochet Gifts in
+       India" is a lot of text under a category pill). It still exists in
+       the DOM for crawlers; it just stops being shown to a small screen. */
+    .category-heading-kicker {
+      display: none;
+    }
   }
 
   .heading-leaf-left,

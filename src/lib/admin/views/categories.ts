@@ -97,6 +97,39 @@ route(/^#\/categories$/, async (ctx: ViewCtx) => {
           () => { labelInput.value = prev; });
       });
 
+      /* ---- shop page intro copy ----
+         This is the only field on this whole page a human has to write —
+         everything else (the URL, the H1, the title, the schema) is derived
+         from name/products automatically. Blank lines split into paragraphs
+         on the category page: the first one is the lead under the H1, the
+         rest sit in an "About <category>" section below the product grid. */
+      const descInput = h("textarea", {
+        class: "a-textarea",
+        placeholder:
+          "What this category is, in a customer's words — materials, sizing, care, " +
+          "who it's for. 400-700 words reads best. Leave a blank line between " +
+          "paragraphs; the first paragraph shows right under the page heading.",
+        "aria-label": "Shop page description",
+      }) as HTMLTextAreaElement;
+      descInput.value = c.description ?? "";
+      const descWordCount = h("p", { class: "a-hint" });
+      const updateWordCount = () => {
+        const words = descInput.value.trim().split(/\s+/).filter(Boolean).length;
+        descWordCount.textContent = words === 0
+          ? "Nothing written yet — the shop page will use a short generic fallback."
+          : `${words} word${words === 1 ? "" : "s"}` +
+            (words < 200 ? " — aim for 400-700 for a page that can actually rank." : "");
+      };
+      updateWordCount();
+      descInput.addEventListener("input", updateWordCount);
+      descInput.addEventListener("change", async () => {
+        const next = descInput.value.trim();
+        const prev = c.description ?? "";
+        if (next === prev) return;
+        await save({ description: next || null }, "save that description",
+          () => { descInput.value = prev; updateWordCount(); });
+      });
+
       /* ---- "From" price override ---- */
       const priceInput = h("input", {
         class: "a-input", value: c.home_price_note ?? "", placeholder: "cheapest item",
@@ -173,6 +206,8 @@ route(/^#\/categories$/, async (ctx: ViewCtx) => {
         thumbWrap,
         h("div", { class: "a-rowitem__main" }, [
           nameInput,
+          h("p", { class: "a-hint",
+            text: "The word customers search for, e.g. “Crochet Flower Bouquets” — this becomes the shop page's web address, heading and title." }),
           h("div", { style: "display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;" }, [
             h("div", { style: "flex:1 1 180px;" }, [
               h("label", { class: "a-label", text: "Shown as" }),
@@ -186,6 +221,11 @@ route(/^#\/categories$/, async (ctx: ViewCtx) => {
               h("p", { class: "a-hint",
                 text: "Leave blank to use the cheapest item in stock." }),
             ]),
+          ]),
+          h("div", { style: "margin-top:8px;" }, [
+            h("label", { class: "a-label", text: "Shop page description" }),
+            descInput,
+            descWordCount,
           ]),
           h("div", { style: "margin-top:8px;" }, [photoBtn, fileInput]),
         ]),

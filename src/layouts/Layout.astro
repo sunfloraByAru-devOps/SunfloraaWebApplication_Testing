@@ -1,18 +1,29 @@
 ---
 import "../styles/global.css";
 import CookieConsent from "../components/CookieConsent.astro";
+import { DEFAULT_OG_IMAGE } from "../lib/seo";
 const {
   title = "My Website",
   description = "My awesome website",
   robots,
+  image = DEFAULT_OG_IMAGE,
+  imageAlt = "Sunflora — handmade crochet",
+  ogType = "website",
 } = Astro.props;
 
 /* Canonical URL — without this, /faq and /faq/ can be indexed as duplicates. */
 const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
+
+/* twitter:card is summary_large_image but there was no image tag anywhere,
+   so every shared link rendered as a bare text card. `image` may be a
+   site-relative path (most callers) or already-absolute (product photos via
+   toAbsoluteUrl) — resolving through URL() handles both without a caller
+   needing to know which. */
+const ogImage = new URL(image, Astro.site ?? Astro.url).href;
 ---
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-IN">
   <head>
     <!-- Basic SEO -->
     <meta charset="UTF-8" />
@@ -47,15 +58,20 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
     <!-- Open Graph (for social sharing) -->
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
     <meta property="og:url" content={canonical} />
     <meta property="og:site_name" content="Sunflora" />
     <meta property="og:locale" content="en_IN" />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:secure_url" content={ogImage} />
+    <meta property="og:image:alt" content={imageAlt} />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={imageAlt} />
 
     <!-- Per-page head extras (structured data, preloads) -->
     <slot name="head" />

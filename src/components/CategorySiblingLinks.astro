@@ -1,0 +1,46 @@
+---
+/* A real internal-linking layer between category pages — something this
+   site had none of before these pages existed. Each category page links to
+   every other one, so a crawler (and a browsing shopper) can move between
+   "Crochet Flower Bouquets" and "Crochet Soft Toys" without going back
+   through /productlist. */
+import { getShopCategories } from "../lib/site-content";
+
+interface Props {
+  currentSlug: string;
+}
+const { currentSlug } = Astro.props;
+
+const categories = await getShopCategories();
+const siblings = categories.filter((c) => c.slug !== currentSlug);
+---
+
+{
+  siblings.length > 0 && (
+    <p class="sibling-links">
+      Shop:{" "}
+      {siblings.map((c, i) => (
+        <>
+          <a href={c.href}>{c.label}</a>
+          {i < siblings.length - 1 && ", "}
+        </>
+      ))}
+    </p>
+  )
+}
+
+<style>
+  .sibling-links {
+    font-size: 0.85rem;
+    color: #8a8078;
+    text-align: center;
+  }
+  .sibling-links a {
+    color: #8b4557;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .sibling-links a:hover {
+    color: #d4708f;
+  }
+</style>

@@ -12,6 +12,7 @@ interface Props {
     id: string;
     brand: string;
     name: string;
+    h1?: string;
     rating: number;
     reviewCount: number;
     sku: string;
@@ -55,7 +56,7 @@ const isRealProduct = product.slug !== "product-not-found";
   data-product-image={toAbsoluteUrl(product.images?.[0]?.src || "")}
 >
   <p class="prod-brand">{product.brand}</p>
-  <h1 class="prod-title">{product.name}</h1>
+  <h1 class="prod-title">{product.h1 || product.name}</h1>
 
   <div class="rating-bar">
     {

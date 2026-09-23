@@ -2,6 +2,7 @@
 import Layout from "../layouts/Layout.astro";
 import LandingNav from "../components/landing/LandingNav.astro";
 import LandingFooter from "../components/landing/LandingFooter.astro";
+import { pageMeta } from "../lib/seo";
 
 /* ── Topic definitions: each drives the card, the note panel, the
      auto-filled subject, and which extra fields appear in the form ── */
@@ -78,12 +79,14 @@ const ICONS: Record<string, string> = {
     bulb: `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.6.5 1.1 1.4 1.1 2.2h5c0-.8.5-1.7 1.1-2.2A6 6 0 0 0 12 3z"/></svg>`,
     "heart-alert": `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 8.6c0 5.6-8.8 10.9-8.8 10.9S3.2 14.2 3.2 8.6a4.8 4.8 0 0 1 8.8-2.7 4.8 4.8 0 0 1 8.8 2.7z"/><line x1="12" y1="7" x2="12" y2="11"/><circle cx="12" cy="13.6" r="0.6" fill="currentColor"/></svg>`,
 };
+
+const meta = pageMeta(
+  "Contact Us — Handmade Crochet Store in India",
+  "We'd love to hear from you. Whatever brings you here, choose a topic and let's connect — custom orders, partnerships, feedback, or support.",
+);
 ---
 
-<Layout
-    title="Contact Us — Sunflora | Handmade Crochet"
-    description="We'd love to hear from you. Whatever brings you here, choose a topic and let's connect — custom orders, partnerships, feedback, or support."
->
+<Layout {...meta}>
     <div class="desktop-chrome">
         <LandingNav />
     </div>
@@ -94,10 +97,23 @@ const ICONS: Record<string, string> = {
             <div class="kn-container contact-hero-inner">
                 <div class="contact-hero-text">
                     <span class="contact-eyebrow">Let's Connect ♡</span>
-                    <h1 class="contact-heading">
+                    {/* This page renders both a desktop and a mobile layout
+                       in the same document, toggled by CSS media query, not
+                       conditionally rendered (see .desktop-flow/.mobile-flow
+                       at the bottom of this file) — so both copies exist in
+                       the served HTML at once, and only one <h1> can exist
+                       page-wide. The mobile copy stays the real <h1>, since
+                       Googlebot crawls as a ~412px viewport where the CSS
+                       already hides this desktop one. This one keeps the
+                       identical text and a level-1 heading role for desktop
+                       screen readers — display:none removes the mobile
+                       element from the accessibility tree whenever this one
+                       is the visible copy, so exactly one heading is ever
+                       exposed to assistive tech, same as to a crawler. */}
+                    <p class="contact-heading" role="heading" aria-level="1">
                         We'd love to<br />
                         hear from you <span class="heart-icon">♡</span>
-                    </h1>
+                    </p>
                     <p class="contact-sub">
                         Whatever brings you here, we're happy you found us.
                         Choose a topic and we'll take it from there.
@@ -463,7 +479,7 @@ const ICONS: Record<string, string> = {
                 <h1 class="contact-heading">
                     We'd love to<br />hear from you <span class="heart-icon"
                         >♡</span
-                    >
+                    ><span class="contact-heading-kicker">Handmade crochet, made to order in India</span>
                 </h1>
                 <p class="contact-sub">
                     Whatever brings you here, we're happy you found us. Choose a
@@ -654,9 +670,9 @@ const ICONS: Record<string, string> = {
                     >
                 </div>
 
-                <h1 class="thankyou-title">
+                <h2 class="thankyou-title">
                     Thank you! <span class="heart-icon">♡</span>
-                </h1>
+                </h2>
                 <p class="thankyou-sub">
                     Your message has been received and means a lot to us.
                 </p>
@@ -1304,6 +1320,15 @@ const ICONS: Record<string, string> = {
         line-height: 1.12;
         color: var(--kn-brown);
         margin-bottom: 20px;
+    }
+
+    .contact-heading-kicker {
+        display: block;
+        font-size: 15px;
+        font-weight: 400;
+        font-family: var(--kn-font-body);
+        color: var(--kn-brown-light);
+        margin-top: 8px;
     }
 
     .contact-sub {

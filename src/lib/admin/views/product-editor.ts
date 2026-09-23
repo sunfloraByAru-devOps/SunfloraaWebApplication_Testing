@@ -333,8 +333,14 @@ async function editor(ctx: ViewCtx, id: string | null) {
 
   root.appendChild(h("div", { class: "a-card" }, [
     h("h2", { text: "Basics", style: "margin-bottom:14px;" }),
-    field("Name", name, "What customers will see."),
-    field("Short tagline", tagline, "One line under the name. Optional."),
+    field("Name", name,
+      "What customers will see, and what becomes the page title and heading — " +
+      "write it the way someone would search for it (what it is, then what makes " +
+      "it special), not a pet name. “Sunny” makes a weak title; " +
+      "“Sunny Sunflower Keychain” makes a good one."),
+    field("Short tagline", tagline,
+      "One line under the name. It's also the first sentence Google shows in " +
+      "search results, so make it a real reason to buy, not a placeholder."),
     field("Description", description),
     field("Category", category),
     h("div", { class: "a-row" }, [

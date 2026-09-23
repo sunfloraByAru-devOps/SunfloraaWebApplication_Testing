@@ -13,7 +13,8 @@
 
 import { supabase } from "./supabase";
 import { getImageUrl } from "./images";
-import { productSlug } from "./slug";
+import { productSlug, categorySlug } from "./slug";
+import { RESERVED_SLUGS } from "./seo";
 
 export interface FaqItem {
   q: string;
@@ -243,7 +244,11 @@ export async function getHomeCategories(): Promise<HomeCategory[]> {
       return {
         name: row.name,
         label,
-        href: `/productlist?category=${encodeURIComponent(row.name)}`,
+        // Points at the indexable /<slug>/ category page, not the
+        // client-side-filtered /productlist?category= link — an internal
+        // link is also a crawl path, and the old one led nowhere a crawler
+        // could follow (the filter never touches the URL).
+        href: `/${categorySlug(row.name)}/`,
         src: getImageUrl(row.image_path, SITE_BUCKET),
         // Defaults only matter for a row written by hand; every upload records
         // the real numbers. A square is the least wrong guess for these cards.
@@ -263,6 +268,142 @@ export async function getHomeCategories(): Promise<HomeCategory[]> {
   }
 
   return cards;
+}
+
+/* ---------- shop categories (the indexable /<slug>/ pages + the filter
+   pills) ---------- */
+
+export interface ShopCategory {
+  id: string;
+  /** The real category name. Filter pills and the legacy ?category= link
+   *  compare on this — same convention as HomeCategory.name above. */
+  name: string;
+  /** What customers read. Only ever cosmetic. */
+  label: string;
+  slug: string;
+  href: string;
+  /** The dashboard's category "Description" field — the raw text for the
+   *  category page's intro copy, still to be split into paragraphs by the
+   *  page. Null until someone writes it; the page degrades, it does not
+   *  fail the build (see the empty-intro note where this is consumed). */
+  description: string | null;
+  productCount: number;
+  minPrice: number | null;
+  image: { src: string; width: number; height: number; alt: string } | null;
+}
+
+interface ShopCategoryRow {
+  id: string;
+  name: string;
+  display_label: string | null;
+  description: string | null;
+  image_path: string | null;
+  image_width: number | null;
+  image_height: number | null;
+  image_alt: string | null;
+}
+
+/* Active categories that actually have at least one active product. An
+   empty category gets no filter pill and no page — the two dead pills this
+   replaced ("Home Decor" -> Wall Hangings, "Customs" -> Customs) always
+   rendered "Nothing here yet", which is a worse experience than not showing
+   the pill, and it self-corrects the moment a product is assigned. */
+export async function getShopCategories(): Promise<ShopCategory[]> {
+  const { data, error } = await supabase
+    .from("categories")
+    .select(
+      "id, name, display_label, description, image_path, image_width, image_height, image_alt",
+    )
+    .eq("is_active", true)
+    .order("display_order", { ascending: true, nullsFirst: false })
+    .order("name", { ascending: true });
+
+  const rows = assertRows<ShopCategoryRow>(
+    data as ShopCategoryRow[] | null, error, "shop categories",
+  );
+
+  const { data: productRows, error: prodErr } = await supabase
+    .from("products")
+    .select("category_id, base_price")
+    .eq("is_active", true)
+    .not("category_id", "is", null);
+
+  if (prodErr) {
+    throw new Error(
+      `[site-content] Failed to load product counts for categories from Supabase: ${prodErr.message}`,
+    );
+  }
+
+  const counts = new Map<string, number>();
+  const minPrices = new Map<string, number>();
+  for (const row of (productRows ?? []) as { category_id: string; base_price: number }[]) {
+    const id = row.category_id;
+    counts.set(id, (counts.get(id) ?? 0) + 1);
+    const price = Number(row.base_price);
+    if (Number.isFinite(price) && price > 0) {
+      const seen = minPrices.get(id);
+      if (seen === undefined || price < seen) minPrices.set(id, price);
+    }
+  }
+
+  /* Root-level URLs mean a category slug can collide with an existing route
+     (categories.ts:"Customs" -> /customs/, one letter from /custom/) or with
+     another category (two names that slugify the same). Both are silent
+     404s waiting to happen — a rename in the dashboard that nobody connects
+     to a shop page vanishing weeks later. Fail the build instead. */
+  const seenSlugs = new Map<string, string>();
+
+  const categories = rows
+    .filter((row) => (counts.get(row.id) ?? 0) > 0)
+    .map((row) => {
+      const slug = categorySlug(row.name);
+
+      if (RESERVED_SLUGS.has(slug)) {
+        throw new Error(
+          `[site-content] Category "${row.name}" slugifies to "/${slug}/", which ` +
+            `is already an existing page on this site. Rename the category in ` +
+            `the dashboard so it does not collide with a reserved route.`,
+        );
+      }
+      const priorName = seenSlugs.get(slug);
+      if (priorName) {
+        throw new Error(
+          `[site-content] Categories "${priorName}" and "${row.name}" both ` +
+            `slugify to "/${slug}/". Rename one of them so their shop pages ` +
+            `don't collide.`,
+        );
+      }
+      seenSlugs.set(slug, row.name);
+
+      const label = row.display_label || row.name;
+      return {
+        id: row.id,
+        name: row.name,
+        label,
+        slug,
+        href: `/${slug}/`,
+        description: row.description,
+        productCount: counts.get(row.id) ?? 0,
+        minPrice: minPrices.get(row.id) ?? null,
+        image: row.image_path
+          ? {
+              src: getImageUrl(row.image_path, SITE_BUCKET),
+              width: row.image_width ?? 800,
+              height: row.image_height ?? 800,
+              alt: row.image_alt || label,
+            }
+          : null,
+      } satisfies ShopCategory;
+    });
+
+  if (!categories.length) {
+    throw new Error(
+      `[site-content] No active category has an active product. Refusing to ` +
+        `build a shop with zero browsable categories.`,
+    );
+  }
+
+  return categories;
 }
 
 /* ---------- site images ---------- */

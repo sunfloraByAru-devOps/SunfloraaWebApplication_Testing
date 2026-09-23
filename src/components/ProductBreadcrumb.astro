@@ -1,19 +1,26 @@
 ---
+/* categoryName/categoryHref used to be a hardcoded literal "Amigurumi"
+   linking to /#offerings — every product, in every category, showed the
+   same wrong crumb. Also note for anyone touching the client-side hydration
+   script below: it selects ".breadcrumb a:nth-of-type(2)", which is THIS
+   category link (the 2nd <a>, after "Home") — it is not indexed against
+   "Collections" as a separate element; "Collections" no longer exists as a
+   distinct crumb. Keep that selector and this markup's <a> order in sync. */
 interface Props {
   product: {
     name: string;
   };
+  categoryName?: string | null;
+  categoryHref?: string;
 }
 
-const { product } = Astro.props;
+const { product, categoryName, categoryHref = "/productlist" } = Astro.props;
 ---
 
 <div class="breadcrumb">
   <a href="/">Home</a>
   <span class="breadcrumb-sep">›</span>
-  <a href="/#offerings">Collections</a>
-  <span class="breadcrumb-sep">›</span>
-  <a href="/#offerings">Amigurumi</a>
+  <a href={categoryHref}>{categoryName || "Shop"}</a>
   <span class="breadcrumb-sep">›</span>
   <span class="breadcrumb-current">{product.name}</span>
 </div>

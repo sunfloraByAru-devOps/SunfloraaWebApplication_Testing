@@ -1,0 +1,286 @@
+---
+/* One page per shop category, e.g. /crochet-flower-bouquets/. This is the
+   page that is meant to win the head-term search ("crochet flower
+   bouquets"), which no single product page can — eight products all titled
+   "... — Crochet Flower Bouquet" would just cannibalize each other and this
+   page (see productTitle's comment in src/lib/seo.ts). /productlist stays
+   the all-products hub; this is the keyword-targeted, copy-bearing page for
+   one slice of it.
+
+   Root-level URL, not /shop/<slug>/ or /collections/<slug>/ — the stronger
+   keyword signal, at the cost of needing the reserved-slug guard that
+   getShopCategories() enforces at build time. */
+import Layout from "../layouts/Layout.astro";
+import LandingNav from "../components/landing/LandingNav.astro";
+import LandingFooter from "../components/landing/LandingFooter.astro";
+import ProductListGrid from "../components/ProductListGrid.astro";
+import ProductListServiceBar from "../components/ProductListServiceBar.astro";
+import CategorySiblingLinks from "../components/CategorySiblingLinks.astro";
+import { getGridImage } from "../lib/product-images";
+import { getShopCategories, type ShopCategory } from "../lib/site-content";
+import { categoryMeta } from "../lib/seo";
+import { productSlug } from "../lib/slug";
+import { supabase } from "../lib/supabase";
+
+// Same stock-shot fallback used on /productlist, for a product with no photo
+// of its own. Duplicated rather than imported: productlist.astro's version
+// is a module-private function, and this page's product set is already
+// filtered to one category, so it never needs the category-keyword branches
+// — only the name-keyword ones.
+import BUNNY from "../assets/crochet_bunny.png";
+import TULIPS from "../assets/crochet_tulip_bouquet.png";
+import TOTE from "../assets/crochet_tote_bag.png";
+import BEANIE from "../assets/crochet_beanie.png";
+import BEAR from "../assets/crochet_teddy_bear.png";
+import KEYCHAIN from "../assets/crochet_daisy_keychain.png";
+import BASKET from "../assets/crochet_basket.png";
+import CLIPS from "../assets/crochet_hair_clips.png";
+
+function getFallbackImg(name: string): string {
+  const n = (name || "").toLowerCase();
+  if (n.includes("bunny")) return BUNNY.src;
+  if (n.includes("tulip") || n.includes("bouquet") || n.includes("flower")) return TULIPS.src;
+  if (n.includes("bag") || n.includes("tote")) return TOTE.src;
+  if (n.includes("beanie") || n.includes("cap") || n.includes("hat")) return BEANIE.src;
+  if (n.includes("bear") || n.includes("teddy")) return BEAR.src;
+  if (n.includes("keychain") || n.includes("daisy")) return KEYCHAIN.src;
+  if (n.includes("basket") || n.includes("pot")) return BASKET.src;
+  if (n.includes("clip") || n.includes("hair")) return CLIPS.src;
+  return BUNNY.src;
+}
+
+export async function getStaticPaths() {
+  const categories = await getShopCategories();
+  return categories.map((category) => ({
+    params: { category: category.slug },
+    props: { category },
+  }));
+}
+
+const { category } = Astro.props as { category: ShopCategory };
+
+const { data: products } = await supabase
+  .from("products_with_image")
+  .select(
+    `
+    id, name, category_name, base_price, base_mrp,
+    avg_rating, review_count, tag, is_new, in_stock,
+    primary_image_path
+  `,
+  )
+  .eq("is_active", true)
+  // Matching on the name, not a category_id column: products_with_image is
+  // a production-only view (not in this repo), and category_name is the
+  // one column of it already proven to exist by productlist.astro's own
+  // query. Matching by id would be one join safer but unverifiable here.
+  .eq("category_name", category.name)
+  .order("display_order", { ascending: true, nullsFirst: false })
+  .order("name", { ascending: true });
+
+const gridProducts = await Promise.all(
+  (products || []).map(async (p) => {
+    const optimized = p.primary_image_path ? await getGridImage(p.primary_image_path) : null;
+    const image = optimized || { src: getFallbackImg(p.name), width: 300, height: 300, srcset: "" };
+    return {
+      id: p.id,
+      name: p.name,
+      category: p.category_name,
+      price: p.base_price,
+      mrp: p.base_mrp,
+      rating: parseFloat(String(p.avg_rating)) || 0,
+      reviews: p.review_count || 0,
+      tag: p.tag,
+      image,
+      isNew: p.is_new,
+      inStock: p.in_stock,
+    };
+  }),
+);
+
+/* getShopCategories() already guarantees productCount > 0 at build time, so
+   an empty result here would mean a product went inactive between that
+   query and this one within the same build — not expected, but a category
+   page with zero products defeats the entire point of the page existing. */
+if (gridProducts.length === 0) {
+  throw new Error(
+    `[${category.slug}] getShopCategories() reported ${category.productCount} ` +
+      `product(s) for "${category.name}", but the page's own product query ` +
+      `returned none. category_name values may not match exactly between ` +
+      `the categories and products tables.`,
+  );
+}
+
+const site = "https://sunfloracrochet.in";
+const pageUrl = `${site}${category.href}`;
+
+/* categories.description is one big text field, written as blank-line-
+   separated paragraphs in the dashboard. First paragraph is the lead, under
+   the H1, ahead of the grid — shopping intent served first. The rest reads
+   as the "About <category>" section below the grid. Missing/short intros
+   degrade rather than fail the build (see getShopCategories' own comment on
+   this field): a blank description must not block publishing a brand new
+   category, it should just read thin until someone writes it. */
+const paragraphs = (category.description || "")
+  .split(/\n\s*\n/)
+  .map((p) => p.trim())
+  .filter(Boolean);
+const [lead, ...rest] = paragraphs.length
+  ? paragraphs
+  : [
+      `Handmade ${category.name.toLowerCase()}, hand-crocheted to order in India. ` +
+        `Every piece is made after you order it — nothing sits waiting on a shelf.`,
+    ];
+
+const meta = categoryMeta({
+  name: category.name,
+  label: category.label,
+  productCount: category.productCount,
+  minPrice: category.minPrice,
+  image: category.image?.src,
+  imageAlt: category.image?.alt,
+});
+
+const itemListSchema = {
+  "@type": "ItemList",
+  itemListElement: gridProducts.map((p, i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    url: `${site}/productdetail/${productSlug(p.name)}`,
+    name: p.name,
+    image: p.image.src,
+    offers: {
+      "@type": "Offer",
+      price: p.price,
+      priceCurrency: "INR",
+      availability: p.inStock === false ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
+    },
+  })),
+};
+
+const breadcrumbSchema = {
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: site },
+    { "@type": "ListItem", position: 2, name: category.label, item: pageUrl },
+  ],
+};
+
+const collectionSchema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "CollectionPage",
+      "@id": `${pageUrl}#collectionpage`,
+      url: pageUrl,
+      name: meta.title,
+      description: meta.description,
+      isPartOf: { "@id": `${site}/#website` },
+      about: category.name,
+      mainEntity: { "@id": `${pageUrl}#itemlist` },
+    },
+    { ...itemListSchema, "@id": `${pageUrl}#itemlist` },
+    breadcrumbSchema,
+  ],
+};
+---
+
+<Layout {...meta}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(collectionSchema)} is:inline />
+  </Fragment>
+
+  <LandingNav />
+  <div style="height: 72px; background-color: #FFF8F0;"></div>
+
+  <nav class="category-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a> <span aria-hidden="true">/</span> <span aria-current="page">{category.label}</span>
+  </nav>
+
+  <header class="category-head">
+    <h1>Handmade {category.name} in India</h1>
+    <p class="category-lead">{lead}</p>
+  </header>
+
+  <nav class="category-siblings" aria-label="Other categories">
+    <CategorySiblingLinks currentSlug={category.slug} />
+  </nav>
+
+  <ProductListGrid products={gridProducts} />
+
+  {
+    rest.length > 0 && (
+      <section class="category-about">
+        <h2>About {category.label}</h2>
+        {rest.map((p) => (
+          <p>{p}</p>
+        ))}
+      </section>
+    )
+  }
+
+  <h2 class="category-why-heading">Why buy crochet from Sunflora</h2>
+  <ProductListServiceBar />
+
+  <LandingFooter />
+</Layout>
+
+<style>
+  .category-breadcrumb {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1rem 1.5rem 0;
+    font-size: 0.8rem;
+    color: #8a8078;
+  }
+  .category-breadcrumb a {
+    color: #8a8078;
+    text-decoration: none;
+  }
+  .category-breadcrumb a:hover {
+    color: #5c3d2e;
+  }
+  .category-breadcrumb span[aria-current] {
+    color: #5c3d2e;
+  }
+  .category-head {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1rem 1.5rem 2rem;
+    text-align: center;
+  }
+  .category-head h1 {
+    font-family: "Playfair Display", serif;
+    font-size: clamp(2rem, 5vw, 3rem);
+    color: #5c3d2e;
+    margin: 0 0 0.75rem;
+  }
+  .category-lead {
+    max-width: 60ch;
+    margin: 0 auto;
+    color: #6b5d54;
+    line-height: 1.7;
+  }
+  .category-siblings {
+    max-width: 1100px;
+    margin: 0 auto 1.5rem;
+    padding: 0 1.5rem;
+  }
+  .category-about {
+    max-width: 70ch;
+    margin: 3rem auto;
+    padding: 0 1.5rem;
+    line-height: 1.75;
+    color: #4a3f38;
+  }
+  .category-about h2 {
+    font-family: "Playfair Display", serif;
+    color: #5c3d2e;
+    margin-bottom: 1rem;
+  }
+  .category-why-heading {
+    text-align: center;
+    font-family: "Playfair Display", serif;
+    color: #5c3d2e;
+    margin: 2rem auto 0;
+  }
+</style>

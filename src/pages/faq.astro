@@ -4,6 +4,7 @@ import LandingNav from "../components/landing/LandingNav.astro";
 import LandingFooter from "../components/landing/LandingFooter.astro";
 import LandingFaq from "../components/landing/LandingFaq.astro";
 import { getFaqGroups } from "../lib/site-content";
+import { pageMeta } from "../lib/seo";
 
 /* Build-time read — see src/lib/site-content.ts. Throws rather than rendering
    an empty FAQ page if the content can't be loaded. */
@@ -55,12 +56,14 @@ const businessSchema = {
 };
 
 const totalQuestions = faqGroups.reduce((n, g) => n + g.items.length, 0);
+
+const meta = pageMeta(
+  "Crochet Gift FAQs — Shipping, Care & Orders",
+  "Shipping, custom orders, returns, care and safety — everything people ask about our handmade crochet bouquets and soft toys. Free shipping across India, made to order in 7–10 days.",
+);
 ---
 
-<Layout
-  title="FAQ — Sunflora | Handmade Crochet Soft Toys & Flower Bouquets"
-  description="Shipping, custom orders, returns, care and safety — everything people ask about our handmade crochet bouquets and amigurumi. Free shipping across India, made to order in 7–10 days."
->
+<Layout {...meta}>
   <Fragment slot="head">
     <script
       type="application/ld+json"
