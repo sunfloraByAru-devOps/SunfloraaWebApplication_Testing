@@ -1,4 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Inter:wght@400;500;700&display=swap');
+/* The Google Fonts stylesheet is loaded from a <link> in Layout.astro, not
+   @import-ed here. An @import is invisible to the browser's preload scanner
+   until this file has downloaded and parsed, which pushed the font CSS and
+   then the font files onto the end of a serial chain. */
 
 @import "tailwindcss";
 @import "./landing.css";

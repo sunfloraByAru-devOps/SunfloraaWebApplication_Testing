@@ -1,8 +1,10 @@
 ---
 import "../styles/global.css";
+import CookieConsent from "../components/CookieConsent.astro";
 const {
   title = "My Website",
   description = "My awesome website",
+  robots,
 } = Astro.props;
 
 /* Canonical URL — without this, /faq and /faq/ can be indexed as duplicates. */
@@ -14,9 +16,25 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
   <head>
     <!-- Basic SEO -->
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    {/* global.css pulls the fonts in with @import, so the browser only learns
+       it needs fonts.gstatic.com after that stylesheet has downloaded and
+       parsed. Opening both connections up front overlaps the handshakes with
+       that wait instead of queueing behind it. */}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Inter:wght@400;500;700&display=swap"
+    />
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+
+    {/* Keeping a page out of the sitemap does not keep it out of the index —
+       these routes are still linked from the nav, so Google can reach them
+       either way. The meta tag is what actually stops indexing. */}
+    {robots && <meta name="robots" content={robots} />}
 
     <!-- Browser UI theme color -->
     <meta name="theme-color" content="#FFF8F0" media="(prefers-color-scheme: light)" />
@@ -45,5 +63,6 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
 
   <body class="paper-grain min-h-screen relative">
     <slot />
+    <CookieConsent />
   </body>
 </html>

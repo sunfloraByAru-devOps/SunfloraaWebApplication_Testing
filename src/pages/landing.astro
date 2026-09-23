@@ -22,7 +22,9 @@ const offerings = [
 ];
 ---
 
-<Layout title="Sunflora — Handmade Crochet, Made to Last" description="One-of-a-kind crochet pieces made slowly, sent with love. Amigurumi, keychains, florals & custom orders — straight from our hands to yours.">
+<Layout title="Sunflora — Handmade Crochet, Made to Last" description="One-of-a-kind crochet pieces made slowly, sent with love. Amigurumi, keychains, florals & custom orders — straight from our hands to yours."
+  robots="noindex, follow"
+>
   <style>
     /* ── Fonts already loaded by global.css ── */
 
@@ -488,7 +490,7 @@ const offerings = [
       <li><a href="#offerings">Collections</a></li>
       <li><a href="#how">Process</a></li>
       <li><a href="#pricing">Pricing</a></li>
-      <li><a href="#testimonials">Love notes</a></li>
+      <li><a href="#testimonials">What's included</a></li>
     </ul>
     <a href={contact.whatsappUrl} class="nav-cta" target="_blank" rel="noreferrer">
       Order now
@@ -526,10 +528,6 @@ const offerings = [
 
       <div class="hero-stats">
         <div>
-          <span class="stat-num">800+</span>
-          <div class="stat-label">Happy homes</div>
-        </div>
-        <div>
           <span class="stat-num">3+</span>
           <div class="stat-label">Years of stitching</div>
         </div>
@@ -543,8 +541,8 @@ const offerings = [
     <div class="hero-right">
       <Image src={HERO} alt="Crochet sunshine on pegboard" />
       <div class="hero-badge">
-        <p>"She brings the sun indoors."</p>
-        <small>— Anika, returning customer</small>
+        <p>"No machines. No shortcuts."</p>
+        <small>— Aru, Sunflora</small>
       </div>
     </div>
   </section>
@@ -563,7 +561,7 @@ const offerings = [
     <span class="trust-dot"></span>
     <span class="trust-item">
       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-      Shipped worldwide
+      Free shipping, all India
     </span>
     <span class="trust-dot"></span>
     <span class="trust-item">
@@ -697,21 +695,23 @@ const offerings = [
     </div>
   </section>
 
-  <!-- ── TESTIMONIALS ── -->
+  <!-- ── WHAT YOU GET ──
+       This section used to carry three named customer testimonials that were
+       never real reviews. Ratings on this site come from the moderated review
+       system and are shown per product, where each one can be traced to an
+       actual order — so this space makes promises we can keep instead. -->
   <section class="testimonials" id="testimonials">
-    <p class="label testimonials-label reveal">800+ happy homes</p>
+    <p class="label testimonials-label reveal">What every order includes</p>
     <div class="testi-marquee">
       {[...Array(2)].map(() => (
         [
-          { quote: "I ordered a custom piece of my late dog and I ugly-cried when I opened it. It was perfect.", author: "Rhea S. · Custom Amigurumi" },
-          { quote: "The packaging alone made me emotional. Felt like I was opening a gift from a dear friend.", author: "Mira T. · Sunshine Keychain" },
-          { quote: "She brings the sun indoors. I have four Sunflora pieces and every guest notices them first.", author: "Anika D. · Returning customer" },
+          { quote: "Made to order in 7–10 working days. Nothing sits waiting on a shelf.", author: "Made for you, not in bulk" },
+          { quote: "Free shipping on every order, anywhere in India.", author: "Delivery" },
+          { quote: "7-day returns on ready-made pieces, and we make it right if something arrives damaged.", author: "If it isn't right" },
+          { quote: "Wrapped in kraft paper with a handwritten care card in every parcel.", author: "How it arrives" },
         ].map(t => (
           <div class="testi-card">
-            <div class="testi-stars">
-              {'★★★★★'.split('').map(s => <span>{s}</span>)}
-            </div>
-            <p class="testi-quote">"{t.quote}"</p>
+            <p class="testi-quote">{t.quote}</p>
             <p class="testi-author">{t.author}</p>
           </div>
         ))
@@ -758,12 +758,12 @@ const offerings = [
         <div class="plan reveal">
           <div class="plan-name">Ready-made</div>
           <div class="plan-price"><sup>₹</sup>249<sub>+</sub></div>
-          <p class="plan-desc">Pieces in stock, ready to ship within 3–5 days. Perfect for gifts that can't wait.</p>
+          <p class="plan-desc">Our existing designs, made fresh for you. Nothing sits waiting on a shelf.</p>
           <ul class="plan-items">
             <li>Keychains, mini amigurumi & florals</li>
-            <li>Ships in 3–5 working days</li>
-            <li>Kraft paper packaging included</li>
-            <li>Handwritten care card</li>
+            <li>Made to order in 7–10 working days</li>
+            <li>7-day returns</li>
+            <li>Kraft paper packaging & a handwritten care card</li>
           </ul>
           <a href={contact.whatsappUrl} class="plan-btn plan-btn-dark" target="_blank" rel="noreferrer">Shop ready-made</a>
         </div>
@@ -825,7 +825,7 @@ const offerings = [
   <!-- ── FOOTER ── -->
   <footer>
     <span>© {new Date().getFullYear()} Sunflora Studio — Handmade with care.</span>
-    <span>Hooked in India · Shipped worldwide</span>
+    <span>Hooked in India · Shipped across India</span>
     <a href={contact.mailto}>{contact.email}</a>
   </footer>
 

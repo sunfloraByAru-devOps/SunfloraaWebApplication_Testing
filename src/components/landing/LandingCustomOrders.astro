@@ -3,6 +3,8 @@
    Left: Text + features + CTA
    Right: Image with "Your idea, Our Creation" tag
 */
+import { Image } from "astro:assets";
+import customHands from "../../assets/custom-hands.png";
 const features = [
   { icon: "share", title: "Share Your Idea", desc: "Tell us what you need" },
   { icon: "design", title: "We Design It", desc: "We create and customize" },
@@ -60,9 +62,11 @@ const features = [
       <!-- Right Image -->
       <div class="custom-image-wrap kn-fade-up">
         <div class="custom-image-card">
-          <img
-            src="/images/landing/custom-hands.png"
+          <Image
+            src={customHands}
             alt="Hands crocheting a custom order"
+            widths={[400, 800, 1024]}
+            sizes="(max-width: 768px) 90vw, 500px"
             loading="lazy"
             class="custom-img"
           />

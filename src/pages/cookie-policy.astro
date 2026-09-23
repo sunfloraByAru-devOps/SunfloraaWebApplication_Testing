@@ -1,0 +1,118 @@
+---
+import LegalLayout from "../layouts/LegalLayout.astro";
+import { getContactLinks } from "../lib/site-content";
+
+const contact = await getContactLinks();
+const EFFECTIVE_DATE = "23 September 2026";
+---
+
+<LegalLayout
+  title="Cookie Policy — Sunflora"
+  description="What cookies and browser storage Sunflora uses, and how to control your preferences."
+  effectiveDate={EFFECTIVE_DATE}
+>
+  <Fragment slot="title">Cookie Policy</Fragment>
+
+  <p>
+    This policy explains the cookies and similar browser storage technologies
+    used on sunfloracrochet.in, and how you can control them. It should be
+    read alongside our <a href="/privacy-policy">Privacy Policy</a>.
+  </p>
+
+  <h2>1. What "cookies" means here</h2>
+  <p>
+    We use the term "cookies" broadly, to cover actual browser cookies as
+    well as similar technologies such as <code>localStorage</code>, which
+    some parts of the Site use instead of a cookie for the same purpose.
+  </p>
+
+  <h2>2. Categories we use</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Category</th>
+        <th>Purpose</th>
+        <th>Consent needed?</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Strictly necessary</strong></td>
+        <td>
+          Keeps your cart contents (stored in your browser's
+          <code>localStorage</code>) and your sign-in session working. The
+          Site cannot function without these.
+        </td>
+        <td>No — always on</td>
+      </tr>
+      <tr>
+        <td><strong>Analytics</strong></td>
+        <td>
+          Helps us understand which pages and products are visited, so we
+          can improve the shop. Not currently active on the Site.
+        </td>
+        <td>Yes — off until you accept</td>
+      </tr>
+      <tr>
+        <td><strong>Marketing</strong></td>
+        <td>
+          Used for social or ad retargeting (e.g. Instagram/Meta). Not
+          currently active on the Site.
+        </td>
+        <td>Yes — off until you accept</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>3. What's active right now</h2>
+  <p>
+    At the effective date above, Sunflora does not run any analytics or
+    advertising cookies — only the strictly necessary cart and sign-in
+    storage described above is in use. If we add analytics or marketing
+    tools in future (for example, to see which products are popular), they
+    will only load after you accept that category in the cookie banner or
+    preference centre, and this page will be updated to name them.
+  </p>
+  <p>
+    Note that our payment gateway, Razorpay, may set its own cookies while
+    you're completing a payment, in order to process your transaction
+    securely. These are set and controlled by Razorpay, not Sunflora — see
+    Razorpay's own privacy and cookie disclosures for details.
+  </p>
+
+  <h2>4. Managing your preferences</h2>
+  <p>
+    You can change your cookie choices at any time using the
+    <button type="button" data-open-cookie-preferences class="legal-inline-link">
+      "Cookie preferences"
+    </button>
+    link in the site footer, or by clearing your browser's site data for
+    sunfloracrochet.in. You can also control or block cookies generally
+    through your browser's settings, though doing so may affect how well
+    the cart and sign-in work.
+  </p>
+
+  <h2>5. Questions</h2>
+  <p>
+    If you have questions about this Cookie Policy, contact us at
+    <a href={contact.mailto}>{contact.email}</a>.
+  </p>
+
+  <hr />
+  <p>
+    See also our <a href="/privacy-policy">Privacy Policy</a> and
+    <a href="/terms-and-conditions">Terms &amp; Conditions</a>.
+  </p>
+</LegalLayout>
+
+<style>
+  .legal-inline-link {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    color: var(--kn-rose);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+</style>

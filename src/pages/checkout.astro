@@ -4,7 +4,9 @@ import LandingNav from "../components/landing/LandingNav.astro";
 import LoginGate from "../components/LoginGate.astro";
 ---
 
-<Layout title="Checkout — Sunflora Studio" description="Complete your order">
+<Layout title="Checkout — Sunflora Studio" description="Complete your order"
+  robots="noindex, follow"
+>
   <LandingNav />
   <LoginGate />
   <div style="height: 72px; background-color: #FFF8F0;"></div>
@@ -145,6 +147,11 @@ import LoginGate from "../components/LoginGate.astro";
         <p class="text-xs text-[#9a8b7a] text-center">
           Payments are processed securely by Razorpay. You'll pay without
           leaving this page.
+        </p>
+        <p class="text-xs text-[#9a8b7a] text-center leading-relaxed">
+          By placing this order, you agree to our
+          <a href="/terms-and-conditions" class="underline">Terms &amp; Conditions</a>
+          and <a href="/privacy-policy" class="underline">Privacy Policy</a>.
         </p>
       </form>
     </section>

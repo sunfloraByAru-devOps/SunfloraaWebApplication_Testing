@@ -5,9 +5,29 @@
    - Parallax-ready with data-speed attributes
    - Decorative floating elements
 */
+import { getImage } from "astro:assets";
+import heroBackground from "../../assets/crochet_girl.png";
+
+/* This is the LCP element. Served from public/ it was a 2.5MB PNG — the
+   image pipeline only ever touched src/assets and remote Supabase images,
+   so a file sitting in public/ was shipped byte-for-byte. Going through
+   getImage() here makes it a WebP a tenth of the size.
+
+   It is a CSS background rather than an <img>, so the optimized URL is
+   handed to the stylesheet through a custom property. */
+const heroBackgroundImage = await getImage({
+  src: heroBackground,
+  format: "webp",
+  quality: 72,
+  width: 1773,
+});
 ---
 
-<section id="hero" class="kn-hero">
+<section
+  id="hero"
+  class="kn-hero"
+  style={`--hero-background: url('${heroBackgroundImage.src}')`}
+>
   <!-- Decorative floating elements (parallax targets) -->
   <div class="hero-deco hero-deco-1" data-parallax-speed="0.15" aria-hidden="true">
     <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
@@ -132,7 +152,7 @@
     background: 
       linear-gradient(to bottom, rgba(255, 248, 240, 0.95) 0%, rgba(255, 248, 240, 0) 35%),
       linear-gradient(to right, rgba(255, 248, 240, 0.95) 0%, rgba(255, 248, 240, 0.7) 50%, rgba(255, 248, 240, 0) 85%),
-      url('/images/landing/crochet_girl.png') center/cover no-repeat;
+      var(--hero-background) center/cover no-repeat;
     padding: 140px 0 0;
     position: relative;
     overflow: hidden;

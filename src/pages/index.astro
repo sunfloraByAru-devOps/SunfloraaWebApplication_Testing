@@ -1,7 +1,21 @@
 ---
+import { getImage } from "astro:assets";
 import Layout from "../layouts/Layout.astro";
 import LandingNav from "../components/landing/LandingNav.astro";
 import LandingHero from "../components/landing/LandingHero.astro";
+import heroBackground from "../assets/crochet_girl.png";
+
+/* The hero image is the LCP element, but it's set as a CSS background inside
+   LandingHero.astro — invisible to the browser's preload scanner until the
+   stylesheet has been fetched and parsed. Preloading it here (same source +
+   params as LandingHero's own getImage call, so Astro resolves to the
+   identical cached file) lets the browser start the fetch immediately. */
+const heroPreload = await getImage({
+  src: heroBackground,
+  format: "webp",
+  quality: 72,
+  width: 1773,
+});
 import LandingCategories from "../components/landing/LandingCategories.astro";
 import LandingCustomOrders from "../components/landing/LandingCustomOrders.astro";
 import LandingServiceBar from "../components/landing/LandingServiceBar.astro";
@@ -44,6 +58,7 @@ const websiteSchema = {
   description="Handmade crochet creations crafted with love. Shop flower bouquets, soft toys, home decor, and custom orders."
 >
   <Fragment slot="head">
+    <link rel="preload" as="image" href={heroPreload.src} fetchpriority="high" />
     <script
       type="application/ld+json"
       set:html={JSON.stringify(organizationSchema)}

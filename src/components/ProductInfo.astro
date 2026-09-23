@@ -39,6 +39,11 @@ interface Props {
 }
 
 const { product, discount } = Astro.props;
+
+/* The not-found fallback renders through this same component. Without this
+   guard it shows a ₹0 "Product Not Found" with a working Add to Cart and Buy
+   Now — an orderable phantom product. */
+const isRealProduct = product.slug !== "product-not-found";
 ---
 
 <div
@@ -205,7 +210,11 @@ const { product, discount } = Astro.props;
   </div>
 
   <!-- Quantity + Cart CTAs -->
-  <div class="qty-cart-row" style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1rem;">
+  <div
+    class="qty-cart-row"
+    style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1rem;"
+    hidden={!isRealProduct}
+  >
     <div class="qty-stepper" style="display:flex; align-items:center; border:1px solid #E8D5C4; border-radius:8px; overflow:hidden;">
       <button type="button" id="qty-minus" style="width:36px; height:36px; background:#FFF8F0; color:#5C3D2E; font-size:1.1rem;">−</button>
       <input

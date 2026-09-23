@@ -3,7 +3,9 @@ import Layout from "../layouts/Layout.astro";
 import LandingNav from "../components/landing/LandingNav.astro";
 ---
 
-<Layout title="Create Account — Sunflora Studio" description="Create your account">
+<Layout title="Create Account — Sunflora Studio" description="Create your account"
+  robots="noindex, follow"
+>
   <LandingNav />
   <div style="height: 72px; background-color: #FFF8F0;"></div>
 
@@ -30,6 +32,12 @@ import LandingNav from "../components/landing/LandingNav.astro";
         Email me a sign-in link
       </button>
     </form>
+
+    <p class="text-xs text-[#9a8b7a] mt-4 leading-relaxed">
+      By continuing, you agree to our
+      <a href="/terms-and-conditions" class="underline">Terms &amp; Conditions</a>
+      and <a href="/privacy-policy" class="underline">Privacy Policy</a>.
+    </p>
 
     <p class="text-sm text-[#9a8b7a] mt-6">
       Already have an account? <a href="/login" class="text-[#D4708F] underline">Log in</a>

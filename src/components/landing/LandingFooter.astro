@@ -26,6 +26,12 @@ const aboutLinks = [
   { label: "Sustainability", href: "#" },
   { label: "Reviews", href: "#" },
 ];
+
+const legalLinks = [
+  { label: "Privacy Policy", href: "/privacy-policy" },
+  { label: "Terms & Conditions", href: "/terms-and-conditions" },
+  { label: "Cookie Policy", href: "/cookie-policy" },
+];
 ---
 
 <footer id="contact" class="kn-footer">
@@ -149,6 +155,18 @@ const aboutLinks = [
         >
         <a href={`tel:+${contact.whatsappNumber}`} class="footer-link">📞 {contact.phoneDisplay}</a>
       </div>
+
+      <!-- Legal -->
+      <div class="footer-col">
+        <h4 class="footer-col-title">Legal</h4>
+        {
+          legalLinks.map((l) => (
+            <a href={l.href} class="footer-link">
+              {l.label}
+            </a>
+          ))
+        }
+      </div>
     </div>
 
     <!-- Bottom bar -->
@@ -156,6 +174,9 @@ const aboutLinks = [
       <p class="footer-copy">
         © {new Date().getFullYear()} Sunflora. All rights reserved.
       </p>
+      <button type="button" data-open-cookie-preferences class="footer-cookie-link">
+        Cookie preferences
+      </button>
     </div>
   </div>
 </footer>
@@ -169,7 +190,7 @@ const aboutLinks = [
 
   .footer-grid {
     display: grid;
-    grid-template-columns: 1.5fr repeat(4, 1fr);
+    grid-template-columns: 1.5fr repeat(5, 1fr);
     gap: 40px;
     margin-bottom: 48px;
   }
@@ -256,6 +277,11 @@ const aboutLinks = [
   .footer-bottom {
     border-top: 1px solid var(--kn-taupe-light);
     padding: 20px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
     text-align: center;
   }
 
@@ -263,6 +289,21 @@ const aboutLinks = [
     font-family: var(--kn-font-body);
     font-size: 12px;
     color: var(--kn-brown-muted);
+  }
+
+  .footer-cookie-link {
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: var(--kn-font-body);
+    font-size: 12px;
+    color: var(--kn-brown-muted);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .footer-cookie-link:hover {
+    color: var(--kn-rose);
   }
 
   @media (max-width: 1024px) {

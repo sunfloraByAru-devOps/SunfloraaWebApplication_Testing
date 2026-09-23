@@ -1,0 +1,174 @@
+---
+import LegalLayout from "../layouts/LegalLayout.astro";
+import { getContactLinks } from "../lib/site-content";
+
+const contact = await getContactLinks();
+const EFFECTIVE_DATE = "23 September 2026";
+---
+
+<LegalLayout
+  title="Terms & Conditions — Sunflora"
+  description="The terms that apply when you browse, order from, or otherwise use the Sunflora website."
+  effectiveDate={EFFECTIVE_DATE}
+>
+  <Fragment slot="title">Terms &amp; Conditions</Fragment>
+
+  <p>
+    These Terms &amp; Conditions ("Terms") govern your use of
+    sunfloracrochet.in (the "Site") and any order you place with Sunflora
+    ("Sunflora", "we", "us", "our"), a home-based handmade crochet studio
+    operated by Aru Jaiswal, based in Siwan, Bihar, India. By browsing the
+    Site or placing an order, you agree to these Terms. If you don't agree,
+    please don't use the Site.
+  </p>
+
+  <h2>1. Who can order</h2>
+  <p>
+    You must be at least 18 years old, or place orders under the supervision
+    of a parent or legal guardian, to order from Sunflora. By placing an
+    order you confirm this is the case and that the information you give us
+    is accurate.
+  </p>
+
+  <h2>2. Our products</h2>
+  <p>
+    Every piece is handmade to order. Because of this:
+  </p>
+  <ul>
+    <li>
+      slight variations in colour, size, stitch pattern and finish between
+      the product photo and the piece you receive are normal, not a defect
+      — that's the nature of something made by hand rather than a machine;
+    </li>
+    <li>
+      colours may also appear slightly different depending on your screen;
+    </li>
+    <li>
+      soft toys and amigurumi may include small parts (eyes, embellishments)
+      and are not intended for children under 3 without adult supervision.
+    </li>
+  </ul>
+
+  <h2>3. Pricing and payment</h2>
+  <p>
+    All prices on the Site are listed in Indian Rupees (₹) and are inclusive
+    of applicable taxes unless stated otherwise. Payments are processed
+    securely through our payment partner, Razorpay; we do not see or store
+    your card, UPI or bank account details. An order is confirmed only once
+    payment has been successfully received.
+  </p>
+  <p>
+    We reserve the right to correct any pricing error and to cancel an order
+    placed at an incorrect price, in which case we will refund any payment
+    already made in full.
+  </p>
+
+  <h2>4. Order acceptance and cancellation</h2>
+  <p>
+    Placing an order is an offer to buy; we may accept, decline, or cancel
+    an order — for example if an item has become unavailable, we suspect
+    fraud, or delivery isn't possible to your location. If we cancel an
+    order after payment, we will refund you in full.
+  </p>
+  <p>
+    Because pieces are made to order, cancellation windows and any
+    applicable cancellation charges are as described at checkout and in our
+    <a href="/faq">FAQ</a>.
+  </p>
+
+  <h2>5. Custom orders</h2>
+  <p>
+    Custom orders are made based on the description, references or images
+    you provide. Please make sure any reference material you send us is
+    something you have the right to share. Turnaround times, deposits and
+    revision terms for custom pieces are as communicated to you at the time
+    of the request — see our <a href="/custom">Custom Orders</a> page and
+    <a href="/faq">FAQ</a> for current details.
+  </p>
+
+  <h2>6. Shipping, returns and refunds</h2>
+  <p>
+    Shipping timelines, charges, and our returns/refund/exchange policy are
+    set out in our <a href="/faq#shipping">Shipping &amp; Delivery</a> and
+    <a href="/faq#returns">Returns &amp; Refunds</a> FAQ sections, which form
+    part of these Terms. As handmade, made-to-order items, custom pieces
+    are generally not eligible for change-of-mind returns; damaged or
+    incorrect items are covered as described there.
+  </p>
+
+  <h2>7. Your account</h2>
+  <p>
+    We use passwordless "magic link" sign-in — you're responsible for
+    keeping access to the email address linked to your account secure, and
+    for all activity that happens through it. Tell us right away at
+    <a href={contact.mailto}>{contact.email}</a> if you suspect unauthorised
+    use of your account.
+  </p>
+
+  <h2>8. Reviews and content you submit</h2>
+  <p>
+    If you submit a product review, comment, or other content to us (for
+    example, a photo of a custom piece), you confirm it's your own and you
+    grant Sunflora a non-exclusive, royalty-free licence to display it on
+    the Site and our social media, for as long as it remains posted. Please
+    keep reviews honest and respectful — we may remove content that is
+    abusive, fraudulent, or unrelated to the product.
+  </p>
+
+  <h2>9. Intellectual property</h2>
+  <p>
+    All designs, photographs, text and branding on the Site belong to
+    Sunflora unless stated otherwise, and may not be copied, reproduced or
+    used commercially without our written permission.
+  </p>
+
+  <h2>10. Acceptable use</h2>
+  <p>You agree not to:</p>
+  <ul>
+    <li>use the Site for any unlawful purpose or to place fraudulent orders;</li>
+    <li>attempt to interfere with the Site's security or normal operation; or</li>
+    <li>scrape, copy or resell content or product listings from the Site without permission.</li>
+  </ul>
+
+  <h2>11. Liability</h2>
+  <p>
+    We provide the Site and our products with reasonable care and skill.
+    To the extent permitted by law, Sunflora is not liable for indirect or
+    consequential loss arising from your use of the Site, and our total
+    liability for any claim relating to an order is limited to the amount
+    you paid for that order. Nothing in these Terms limits any right you
+    have under the Consumer Protection Act, 2019 that cannot lawfully be
+    excluded.
+  </p>
+
+  <h2>12. Governing law and grievance redressal</h2>
+  <p>
+    These Terms are governed by the laws of India. Subject to applicable
+    consumer-protection law giving you the right to approach a forum closer
+    to you, courts having jurisdiction over Siwan, Bihar shall have
+    exclusive jurisdiction over any dispute.
+  </p>
+  <p>
+    For any complaint regarding an order or these Terms, please contact our
+    Grievance Officer:
+  </p>
+  <p>
+    <strong>Aru Jaiswal</strong><br />
+    Sunflora, Siwan, Bihar, India<br />
+    Email: <a href={contact.mailto}>{contact.email}</a><br />
+    WhatsApp: <a href={contact.whatsappUrl}>{contact.phoneDisplay}</a>
+  </p>
+
+  <h2>13. Changes to these Terms</h2>
+  <p>
+    We may update these Terms from time to time. Changes take effect once
+    posted here with an updated effective date; continuing to use the Site
+    after that means you accept the updated Terms.
+  </p>
+
+  <hr />
+  <p>
+    See also our <a href="/privacy-policy">Privacy Policy</a> and
+    <a href="/cookie-policy">Cookie Policy</a>.
+  </p>
+</LegalLayout>

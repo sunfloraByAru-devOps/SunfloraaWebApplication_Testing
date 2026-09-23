@@ -1,0 +1,243 @@
+---
+import LegalLayout from "../layouts/LegalLayout.astro";
+import { getContactLinks } from "../lib/site-content";
+
+const contact = await getContactLinks();
+const EFFECTIVE_DATE = "23 September 2026";
+---
+
+<LegalLayout
+  title="Privacy Policy — Sunflora"
+  description="How Sunflora collects, uses and protects your personal data, and your rights under India's Digital Personal Data Protection Act, 2023."
+  effectiveDate={EFFECTIVE_DATE}
+>
+  <Fragment slot="title">Privacy Policy</Fragment>
+
+  <p>
+    Sunflora ("Sunflora", "we", "us", "our") is a home-based, handmade crochet
+    studio operated by Aru Jaiswal, based in Siwan, Bihar, India. Sunflora is
+    not a separately registered company — it trades simply as "Sunflora".
+    This policy explains what personal data we collect through
+    sunfloracrochet.in (the "Site"), why we collect it, who we share it with,
+    and the rights you have over it under the Digital Personal Data
+    Protection Act, 2023 ("DPDP Act") and other applicable Indian law.
+  </p>
+  <p>
+    Under the DPDP Act, Sunflora acts as the <strong>Data Fiduciary</strong>
+    and you, as a visitor or customer, are the <strong>Data Principal</strong>.
+
+  </p>
+
+  <h2>1. What personal data we collect</h2>
+  <p>We collect personal data directly from you, in these situations:</p>
+  <ul>
+    <li>
+      <strong>Creating an account or signing in</strong> — your name and
+      email address (we use passwordless "magic link" sign-in, so we never
+      ask for or store a password).
+    </li>
+    <li>
+      <strong>Placing an order</strong> — your name, phone number, email
+      address, and delivery address (address line(s), city, state and
+      pincode), plus order notes you choose to add.
+    </li>
+    <li>
+      <strong>Custom order requests and the contact form</strong> — your
+      name, email, and whatever details, reference images or links you
+      choose to share about the piece you'd like made.
+    </li>
+    <li>
+      <strong>Product reviews</strong> — your name and the content of the
+      review you submit, which is displayed publicly on the product page.
+    </li>
+    <li>
+      <strong>Payments</strong> — we do <strong>not</strong> collect or store
+      your card, UPI or bank details. Payments are processed directly by our
+      payment gateway, Razorpay; we only receive the order amount, payment
+      status and a transaction reference.
+    </li>
+    <li>
+      <strong>Automatically</strong> — standard technical data such as your
+      approximate location (from IP address), browser/device type, and pages
+      visited, collected by our hosting and security provider. Your cart
+      contents are kept only in your browser's local storage until you check
+      out — see our <a href="/cookie-policy">Cookie Policy</a> for details.
+    </li>
+  </ul>
+  <p>
+    We do not knowingly collect any special or sensitive category of
+    personal data (such as health, financial account, or biometric data)
+    beyond what is described above.
+  </p>
+
+  <h2>2. Why we use your data</h2>
+  <p>We use your personal data only for the purposes you'd reasonably expect:</p>
+  <ul>
+    <li>to process, pack, ship and deliver your order;</li>
+    <li>to communicate with you about your order, custom request, or enquiry;</li>
+    <li>to create and manage your account and order history;</li>
+    <li>to respond to customer support requests and resolve issues;</li>
+    <li>to display product reviews you've chosen to submit;</li>
+    <li>
+      to maintain the security, integrity and proper functioning of the
+      Site;
+    </li>
+    <li>
+      to comply with tax, accounting and consumer-protection obligations
+      under Indian law; and
+    </li>
+    <li>
+      with your separate consent only, to send you updates, offers or
+      marketing communications, and to measure how the Site is used (see our
+      <a href="/cookie-policy">Cookie Policy</a>).
+    </li>
+  </ul>
+  <p>
+    We do not sell your personal data, and we do not use it for any purpose
+    beyond what is described in this policy without asking you first.
+  </p>
+
+  <h2>3. Consent</h2>
+  <p>
+    By creating an account, placing an order, submitting the contact form,
+    or otherwise providing your personal data to us, you consent to it being
+    processed as described in this policy. Where processing is not
+    necessary to fulfil your order or a legal obligation — such as
+    analytics or marketing — we ask for your consent separately (through the
+    cookie preference banner) and you may withdraw it at any time without
+    affecting orders already placed. Withdrawing consent for data that is
+    genuinely necessary to complete an order you've placed may mean we're
+    unable to fulfil that order.
+  </p>
+
+  <h2>4. Who we share your data with</h2>
+  <p>
+    We share personal data only with service providers who help us run the
+    Site and fulfil your order, under obligations to keep it secure and use
+    it only for the purpose we've engaged them for:
+  </p>
+  <ul>
+    <li>
+      <strong>Supabase</strong> — our database, authentication and
+      file-storage provider. Your account, order and address data is stored
+      on Supabase's infrastructure.
+    </li>
+    <li>
+      <strong>Razorpay</strong> — our payment gateway, which processes
+      payments directly and securely; we never see your full card or bank
+      details.
+    </li>
+    <li>
+      <strong>Cloudflare</strong> — our hosting and content-delivery
+      provider.
+    </li>
+    <li>
+      <strong>Courier and logistics partners</strong> — to whom we pass your
+      name, phone number and delivery address solely to ship your order.
+    </li>
+  </ul>
+  <p>
+    We may also disclose personal data if required to do so by law, court
+    order, or a valid request from a government or regulatory authority.
+  </p>
+
+  <h2>5. Where your data is stored</h2>
+  <p>
+    Some of our service providers (including Supabase and Cloudflare) may
+    process or store data on servers located outside India. Where this
+    happens, we rely on those providers' own security and contractual
+    safeguards. As of the effective date above, the Central Government has
+    not notified any country to which transfer of personal data is
+    restricted under Section 16 of the DPDP Act.
+  </p>
+
+  <h2>6. How long we keep your data</h2>
+  <p>
+    We retain personal data only for as long as reasonably necessary for
+    the purposes described in this policy — for example, order and invoice
+    records are kept for as long as required under applicable Indian tax
+    and accounting law. Account data is retained until you ask us to delete
+    it, subject to any legal retention obligations that still apply (such
+    as completed order records).
+  </p>
+
+  <h2>7. Your rights as a Data Principal</h2>
+  <p>Under the DPDP Act, you have the right to:</p>
+  <ul>
+    <li>
+      <strong>Access</strong> a summary of the personal data we hold about
+      you and how it has been processed;
+    </li>
+    <li>
+      <strong>Correct or update</strong> inaccurate or incomplete personal
+      data;
+    </li>
+    <li>
+      <strong>Erase</strong> personal data that is no longer necessary for
+      the purpose it was collected for;
+    </li>
+    <li><strong>Withdraw consent</strong> at any time, as easily as you gave it;</li>
+    <li>
+      <strong>Nominate</strong> another individual to exercise these rights
+      on your behalf in the event of your death or incapacity; and
+    </li>
+    <li>
+      <strong>Grievance redressal</strong> — raise a complaint about how we
+      handle your personal data (see below).
+    </li>
+  </ul>
+  <p>
+    To exercise any of these rights, contact our Grievance Officer using the
+    details in Section 10. We'll acknowledge your request promptly and
+    respond within a reasonable time, consistent with the DPDP Act and its
+    rules.
+  </p>
+
+  <h2>8. Children's data</h2>
+  <p>
+    The Site is not directed at children. Under the DPDP Act, a "child" is
+    anyone under 18. We do not knowingly collect personal data from a child
+    without verifiable consent of their parent or lawful guardian. If you
+    believe a child has provided us with personal data without such
+    consent, please contact us and we will delete it.
+  </p>
+
+  <h2>9. How we protect your data</h2>
+  <p>
+    We use reasonable technical and organisational safeguards to protect
+    your personal data — including encrypted (HTTPS) connections, access
+    controls, and database-level row security restricting who can read or
+    write your data. No method of transmission or storage is 100% secure,
+    but we work to protect your data appropriately for what it is.
+  </p>
+
+  <h2>10. Grievance Officer</h2>
+  <p>
+    If you have a question, complaint, or wish to exercise any right
+    described above, please contact:
+  </p>
+  <p>
+    <strong>Aru Jaiswal</strong> (Grievance Officer)<br />
+    Sunflora, Siwan, Bihar, India<br />
+    Email: <a href={contact.mailto}>{contact.email}</a><br />
+    WhatsApp: <a href={contact.whatsappUrl}>{contact.phoneDisplay}</a>
+  </p>
+  <p>
+    If you're not satisfied with how we've resolved your grievance, you may
+    approach the Data Protection Board of India under the DPDP Act.
+  </p>
+
+  <h2>11. Changes to this policy</h2>
+  <p>
+    We may update this policy from time to time — for example, as our use of
+    analytics or marketing tools changes. We'll post the revised policy here
+    with an updated effective date, and, where the change is material,
+    we'll make reasonable efforts to bring it to your attention.
+  </p>
+
+  <hr />
+  <p>
+    See also our <a href="/terms-and-conditions">Terms &amp; Conditions</a>
+    and <a href="/cookie-policy">Cookie Policy</a>.
+  </p>
+</LegalLayout>

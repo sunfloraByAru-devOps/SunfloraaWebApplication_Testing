@@ -435,6 +435,7 @@ const breadcrumbSchema = isRealProduct
 <Layout
   title={`${product.name} — ${product.brand}`}
   description={product.description}
+  robots={isRealProduct ? undefined : "noindex, follow"}
 >
   {
     productSchema && (

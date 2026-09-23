@@ -31,8 +31,31 @@ if (!PUBLIC_SUPABASE_URL) {
 // https://astro.build/config
 export default defineConfig({
   site: 'https://sunfloracrochet.in',
-  // The dashboard is private - keep it out of the public sitemap.
-  integrations: [sitemap({ filter: (page) => !page.includes('/admin') })],
+  /* Only pages a stranger could usefully land on from search belong in the
+     sitemap. The rest are private (the dashboard, order history), mid-purchase
+     (cart, checkout, confirmation), credential screens, or the not-found
+     fallback — several of which robots.txt also disallows, so listing them
+     here was telling Google two opposite things at once.
+
+     /landing is a second homepage with no internal links pointing at it; it
+     competes with / for the same intent, so it stays out until it is either
+     removed or given a distinct purpose. */
+  integrations: [
+    sitemap({
+      filter: (page) =>
+        ![
+          '/admin',
+          '/account/orders',
+          '/cart',
+          '/checkout',
+          '/order-confirmation',
+          '/login',
+          '/signup',
+          '/landing',
+          '/productdetail/product-not-found',
+        ].some((path) => page.includes(path)),
+    }),
+  ],
 
   image: {
     /* Scoped to the public object endpoint on purpose. A bare host rule would
